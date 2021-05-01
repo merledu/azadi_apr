@@ -12,7 +12,7 @@
 * Author: Andreas Traber <atraber@iis.ee.ethz.ch>
 * Author: Florian Zaruba <zarubaf@iis.ee.ethz.ch>
 *
-* Description: Clock domain crossings for JTAG to DMI very heavily based
+* Description: clk_i domain crossings for JTAG to DMI very heavily based
 *              on previous work by Andreas Traber for the PULP project.
 *              This is mainly a wrapper around the existing CDCs.
 */

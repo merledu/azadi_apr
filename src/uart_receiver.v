@@ -23,11 +23,11 @@
 // This file contains the UART Receiver.  This receiver is able to
 // receive 8 bits of serial data, one start bit, one stop bit,
 // and no parity bit.  When receive is complete o_rx_dv will be
-// driven high for one clock cycle.
+// driven high for one clk_i cycle.
 // 
 // Set Parameter CLKS_PER_BIT as follows:
 // CLKS_PER_BIT = (Frequency of i_Clock)/(Frequency of UART)
-// Example: 10 MHz Clock, 115200 baud UART
+// Example: 10 MHz clk_i, 115200 baud UART
 // (10000000)/(115200) = 87
    
 module uart_receiver (
@@ -55,7 +55,7 @@ reg           r_Rx_DV       = 0;
 reg [2:0]     r_SM_Main     = 0;
  
 // Purpose: Double-register the incoming data.
-// This allows it to be used in the UART RX Clock Domain.
+// This allows it to be used in the UART RX clk_i Domain.
 // (It removes problems caused by metastability)
 always @(posedge i_Clock)
   begin
@@ -93,7 +93,7 @@ always @(posedge i_Clock or negedge rst_ni)
             begin
               if (r_Rx_Data == 1'b0)
                 begin
-                  r_Clock_Count <= 0;  // reset counter, found the middle
+                  r_Clock_Count <= 0;  // rst_ni counter, found the middle
                   r_SM_Main     <= s_RX_DATA_BITS;
                 end
               else
@@ -107,7 +107,7 @@ always @(posedge i_Clock or negedge rst_ni)
         end // case: s_RX_START_BIT
        
        
-      // Wait CLKS_PER_BIT-1 clock cycles to sample serial data
+      // Wait CLKS_PER_BIT-1 clk_i cycles to sample serial data
       s_RX_DATA_BITS :
         begin
           if (r_Clock_Count < CLKS_PER_BIT-1)
@@ -138,7 +138,7 @@ always @(posedge i_Clock or negedge rst_ni)
       // Receive Stop bit.  Stop bit = 1
       s_RX_STOP_BIT :
         begin
-          // Wait CLKS_PER_BIT-1 clock cycles for Stop bit to finish
+          // Wait CLKS_PER_BIT-1 clk_i cycles for Stop bit to finish
           if (r_Clock_Count < CLKS_PER_BIT-1)
             begin
               r_Clock_Count <= r_Clock_Count + 1;
@@ -153,7 +153,7 @@ always @(posedge i_Clock or negedge rst_ni)
         end // case: s_RX_STOP_BIT
    
        
-      // Stay here 1 clock
+      // Stay here 1 clk_i
       s_CLEANUP :
         begin
           r_SM_Main <= s_IDLE;

@@ -236,7 +236,7 @@ module fpnew_divsqrt_multi #(
     end
   end
 
-  // FSM status register (asynch active low reset)
+  // FSM status register (asynch active low rst_ni)
   `FF(state_q, state_d, IDLE)
 
   // Hold additional information while the operation is in progress
@@ -276,7 +276,7 @@ module fpnew_divsqrt_multi #(
   // Adjust result width and fix FP8
   assign adjusted_result = result_is_fp8_q ? unit_result >> 8 : unit_result;
 
-  // The Hold register (load, no reset)
+  // The Hold register (load, no rst_ni)
   `FFLNR(held_result_q, adjusted_result, hold_result, clk_i)
   `FFLNR(held_status_q, unit_status,     hold_result, clk_i)
 

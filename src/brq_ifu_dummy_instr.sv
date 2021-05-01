@@ -7,7 +7,7 @@
  */
 
 module brq_ifu_dummy_instr (
-    // Clock and reset
+    // clk_i and rst_ni
     input  logic        clk_i,
     input  logic        rst_ni,
 

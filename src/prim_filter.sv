@@ -1,7 +1,7 @@
 
 // Primitive input filter, with enable.  Configurable number of cycles.
 //
-// when in reset, stored vector is zero
+// when in rst_ni, stored vector is zero
 // when enable is false, output is input
 // when enable is true, output is stored value,
 //   new input must be opposite value from stored value for

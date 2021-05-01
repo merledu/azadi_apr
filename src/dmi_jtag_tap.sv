@@ -25,9 +25,9 @@ module dmi_jtag_tap #(
   // xxxxxxxxxxx      manufacturer id
   // 1                required by standard
 ) (
-  input  logic        tck_i,    // JTAG test clock pad
+  input  logic        tck_i,    // JTAG test clk_i pad
   input  logic        tms_i,    // JTAG test mode select pad
-  input  logic        trst_ni,  // JTAG test reset pad
+  input  logic        trst_ni,  // JTAG test rst_ni pad
   input  logic        td_i,     // JTAG test data input pad
   output logic        td_o,     // JTAG test data output pad
   output logic        tdo_oe_o, // Data out output enable
@@ -110,7 +110,7 @@ module dmi_jtag_tap #(
       jtag_ir_d = ir_reg_e'(jtag_ir_shift_q);
     end
 
-    // synchronous test-logic reset
+    // synchronous test-logic rst_ni
     if (test_logic_reset_o) begin
       jtag_ir_shift_d = '0;
       jtag_ir_d       = IDCODE;

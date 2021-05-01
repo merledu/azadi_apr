@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 //
-// Common Library: Clock Gating cell
+// Common Library: clk_i Gating cell
 
 module prim_generic_clock_gating #(
   parameter bit NoFpgaGate = 1'b0 // this parameter has no function in generic

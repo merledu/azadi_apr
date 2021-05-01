@@ -127,7 +127,7 @@ module fifo_async #(
   assign  full_wclk = (fifo_wptr == (fifo_rptr_sync ^ {1'b1,{(PTR_WIDTH-1){1'b0}}}));
   assign  full_rclk = (fifo_wptr_sync_combi == (fifo_rptr ^ {1'b1,{(PTR_WIDTH-1){1'b0}}}));
 
-  // Current depth in the write clock side
+  // Current depth in the write clk_i side
   logic  wptr_msb;
   logic  rptr_sync_msb;
   logic  [PTRV_W-1:0] wptr_value;
@@ -140,7 +140,7 @@ module fifo_async #(
                     (wptr_msb == rptr_sync_msb) ? DepthW'(wptr_value) - DepthW'(rptr_sync_value) :
                     (DepthW'(Depth) - DepthW'(rptr_sync_value) + DepthW'(wptr_value)) ;
 
-  // Same again in the read clock side
+  // Same again in the read clk_i side
   assign empty = (fifo_wptr_sync_combi ==  fifo_rptr);
   logic  rptr_msb;
   logic  wptr_sync_msb;

@@ -22,8 +22,8 @@ module dm_mem #(
   parameter logic [NrHarts-1:0] SelectableHarts  = {NrHarts{1'b1}},
   parameter int unsigned        DmBaseAddress    = '0
 ) (
-  input  logic                             clk_i,       // Clock
-  input  logic                             rst_ni,      // debug module reset
+  input  logic                             clk_i,       // clk_i
+  input  logic                             rst_ni,      // debug module rst_ni
 
   output logic [NrHarts-1:0]               debug_req_o,
   input  logic [19:0]                      hartsel_i,

@@ -43,7 +43,7 @@ spi_core spi_host(
                                                      
   // SPI signals                                     
   .ss_o        (ss_o),         // slave select
-  .sclk_o      (sclk_o),       // serial clock
+  .sclk_o      (sclk_o),       // serial clk_i
   .sd_o        (sd_o),       // master out slave in
   .sd_i        (sd_i)     // master in slave out
 );

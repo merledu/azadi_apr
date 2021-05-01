@@ -83,9 +83,9 @@ module rr_arb_tree #(
   /// Type for defining the arbitration priority and arbitrated index signal.
   parameter type         idx_t      = logic [IdxWidth-1:0]
 ) (
-  /// Clock, positive edge triggered.
+  /// clk_i, positive edge triggered.
   input  logic                clk_i,
-  /// Asynchronous reset, active low.
+  /// Asynchronous rst_ni, active low.
   input  logic                rst_ni,
   /// Clears the arbiter state. Only used if `ExtPrio` is `1'b0` or `LockIn` is `1'b1`.
   input  logic                flush_i,
@@ -111,7 +111,7 @@ module rr_arb_tree #(
 
   // pragma translate_off
   `ifndef VERILATOR
-  // Default SVA reset
+  // Default SVA rst_ni
   default disable iff (!rst_ni || flush_i);
   `endif
   // pragma translate_on

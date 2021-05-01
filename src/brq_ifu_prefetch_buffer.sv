@@ -176,7 +176,7 @@ module brq_ifu_prefetch_buffer #(
   // Store whatever address was issued on the bus
   assign stored_addr_d = instr_addr;
 
-  // CPU resets with a branch, so no need to reset these addresses
+  // CPU resets with a branch, so no need to rst_ni these addresses
   always_ff @(posedge clk_i) begin
     if (stored_addr_en) begin
       stored_addr_q <= stored_addr_d;

@@ -16,7 +16,7 @@ module brq_fp_register_file_ff #(
     parameter brq_pkg::rvfloat_e RVF       = brq_pkg::RV32FSingle,
     parameter int unsigned       DataWidth = 32
     ) (
-    // Clock and Reset
+    // clk_i and rst_ni
     input  logic                 clk_i,
     input  logic                 rst_ni,
 

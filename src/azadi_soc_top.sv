@@ -5,64 +5,63 @@ module azadi_soc_top #(
   parameter logic DirectDmiTap = 1'b1
 )(
   input clk_i,
-  input reset,
+  input rst_ni,
 //  input uart_rx_i,
 
-  inout  logic [5:0] gpio,
-//  output logic [19:0] gpio_o,
-//  output logic [19:0] gpio_oe
+  input  logic [19:0] gpio_i,
+  output logic [19:0] gpio_o,
 
   // jtag interface 
-//  input               jtag_tck_i,
-//  input               jtag_tms_i,
-//  input               jtag_trst_ni,
-//  input               jtag_tdi_i,
-//  output              jtag_tdo_o,
+  input               jtag_tck_i,
+  input               jtag_tms_i,
+  input               jtag_trst_ni,
+  input               jtag_tdi_i,
+  output              jtag_tdo_o,
 
   // uart-periph interface
   output              uart_tx,
   input               uart_rx,
 
-  // PWM interface 
+  // PWM interface  
 
   output              pwm_o,
   output              pwm_o_2,
 
   // SPI interface
 
-  output               ss_o,        
-  output               sclk_o,      
-  output               sd_o,       
-  input                sd_i 
+  output          [`SPI_SS_NB-1:0] ss_o,        
+  output                           sclk_o,      
+  output                           sd_o,       
+  input                            sd_i 
 
 );
-logic clock;
-logic reset_ni;
-assign reset_ni = ~reset;
-
-clk_wiz_1 clk_m (
-  // Clock out ports
-  .clk_out1(clock),
-  // Status and control signals
-  .resetn(reset_ni),
-  .locked(),
- // Clock in ports
-  .clk_in1(clk_i)
- );
+ logic [19:0] gpio_oe;
+//logic clk_i;
+//logic rst_ni;
+//assign rst_ni = ~rst_ni;
+//
+//clk_wiz_0 clk_m (
+//  // clk_i out ports
+//  .clk_out1(clk_i),
+//  // Status and control signals
+//  .resetn(rst_ni),
+//  .locked(),
+// // clk_i in ports
+//  .clk_in1(clk_i)
+// );
 
   logic      uart_rx_i;
 
-  logic               jtag_tck_i;
-  logic               jtag_tms_i;
-  logic               jtag_trst_ni;
-  logic               jtag_tdi_i;
-  logic              jtag_tdo_o;
-
-  logic [19:0] gpio_i;
-  logic [19:0] gpio_o;
-
- logic          [`SPI_SS_NB-1:0] ss;       
- assign ss_o = ss[0]; 
+//  logic               jtag_tck_i;
+//  logic               jtag_tms_i;
+//  logic               jtag_trst_ni;
+//  logic               jtag_tdi_i;
+//  logic              jtag_tdo_o;
+//
+//  logic [19:0] gpio_i;
+//  logic [19:0] gpio_o;
+//
+// logic          [`SPI_SS_NB-1:0] ss_o;        
 // logic                           sclk_o;      
 // logic                           sd_o;       
 // logic                            sd_i; 
@@ -70,17 +69,13 @@ clk_wiz_1 clk_m (
 
 logic system_rst_ni;
 
-logic [31:0] gpio_in;
-logic [31:0] gpio_out;
-logic [31:0] gpio_oe;
-//assign gpio_in = gpio_i;
-//assign gpio_o = gpio_out; 
+wire [19:0] gpio_in;
+wire [19:0] gpio_out;
 
-for(genvar i = 0; i<=31; i++) begin
+assign gpio_in = gpio_i;
+assign gpio_o = gpio_out; 
 
-   assign gpio[i]  = gpio_oe[i]? gpio_out[i]: 1'bZ;
-   assign gpio_in[i] = gpio[i];
-end
+
 // end here
         
   tlul_pkg::tl_h2d_t ifu_to_xbar;
@@ -209,8 +204,8 @@ brq_core_top #(
     .DmHaltAddr       (tl_main_pkg::ADDR_SPACE_DEBUG_ROM + 32'h 800), 
     .DmExceptionAddr  (tl_main_pkg::ADDR_SPACE_DEBUG_ROM + dm::ExceptionAddress) 
 ) u_top (
-    .clock (clock),
-    .reset (system_rst_ni),
+    .clk_i (clk_i),
+    .rst_ni (system_rst_ni),
 
   // instruction memory interface 
     .tl_i_i (xbar_to_ifu),
@@ -220,7 +215,7 @@ brq_core_top #(
     .tl_d_i (xbar_to_lsu),
     .tl_d_o (lsu_to_xbar),
 
-    .test_en_i   (1'b0),     // enable all clock gates for testing
+    .test_en_i   (1'b0),     // enable all clk_i gates for testing
 
     .hart_id_i   (32'b0), 
     .boot_addr_i (32'h20000000),
@@ -248,11 +243,11 @@ brq_core_top #(
   .IdcodeValue(JTAG_ID),
   .DirectDmiTap (DirectDmiTap)
   ) debug_module (
-  .clk_i(clock),       // clock
-  .rst_ni(reset_ni),      // asynchronous reset active low, connect PoR
-                                          // here, not the system reset
+  .clk_i(clk_i),       // clk_i
+  .rst_ni(rst_ni),      // asynchronous rst_ni active low, connect PoR
+                                          // here, not the system rst_ni
   .testmode_i(),
-  .ndmreset_o(dbg_rst),  // non-debug module reset
+  .ndmreset_o(dbg_rst),  // non-debug module rst_ni
   .dmactive_o(),  // debug module is active
   .debug_req_o(dbg_req), // async debug request
   .unavailable_i(1'b0), // communicate whether the hart is unavailable
@@ -274,7 +269,7 @@ brq_core_top #(
 
 // main xbar module
   tl_xbar_main main_swith (
-  .clk_main_i         (clock),
+  .clk_main_i         (clk_i),
   .rst_main_ni        (system_rst_ni),
 
   // Host interfaces
@@ -315,8 +310,8 @@ brq_core_top #(
 // dummy data memory
 
 data_mem dccm(
-  .clock    (clock),
-  .reset    (system_rst_ni),
+  .clk_i    (clk_i),
+  .rst_ni    (system_rst_ni),
 
 // tl-ul insterface
   .tl_d_i   (xbar_to_dccm),
@@ -324,7 +319,7 @@ data_mem dccm(
 );
 
 rv_timer timer0(
-  .clk_i  (clock),
+  .clk_i  (clk_i),
   .rst_ni (system_rst_ni),
 
   .tl_i   (xbar_to_timer),
@@ -337,7 +332,7 @@ rv_timer timer0(
 //peripheral xbar
 
 xbar_periph periph_switch (
-  .clk_peri_i         (clock),
+  .clk_peri_i         (clk_i),
   .rst_peri_ni        (system_rst_ni),
 
   // Host interfaces
@@ -380,7 +375,7 @@ xbar_periph periph_switch (
 
 pwm_top u_pwm(
 
-  .clk_i   (clock),
+  .clk_i   (clk_i),
   .rst_ni  (system_rst_ni),
 
   .tl_i    (xbar_to_pwm),
@@ -396,7 +391,7 @@ pwm_top u_pwm(
 
 spi_top u_spi_host(
 
-  .clk_i       (clock),
+  .clk_i       (clk_i),
   .rst_ni      (system_rst_ni),
 
   .tl_i        (xbar_to_spi),
@@ -413,47 +408,44 @@ spi_top u_spi_host(
 
 //GPIO module
  gpio GPIO (
-  .clk_i          (clock),
+  .clk_i          (clk_i),
   .rst_ni         (system_rst_ni),
 
   // Below Regster interface can be changed
   .tl_i           (xbarp_to_gpio),
   .tl_o           (gpio_to_xbarp),
 
-  .cio_gpio_i     (gpio_in),
+  .cio_gpio_i     ({12'b0,gpio_in}),
   .cio_gpio_o     (gpio_out),
-  .cio_gpio_en_o  (gpio_oe),
+  .cio_gpio_en_o  (),
 
   .intr_gpio_o    (intr_gpio )  
 );
 
+//  iccm_controller u_dut(
+// 	.clk_i       (clk_i),
+// 	.rst_ni      (rst_ni),
+// 	.rx_dv_i     (rx_dv_i),
+// 	.rx_byte_i   (rx_byte_i),
+// 	.we_o        (iccm_cntrl_we),
+// 	.addr_o      (iccm_cntrl_addr),
+// 	.wdata_o     (iccm_cntrl_data),
+// 	.reset_o     (iccm_cntrl_reset)
+// );
 
-
-
- iccm_controller u_dut(
-	.clk_i       (clock),
-	.rst_ni      (RESET),
-	.rx_dv_i     (rx_dv_i),
-	.rx_byte_i   (rx_byte_i),
-	.we_o        (iccm_cntrl_we),
-	.addr_o      (iccm_cntrl_addr),
-	.wdata_o     (iccm_cntrl_data),
-	.reset_o     (iccm_cntrl_reset)
-);
-
- uart_receiver programmer (
- .i_Clock       (clock),
- .rst_ni        (RESET),
- .i_Rx_Serial   (uart_rx_i),
- .CLKS_PER_BIT  (15'd87),
- .o_Rx_DV       (rx_dv_i),
- .o_Rx_Byte     (rx_byte_i)
- );
+//  uart_receiver programmer (
+//  .i_Clock       (clk_i),
+//  .rst_ni        (rst_ni),
+//  .i_Rx_Serial   (uart_rx_i),
+//  .CLKS_PER_BIT  (15'd87),
+//  .o_Rx_DV       (rx_dv_i),
+//  .o_Rx_Byte     (rx_byte_i)
+//  );
 
 
 instr_mem_top iccm (
-  .clock      (clock),
-  .reset      (system_rst_ni),
+  .clk_i      (clk_i),
+  .rst_ni      (system_rst_ni),
 
   .req        (req_i),
   .addr       (tlul_addr),
@@ -472,7 +464,7 @@ instr_mem_top iccm (
   .ErrOnRead    (0)   // 1: Reads not allowed, automatically error  
 
 ) inst_mem (
-    .clk_i     (clock),
+    .clk_i     (clk_i),
     .rst_ni    (system_rst_ni),
     .tl_i      (xbar_to_iccm),
     .tl_o      (iccm_to_xbar), 
@@ -482,21 +474,21 @@ instr_mem_top iccm (
     .addr_o    (tlul_addr),
     .wdata_o   (),
     .wmask_o   (),
-    .rdata_i   ((reset_ni) ? tlul_data: '0),
+    .rdata_i   ((system_rst_ni) ? tlul_data: '0),
     .rvalid_i  (instr_valid),
     .rerror_i  (2'b0)
     );
 
 rstmgr reset_manager(
-  .clk_i(clock),
-  .rst_ni(reset_ni),
+  .clk_i(clk_i),
+  .rst_ni(rst_ni),
   .ndmreset (dbg_rst),
   .sys_rst_ni(system_rst_ni)
 );
 
 
 rv_plic intr_controller (
-  .clk_i(clock),
+  .clk_i(clk_i),
   .rst_ni(system_rst_ni),
 
   // Bus Interface (device)
@@ -514,7 +506,7 @@ rv_plic intr_controller (
 );
 
 uart u_uart0(
-  .clk_i                   (clock             ),
+  .clk_i                   (clk_i             ),
   .rst_ni                  (system_rst_ni     ),
 
   // Bus Interface

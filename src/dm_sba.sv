@@ -18,9 +18,9 @@
 module dm_sba #(
   parameter int unsigned BusWidth = 32
 ) (
-  input  logic                   clk_i,       // Clock
+  input  logic                   clk_i,       // clk_i
   input  logic                   rst_ni,
-  input  logic                   dmactive_i,  // synchronous reset active low
+  input  logic                   dmactive_i,  // synchronous rst_ni active low
 
   output logic                   master_req_o,
   output logic [BusWidth-1:0]    master_add_o,

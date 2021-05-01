@@ -106,7 +106,7 @@ module brq_idu_controller #(
 
   // FSM state encoding
   typedef enum logic [3:0] {
-    RESET, BOOT_SET, WAIT_SLEEP, SLEEP, FIRST_FETCH, DECODE, FLUSH,
+    rst_ni, BOOT_SET, WAIT_SLEEP, SLEEP, FIRST_FETCH, DECODE, FLUSH,
     IRQ_TAKEN, DBG_TAKEN_IF, DBG_TAKEN_ID
   } ctrl_fsm_e;
 
@@ -381,7 +381,7 @@ module brq_idu_controller #(
     controller_run_o       = 1'b0;
 
     unique case (ctrl_fsm_cs)
-      RESET: begin
+      rst_ni: begin
         instr_req_o   = 1'b0;
         pc_mux_o      = PC_BOOT;
         pc_set_o      = 1'b1;
@@ -419,7 +419,7 @@ module brq_idu_controller #(
         if (irq_nm_i || irq_pending_i || debug_req_i || debug_mode_q || debug_single_step_i) begin
           ctrl_fsm_ns = FIRST_FETCH;
         end else begin
-          // Make sure clock remains disabled.
+          // Make sure clk_i remains disabled.
           ctrl_busy_o = 1'b0;
         end
       end
@@ -640,7 +640,7 @@ module brq_idu_controller #(
         // here.
 
         // exceptions: set exception PC, save PC and exception cause
-        // exc_req_lsu is high for one clock cycle only (in DECODE)
+        // exc_req_lsu is high for one clk_i cycle only (in DECODE)
         if (exc_req_q || store_err_q || load_err_q) begin
           pc_set_o         = 1'b1;
           pc_set_spec_o    = 1'b1;
@@ -757,7 +757,7 @@ module brq_idu_controller #(
 
       default: begin
         instr_req_o = 1'b0;
-        ctrl_fsm_ns = RESET;
+        ctrl_fsm_ns = rst_ni;
       end
     endcase
   end
@@ -792,7 +792,7 @@ module brq_idu_controller #(
   // update registers
   always_ff @(posedge clk_i or negedge rst_ni) begin : update_regs
     if (!rst_ni) begin
-      ctrl_fsm_cs    <= RESET;
+      ctrl_fsm_cs    <= rst_ni;
       nmi_mode_q     <= 1'b0;
       debug_mode_q   <= 1'b0;
       load_err_q     <= 1'b0;

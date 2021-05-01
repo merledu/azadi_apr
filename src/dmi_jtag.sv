@@ -19,11 +19,11 @@
 module dmi_jtag #(
   parameter logic [31:0] IdcodeValue = 32'h00000001
 ) (
-  input  logic         clk_i,      // DMI Clock
-  input  logic         rst_ni,     // Asynchronous reset active low
+  input  logic         clk_i,      // DMI clk_i
+  input  logic         rst_ni,     // Asynchronous rst_ni active low
   input  logic         testmode_i,
 
-  output logic         dmi_rst_no, // hard reset
+  output logic         dmi_rst_no, // hard rst_ni
   output dm::dmi_req_t dmi_req_o,
   output logic         dmi_req_valid_o,
   input  logic         dmi_req_ready_i,
@@ -32,9 +32,9 @@ module dmi_jtag #(
   output logic         dmi_resp_ready_o,
   input  logic         dmi_resp_valid_i,
 
-  input  logic         tck_i,    // JTAG test clock pad
+  input  logic         tck_i,    // JTAG test clk_i pad
   input  logic         tms_i,    // JTAG test mode select pad
-  input  logic         trst_ni,  // JTAG test reset pad
+  input  logic         trst_ni,  // JTAG test rst_ni pad
   input  logic         td_i,     // JTAG test data input pad
   output logic         td_o,     // JTAG test data output pad
   output logic         tdo_oe_o  // Data out output enable

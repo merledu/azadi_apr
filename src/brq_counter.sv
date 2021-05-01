@@ -47,7 +47,7 @@ module brq_counter #(
   localparam int DspPragma = CounterWidth < 49  ? "yes" : "no";
   (* use_dsp = DspPragma *) logic [CounterWidth-1:0] counter_q;
 
-  // DSP output register requires synchronous reset.
+  // DSP output register requires synchronous rst_ni.
   `define COUNTER_FLOP_RST posedge clk_i
 `else
   logic [CounterWidth-1:0] counter_q;

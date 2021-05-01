@@ -8,7 +8,7 @@ module brq_pmp #(
     // Number of implemented regions
     parameter int unsigned PMPNumRegions  = 4
 ) (
-    // Clock and Reset
+    // clk_i and rst_ni
     input  logic                    clk_i,
     input  logic                    rst_ni,
 

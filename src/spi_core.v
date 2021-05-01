@@ -15,7 +15,7 @@ module spi_core
                                                      
   // SPI signals                                     
   output          [`SPI_SS_NB-1:0] ss_o,         // slave select
-  output                           sclk_o,       // serial clock
+  output                           sclk_o,       // serial clk_i
   output                           sd_o,       // master out slave in
   input                            sd_i       // master in slave out
 );

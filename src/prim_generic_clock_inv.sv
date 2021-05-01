@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 //
-// Clock inverter
+// clk_i inverter
 //   Varies on the process
 
 module prim_generic_clock_inv #(
@@ -16,7 +16,7 @@ module prim_generic_clock_inv #(
   if (HasScanMode) begin : gen_scan
     prim_generic_clock_mux2 i_dft_tck_mux (
       .clk0_i ( ~clk_i     ),
-      .clk1_i ( clk_i      ), // bypass the inverted clock for testing
+      .clk1_i ( clk_i      ), // bypass the inverted clk_i for testing
       .sel_i  ( scanmode_i ),
       .clk_o  ( clk_no     )
     );

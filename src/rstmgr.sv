@@ -1,13 +1,13 @@
 
-// basic reset managemnet logic for azadi
+// basic rst_ni managemnet logic for azadi
 
 module rstmgr(
 
-    input clk_i, //system clock
-    input rst_ni, // system reset
+    input clk_i, //system clk_i
+    input rst_ni, // system rst_ni
 
-    input  logic  ndmreset, // non-debug module reset
-    output logic  sys_rst_ni // reset for system except debug module
+    input  logic  ndmreset, // non-debug module rst_ni
+    output logic  sys_rst_ni // rst_ni for system except debug module
 );
 
   logic rst_d, rst_q;

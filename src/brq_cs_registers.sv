@@ -22,7 +22,7 @@ module brq_cs_registers #(
     parameter brq_pkg::rv32m_e   RV32M             = brq_pkg::RV32MFast,
     parameter brq_pkg::rvfloat_e RVF               = brq_pkg::RV64FDouble // for floating point
 ) (
-    // Clock and Reset
+    // clk_i and rst_ni
     input  logic                 clk_i,
     input  logic                 rst_ni,
 
@@ -294,18 +294,27 @@ module brq_cs_registers #(
   // See RISC-V Privileged Specification, version 1.11, Section 2.1
   assign illegal_csr_priv    = (csr_addr[9:8] > {priv_lvl_q});
   assign illegal_csr_write   = (csr_addr[11:10] == 2'b11) && csr_wreq;
-  assign illegal_csr_insn_o  = csr_access_i & (illegal_csr | illegal_csr_write | illegal_csr_priv
-                               | illegal_csr_dyn_mod);
+  assign illegal_csr_insn_o  = (csr_access_i & (illegal_csr | illegal_csr_write | illegal_csr_priv)) | illegal_csr_dyn_mod;
 
-  // mip CSR is purely combinational - must be able to re-enable the clock upon WFI
+  // mip CSR is purely combinational - must be able to re-enable the clk_i upon WFI
   assign mip.irq_software = irq_software_i;
   assign mip.irq_timer    = irq_timer_i;
   assign mip.irq_external = irq_external_i;
   assign mip.irq_fast     = irq_fast_i;
   
   // Floating point
-  assign fp_frm_o = frm_q;
-
+  always_comb begin
+    unique case (frm_q)
+      000,
+      001,
+      010,
+      011,
+      100: illegal_dyn_mod =  1'b0;
+      default: illegal_dyn_mod =  1'b1;
+    endcase 
+    fp_frm_o = frm_q;
+  end
+  
   // read logic
   always_comb begin
     csr_rdata_int = '0;
@@ -321,14 +330,6 @@ module brq_cs_registers #(
       // frm: floating-point dynamic rounding mode
       CSR_FRM: begin
         csr_rdata_int = {29'b0 , frm_q};
-        unique case (frm_q)
-          000,
-          001,
-          010,
-          011,
-          100: illegal_dyn_mod =  1'b0;
-          default: illegal_dyn_mod =  1'b1;
-        endcase 
       end
 
       // mhartid: unique hardware thread id
@@ -557,20 +558,26 @@ module brq_cs_registers #(
         // mstatus: IE bit
 
         CSR_FCSR: begin 
-          fcsr_en = 1'b1;
-          fcsr_d  = csr_wdata_int[7:0];
+          fcsr_en   = 1'b1;
+          fflags_en = 1'b1;
+          frm_en    = 1'b1;
+          fcsr_d    = csr_wdata_int[7:0];
+          fflags_d  = fcsr_d[4:0];
+          frm_d     = fcsr_d[7:5];
         end
 
         CSR_FFLAG : begin
           fflags_en = 1'b1;
-          fflags_d  = csr_wdata_int;
-          fcsr_d    = {frm_q, fflags_q};
+          fcsr_en   = 1'b1;
+          fflags_d  = fpnew_pkg::status_t'(csr_wdata_int[4:0]);
+          fcsr_d    = {frm_q, fflags_d};
         end
 
         CSR_FRM: begin
-          frm_en = 1'b1;
-          frm_d  = roundmode_e'(csr_wdata_int[2:0]); 
-          fcsr_d = {frm_q, fflags_q};
+          frm_en  = 1'b1;
+          fcsr_en = 1'b1;
+          frm_d   = roundmode_e'(csr_wdata_int[2:0]); 
+          fcsr_d  = {frm_d, fflags_q};
         end
 
         CSR_MSTATUS: begin
@@ -778,7 +785,7 @@ module brq_cs_registers #(
                       CSR_OP_SET,
                       CSR_OP_CLEAR});
 
-  // only write CSRs during one clock cycle
+  // only write CSRs during one clk_i cycle
   assign csr_we_int  = csr_wreq & ~illegal_csr_insn_o;
 
   assign csr_rdata_o = csr_rdata_int;
@@ -795,7 +802,7 @@ module brq_cs_registers #(
   assign debug_ebreaku_o     = dcsr_q.ebreaku;
 
   // Qualify incoming interrupt requests in mip CSR with mie CSR for controller and to re-enable
-  // clock upon WFI (must be purely combinational).
+  // clk_i upon WFI (must be purely combinational).
   assign irqs_o        = mip & mie_q;
   assign irq_pending_o = |irqs_o;
 
@@ -824,7 +831,7 @@ module brq_cs_registers #(
 
   // FCSR
   brq_csr #(
-    .Width      (32),
+    .Width      (8),
     .ShadowCopy (1'b0),
     .ResetValue ('0)
   ) fcsr_csr (
@@ -838,7 +845,7 @@ module brq_cs_registers #(
 
   // FFLAGS
   brq_csr #(
-    .Width      (32),
+    .Width      (5),
     .ShadowCopy (1'b0),
     .ResetValue ('0)
   ) fflags_csr (
@@ -852,7 +859,7 @@ module brq_cs_registers #(
 
   // FRM
   brq_csr #(
-    .Width      (32),
+    .Width      (3),
     .ShadowCopy (1'b0),
     .ResetValue ('0)
   ) frm_csr (

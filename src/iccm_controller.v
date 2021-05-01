@@ -54,20 +54,20 @@ module iccm_controller (
 	localparam [1:0] DONE = 3;
 	localparam [1:0] LOAD = 1;
 	localparam [1:0] PROG = 2;
-	localparam [1:0] RESET = 0;
+	localparam [1:0] rst_ni = 0;
 	always @(*) begin
 		we_d = we_q;
 		addr_d = addr_q;
 		reset_d = reset_q;
 		ctrl_fsm_ns = ctrl_fsm_cs;
 		case (ctrl_fsm_cs)
-			RESET: begin
+			rst_ni: begin
 				we_d = 1'b0;
 				reset_d = 1'b0;
 				if (rx_dv_i)
 					ctrl_fsm_ns = LOAD;
 				else
-					ctrl_fsm_ns = RESET;
+					ctrl_fsm_ns = rst_ni;
 			end
 			LOAD:
 				if (((byte_count == 2'b11) && (rx_byte_q2 != 8'h0f)) && (rx_byte_d != 8'hff)) begin
@@ -89,7 +89,7 @@ module iccm_controller (
 					ctrl_fsm_ns = LOAD;
 				else
 					ctrl_fsm_ns = DONE;
-			default: ctrl_fsm_ns = RESET;
+			default: ctrl_fsm_ns = rst_ni;
 		endcase
 	end
 	assign rx_byte_d = rx_byte_i;
@@ -107,7 +107,7 @@ module iccm_controller (
 			rx_byte_q3 <= 8'b00000000;
 			reset_q <= 1'b0;
 			byte_count <= 2'b00;
-			ctrl_fsm_cs <= RESET;
+			ctrl_fsm_cs <= rst_ni;
 		end
 		else begin
 			we_q <= we_d;

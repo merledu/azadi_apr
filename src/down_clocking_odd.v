@@ -1,7 +1,7 @@
 /*Author: Zhuxu
 	m99a1@yahoo.cn
 Down clocking module
-Output clock frequency is the original frequency divided by an odd number
+Output clk_i frequency is the original frequency divided by an odd number
 */
 module down_clocking_odd(
 input	i_clk,

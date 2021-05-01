@@ -69,11 +69,11 @@ module dm_obi_top #(
   // that don't use hart numbers in a contiguous fashion.
   parameter logic [NrHarts-1:0] SelectableHarts  = {NrHarts{1'b1}}
 ) (
-  input  logic                  clk_i,           // clock
-  // asynchronous reset active low, connect PoR here, not the system reset
+  input  logic                  clk_i,           // clk_i
+  // asynchronous rst_ni active low, connect PoR here, not the system rst_ni
   input  logic                  rst_ni,
   input  logic                  testmode_i,
-  output logic                  ndmreset_o,      // non-debug module reset
+  output logic                  ndmreset_o,      // non-debug module rst_ni
   output logic                  dmactive_o,      // debug module is active
   output logic [NrHarts-1:0]    debug_req_o,     // async debug request
   // communicate whether the hart is unavailable (e.g.: power down)

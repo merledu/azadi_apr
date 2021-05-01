@@ -11,7 +11,7 @@ module prim_generic_flop_2sync #(
   localparam int WidthSubOne = Width-1, // temp work around #2679
   parameter logic [WidthSubOne:0] ResetValue = '0
 ) (
-  input                    clk_i,       // receive clock
+  input                    clk_i,       // receive clk_i
   input                    rst_ni,
   input        [Width-1:0] d_i,
   output logic [Width-1:0] q_o

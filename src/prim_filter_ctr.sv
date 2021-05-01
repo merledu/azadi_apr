@@ -6,7 +6,7 @@
 // Configurable number of cycles. Cheaper version of filter for
 // large values of #Cycles
 //
-// when in reset, stored value is zero
+// when in rst_ni, stored value is zero
 // when enable is false, output is input
 // when enable is true, output is stored value,
 //   new input must be opposite value from stored value for

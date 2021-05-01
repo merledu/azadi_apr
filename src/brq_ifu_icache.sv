@@ -17,7 +17,7 @@ module brq_ifu_icache #(
   // Only cache branch targets
   parameter bit          BranchCache     = 1'b0
 ) (
-    // Clock and reset
+    // clk_i and rst_ni
     input  logic                clk_i,
     input  logic                rst_ni,
 
@@ -1015,7 +1015,7 @@ module brq_ifu_icache #(
   // Invalidations //
   ///////////////////
 
-  // Invalidate on reset, or when instructed. If an invalidation request is received while a
+  // Invalidate on rst_ni, or when instructed. If an invalidation request is received while a
   // previous invalidation is ongoing, it does not need to be restarted.
   assign start_inval   = (~reset_inval_q | icache_inval_i) & ~inval_prog_q;
   assign inval_prog_d  = start_inval | (inval_prog_q & ~inval_done);

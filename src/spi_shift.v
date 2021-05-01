@@ -1,8 +1,8 @@
 
 `include "/home/merl/Desktop/azadi_arty07/src/spi_host/rtl/spi_defines.v"
 module spi_shift (
-  input                          clk,          // system clock
-  input                          rst,          // reset
+  input                          clk,          // system clk_i
+  input                          rst,          // rst_ni
   input                          latch,        // latch signal for storing the data in shift register
   input                    [3:0] byte_sel,     // byte select signals for storing the data in shift register
   input [`SPI_CHAR_LEN_BITS-1:0] len,          // data len in bits (minus one)
@@ -16,7 +16,7 @@ module spi_shift (
   output                         last,         // last bit
   input                   [31:0] p_in,         // parallel in
   output     [`SPI_MAX_CHAR-1:0] p_out,        // parallel out
-  input                          s_clk,        // serial clock
+  input                          s_clk,        // serial clk_i
   input                          s_in,         // serial in
   output   reg                   s_out         // serial out
 );
@@ -28,8 +28,8 @@ module spi_shift (
   reg        [`SPI_MAX_CHAR-1:0] data;         // shift register
   wire    [`SPI_CHAR_LEN_BITS:0] tx_bit_pos;   // next bit position
   wire    [`SPI_CHAR_LEN_BITS:0] rx_bit_pos;   // next bit position
-  wire                           rx_clk;       // rx clock enable
-  wire                           tx_clk;       // tx clock enable
+  wire                           rx_clk;       // rx clk_i enable
+  wire                           tx_clk;       // tx clk_i enable
   
   assign p_out = data;
   

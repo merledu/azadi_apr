@@ -20,10 +20,10 @@ module dm_csrs #(
   parameter int unsigned        BusWidth         = 32,
   parameter logic [NrHarts-1:0] SelectableHarts  = {NrHarts{1'b1}}
 ) (
-  input  logic                              clk_i,           // Clock
-  input  logic                              rst_ni,          // Asynchronous reset active low
+  input  logic                              clk_i,           // clk_i
+  input  logic                              rst_ni,          // Asynchronous rst_ni active low
   input  logic                              testmode_i,
-  input  logic                              dmi_rst_ni,      // Debug Module Intf reset active-low
+  input  logic                              dmi_rst_ni,      // Debug Module Intf rst_ni active-low
   input  logic                              dmi_req_valid_i,
   output logic                              dmi_req_ready_o,
   input  dm::dmi_req_t                      dmi_req_i,
@@ -32,7 +32,7 @@ module dm_csrs #(
   input  logic                              dmi_resp_ready_i,
   output dm::dmi_resp_t                     dmi_resp_o,
   // global ctrl
-  output logic                              ndmreset_o,      // non-debug module reset active-high
+  output logic                              ndmreset_o,      // non-debug module rst_ni active-high
   output logic                              dmactive_o,      // 1 -> debug-module is active,
                                                              // 0 -> synchronous re-set
   // hart status
@@ -218,7 +218,7 @@ module dm_csrs #(
     dmstatus.version = dm::DbgVersion013;
     // no authentication implemented
     dmstatus.authenticated = 1'b1;
-    // we do not support halt-on-reset sequence
+    // we do not support halt-on-rst_ni sequence
     dmstatus.hasresethaltreq = 1'b0;
     // TODO(zarubaf) things need to change here if we implement the array mask
     dmstatus.allhavereset = havereset_q_aligned[selected_hart];
@@ -381,7 +381,7 @@ module dm_csrs #(
           // Gets set if an abstract command fails. The bits in this
           // field remain set until they are cleared by writing 1 to
           // them. No abstract command is started until the value is
-          // reset to 0.
+          // rst_ni to 0.
           a_abstractcs = dm::abstractcs_t'(dmi_req_i.data);
           // reads during abstract command execution are not allowed
           if (!cmdbusy_i) begin
@@ -556,7 +556,7 @@ module dm_csrs #(
     .Depth   (2)
   ) i_fifo (
     .clk_i   ( clk_i                ),
-    .rst_ni  ( dmi_rst_ni           ), // reset only when system is re-set
+    .rst_ni  ( dmi_rst_ni           ), // rst_ni only when system is re-set
     .clr_i   ( 1'b0                 ),
     .wdata_i ( resp_queue_data      ),
     .wvalid_i( dmi_req_valid_i      ),
@@ -571,7 +571,7 @@ module dm_csrs #(
     // PoR
     if (!rst_ni) begin
       dmcontrol_q    <= '0;
-      // this is the only write-able bit during reset
+      // this is the only write-able bit during rst_ni
       cmderr_q       <= dm::CmdErrNone;
       command_q      <= '0;
       cmd_valid_q    <= '0;
@@ -598,7 +598,7 @@ module dm_csrs #(
         dmcontrol_q.setresethaltreq  <= '0;
         dmcontrol_q.clrresethaltreq  <= '0;
         dmcontrol_q.ndmreset         <= '0;
-        // this is the only write-able bit during reset
+        // this is the only write-able bit during rst_ni
         dmcontrol_q.dmactive         <= dmcontrol_d.dmactive;
         cmderr_q                     <= dm::CmdErrNone;
         command_q                    <= '0;

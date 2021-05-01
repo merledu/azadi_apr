@@ -24,11 +24,11 @@ module brq_core_tracing #(
     parameter int unsigned        DmHaltAddr       = 32'h1A110800,
     parameter int unsigned        DmExceptionAddr  = 32'h1A110808
 ) (
-    // Clock and Reset
+    // clk_i and rst_ni
     input  logic        clk_i,
     input  logic        rst_ni,
 
-    input  logic        test_en_i,     // enable all clock gates for testing
+    input  logic        test_en_i,     // enable all clk_i gates for testing
 
     input  logic [31:0] hart_id_i,
     input  logic [31:0] boot_addr_i,

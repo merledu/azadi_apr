@@ -4,8 +4,8 @@
 // Verilog parameters
 //   M:             Number of host ports.
 //   HReqPass:      M bit array to allow requests to pass through the host i
-//                  FIFO with no clock delay if the request FIFO is empty. If
-//                  1'b0, at least one clock cycle of latency is created.
+//                  FIFO with no clk_i delay if the request FIFO is empty. If
+//                  1'b0, at least one clk_i cycle of latency is created.
 //                  Default is 1'b1.
 //   HRspPass:      Same as HReqPass but for host response FIFO.
 //   HReqDepth:     Mx4 bit array. bit[i*4+:4] is depth of host i request FIFO.

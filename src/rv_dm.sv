@@ -5,11 +5,11 @@ module rv_dm #(
   parameter logic [31:0]     IdcodeValue = 32'h 0000_0001,
   parameter  logic DirectDmiTap = 1'b1
 ) (
-  input  logic               clk_i,       // clock
-  input  logic               rst_ni,      // asynchronous reset active low, connect PoR
-                                          // here, not the system reset
+  input  logic               clk_i,       // clk_i
+  input  logic               rst_ni,      // asynchronous rst_ni active low, connect PoR
+                                          // here, not the system rst_ni
   input  logic               testmode_i,
-  output logic               ndmreset_o,  // non-debug module reset
+  output logic               ndmreset_o,  // non-debug module rst_ni
   output logic               dmactive_o,  // debug module is active
   output logic [NrHarts-1:0] debug_req_o, // async debug request
   input  logic [NrHarts-1:0] unavailable_i, // communicate whether the hart is unavailable
@@ -183,8 +183,8 @@ module rv_dm #(
   tlul_host_adapter #(
     .MAX_REQS(1)
   ) tl_adapter_host_sba (
-    .clock(clk_i),
-    .reset(rst_ni),
+    .clk_i(clk_i),
+    .rst_ni(rst_ni),
     .req_i        (host_req),
     .gnt_o        (host_gnt),
     .addr_i       (host_add),

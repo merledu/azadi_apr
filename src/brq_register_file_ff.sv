@@ -11,7 +11,7 @@ module brq_register_file_ff #(
     parameter int unsigned DataWidth         = 32,
     parameter bit          DummyInstructions = 0
 ) (
-    // Clock and Reset
+    // clk_i and rst_ni
     input  logic                 clk_i,
     input  logic                 rst_ni,
 

@@ -1,8 +1,8 @@
 
 module instr_mem_top
 (
-  input clock,
-  input reset,
+  input clk_i,
+  input rst_ni,
 
   input  logic        req,
   input  logic [11:0] addr,
@@ -12,8 +12,8 @@ module instr_mem_top
   input  logic [3:0]  we
 );
 
-  always_ff @(posedge clock) begin
-  if (!reset) begin
+  always_ff @(posedge clk_i) begin
+  if (!rst_ni) begin
     rvalid <= 1'b0;
   end else if (we) begin
     rvalid <= 1'b0;
@@ -24,7 +24,7 @@ module instr_mem_top
 
 DFFRAM iccm (
 
-    .CLK    (clock),
+    .CLK    (clk_i),
     .EN     (req), // chip enable
     .WE     (we), //write mask
     .Di     (wdata), //data input

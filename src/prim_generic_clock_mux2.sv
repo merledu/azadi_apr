@@ -15,7 +15,7 @@ module prim_generic_clock_mux2 #(
 
   assign clk_o = (sel_i) ? clk1_i : clk0_i;
 
-  // make sure sel is never X (including during reset)
+  // make sure sel is never X (including during rst_ni)
   // need to use ##1 as this could break with inverted clocks that
   // start with a rising edge at the beginning of the simulation.
 

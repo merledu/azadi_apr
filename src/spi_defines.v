@@ -1,6 +1,6 @@
 
 // Number of bits used for devider register. If used in system with
-// low frequency of system clock this can be reduced.
+// low frequency of system clk_i this can be reduced.
 // Use SPI_DIVIDER_LEN for fine tuning theexact number.
 //
 //`define SPI_DIVIDER_LEN_8

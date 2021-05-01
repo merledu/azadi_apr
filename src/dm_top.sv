@@ -26,10 +26,10 @@ module dm_top #(
   parameter logic [NrHarts-1:0] SelectableHarts  = {NrHarts{1'b1}},
   parameter bit                 ReadByteEnable   = 1 // toggle new behavior to drive master_be_o during a read
 ) (
-  input  logic                  clk_i,       // clock
-  input  logic                  rst_ni,      // asynchronous reset active low, connect PoR here, not the system reset
+  input  logic                  clk_i,       // clk_i
+  input  logic                  rst_ni,      // asynchronous rst_ni active low, connect PoR here, not the system rst_ni
   input  logic                  testmode_i,
-  output logic                  ndmreset_o,  // non-debug module reset
+  output logic                  ndmreset_o,  // non-debug module rst_ni
   output logic                  dmactive_o,  // debug module is active
   output logic [NrHarts-1:0]    debug_req_o, // async debug request
   input  logic [NrHarts-1:0]    unavailable_i, // communicate whether the hart is unavailable (e.g.: power down)

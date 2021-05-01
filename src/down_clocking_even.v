@@ -1,5 +1,5 @@
 /*Down clocking module
-Output clock frequency is the original frequency divided by an even number
+Output clk_i frequency is the original frequency divided by an even number
 */
 module	down_clocking_even(
 input	i_clk,

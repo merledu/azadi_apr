@@ -1,13 +1,13 @@
 `include "/home/merl/Desktop/azadi_arty07/src/spi_host/rtl/spi_defines.v"
 
 module spi_clgen (
-  input                            clk_in,   // input clock (system clock)
-  input                            rst,      // reset
-  input                            enable,   // clock enable
+  input                            clk_in,   // input clk_i (system clk_i)
+  input                            rst,      // rst_ni
+  input                            enable,   // clk_i enable
   input                            go,       // start transfer
-  input                            last_clk, // last clock
-  input     [`SPI_DIVIDER_LEN-1:0] divider,  // clock divider (output clock is divided by this value)
-  output    reg                    clk_out,  // output clock
+  input                            last_clk, // last clk_i
+  input     [`SPI_DIVIDER_LEN-1:0] divider,  // clk_i divider (output clk_i is divided by this value)
+  output    reg                    clk_out,  // output clk_i
   output    reg                    pos_edge, // pulse marking positive edge of clk_out
   output    reg                    neg_edge // pulse marking negative edge of clk_out
 
@@ -17,7 +17,7 @@ module spi_clgen (
   //reg                              pos_edge;
   //reg                              neg_edge;
                             
-  reg       [`SPI_DIVIDER_LEN-1:0] cnt;      // clock counter 
+  reg       [`SPI_DIVIDER_LEN-1:0] cnt;      // clk_i counter 
   wire                             cnt_zero; // conter is equal to zero
   wire                             cnt_one;  // conter is equal to one
   

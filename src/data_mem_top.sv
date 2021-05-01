@@ -1,7 +1,7 @@
 module data_mem_top
 (
-  input clock,
-  input reset,
+  input clk_i,
+  input rst_ni,
 
 // tl-ul insterface
   input tlul_pkg::tl_h2d_t tl_d_i,
@@ -17,8 +17,8 @@ module data_mem_top
   logic rvalid_o;
   logic [31:0] rdata_o; 
 
-  always_ff @(posedge clock) begin
-    if (!reset) begin
+  always_ff @(posedge clk_i) begin
+    if (!rst_ni) begin
       rvalid_o <= 1'b0;
     end else if (we_i) begin
       rvalid_o <= 1'b0;
@@ -36,7 +36,7 @@ module data_mem_top
   
 DFFRAM dccm (
 
-    .CLK    (clock),
+    .CLK    (clk_i),
     .EN     (req_i), // chip enable
     .WE     (we_i? data_we: '0), //write mask
     .Di     (wdata_i), //data input
@@ -53,8 +53,8 @@ tlul_sram_adapter #(
   .ErrOnRead    (0) 
 
 ) data_mem (
-    .clk_i (clock),
-    .rst_ni (reset),
+    .clk_i (clk_i),
+    .rst_ni (rst_ni),
     .tl_i(tl_d_i),
     .tl_o (tl_d_o), 
     .req_o (req_i),
@@ -63,7 +63,7 @@ tlul_sram_adapter #(
     .addr_o (addr_i),
     .wdata_o (wdata_i),
     .wmask_o (wmask_i),
-    .rdata_i (rdata_o), // (reset) ? rdata_o: '0
+    .rdata_i (rdata_o), // (rst_ni) ? rdata_o: '0
     .rvalid_i (rvalid_o),
     .rerror_i (2'b0)
 

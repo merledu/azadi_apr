@@ -1,13 +1,13 @@
 /*
 control register [7:0]ctrl:
-bit 0:	When set, external clock is chosen for PWM/timer. When cleared, wb clock is used for PWM/timer.
+bit 0:	When set, external clk_i is chosen for PWM/timer. When cleared, wb clk_i is used for PWM/timer.
 bit 1:	When set,  PWM is enabled. When cleared,  timer is enabled.
 bit 2:	When set,  PWM/timer starts. When cleared, PWM/timer stops.
 bit 3:	When set, timer runs continuously. When cleared, timer runs one time.
 bit 4:	When set, o_pwm enabled.
 bit 5:	timer interrupt bit	When it is written with 0, interrupt request is cleared. 
 bit 6:	When set, a 16-bit external signal i_DC is used as duty cycle. When cleared, register DC is used.
-bit 7:	When set, counter reset for PWM/timer, it's output and bit 5 will also be cleared. When changing from PWM mode to timer mode reset is needed before timer starts.
+bit 7:	When set, counter rst_ni for PWM/timer, it's output and bit 5 will also be cleared. When changing from PWM mode to timer mode rst_ni is needed before timer starts.
 */
 module	PWM(
 //tlul interface

@@ -98,7 +98,7 @@ module uart_core (
   end
 
   // break_err edges in same cycle as event_rx_frame_err edges ; that way the
-  // reset-on-read works the same way for break and frame error interrupts.
+  // rst_ni-on-read works the same way for break and frame error interrupts.
 
   always_comb begin
     unique case (reg2hw.ctrl.rxblvl.q)
@@ -149,7 +149,7 @@ module uart_core (
   assign hw2reg.fifo_ctrl.txilvl.d  = 2'h0;
 
   //              NCO 16x Baud Generator
-  // output clock rate is:
+  // output clk_i rate is:
   //      Fin * (NCO/2**NcoWidth)
   logic   [NcoWidth:0]     nco_sum_q; // extra bit to get the carry
 
@@ -352,15 +352,15 @@ module uart_core (
               // don't count if timeout feature not enabled ;
               // will never reach timeout val + lower power
               (uart_rxto_en == 1'b0)              ? 24'd0 :
-              // reset count if timeout interrupt is set
+              // rst_ni count if timeout interrupt is set
               event_rx_timeout                    ? 24'd0 :
-              // reset count upon change in fifo level: covers both read and receiving a new byte
+              // rst_ni count upon change in fifo level: covers both read and receiving a new byte
               rx_fifo_depth_changed               ? 24'd0 :
-              // reset count if no bytes are pending
+              // rst_ni count if no bytes are pending
               (rx_fifo_depth == 5'd0)             ? 24'd0 :
               // stop the count at timeout value (this will set the interrupt)
               //   Removed below line as when the timeout reaches the value,
-              //   event occured, and timeout value reset to 0h.
+              //   event occured, and timeout value rst_ni to 0h.
               //(rx_timeout_count_q == uart_rxto_val) ? rx_timeout_count_q :
               // increment if at rx baud tick
               rx_tick_baud                        ? (rx_timeout_count_q + 24'd1) :

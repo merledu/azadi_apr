@@ -380,7 +380,7 @@ module brq_ifu #(
     logic        prev_instr_seq_q, prev_instr_seq_d;
 
     // Do not check for sequential increase after a branch, jump, exception, interrupt or debug
-    // request, all of which will set branch_req. Also do not check after reset or for dummys.
+    // request, all of which will set branch_req. Also do not check after rst_ni or for dummys.
     assign prev_instr_seq_d = (prev_instr_seq_q | instr_new_id_d) &
         ~branch_req & ~stall_dummy_instr;
 
