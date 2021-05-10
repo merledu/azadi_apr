@@ -1,4 +1,4 @@
-`include "/home/merl/Desktop/azadi_arty07/src/spi_host/rtl/spi_defines.v"
+`include "spi_defines.v"
 module spi_core
 (
   // tlul signals
@@ -84,9 +84,9 @@ module spi_core
   end
   
   // Wb data out
-  always @(posedge clk_i or posedge rst_ni)
+  always @(posedge clk_i or negedge rst_ni)
   begin
-    if (~rst_ni)
+    if (!rst_ni)
       rdata_o <=  32'b0;
     else
       rdata_o <=  wb_dat;
@@ -97,9 +97,9 @@ module spi_core
   assign error_o = 1'b0;
   
   // Interrupt
-  always @(posedge clk_i or posedge rst_ni)
+  always @(posedge clk_i or negedge rst_ni)
   begin
-    if (~rst_ni)
+    if (!rst_ni)
       intr_o <=  1'b0;
     else if (ie && tip && last_bit && pos_edge)
       intr_o <=  1'b1;
@@ -108,9 +108,9 @@ module spi_core
   end
   
   // Divider register
-  always @(posedge clk_i or posedge rst_ni)
+  always @(posedge clk_i or negedge rst_ni)
   begin
-    if (~rst_ni)
+    if (!rst_ni)
         divider <=  {`SPI_DIVIDER_LEN{1'b0}};
     else if (spi_divider_sel && we_i && !tip)
       begin
@@ -146,9 +146,9 @@ module spi_core
   end
   
   // Ctrl register
-  always @(posedge clk_i or posedge rst_ni)
+  always @(posedge clk_i or negedge rst_ni)
   begin
-    if (~rst_ni)
+    if (!rst_ni)
       ctrl <=  {`SPI_CTRL_BIT_NB{1'b0}};
     else if(spi_ctrl_sel && we_i && !tip)
       begin
@@ -170,9 +170,9 @@ module spi_core
   assign ass        = ctrl[`SPI_CTRL_ASS];
   
   // Slave select register
-  always @(posedge clk_i or posedge rst_ni)
+  always @(posedge clk_i or negedge rst_ni)
   begin
-    if (~rst_ni)
+    if (!rst_ni)
       ss <=  {`SPI_SS_NB{1'b0}};
     else if(spi_ss_sel && we_i && !tip)
       begin

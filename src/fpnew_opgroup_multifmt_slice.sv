@@ -12,7 +12,7 @@
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-`include "/home/merl/Desktop/azadi_arty07/src/fpnew/src/common_cells/include/common_cells/registers.svh"
+`include "registers.svh"
 module fpnew_opgroup_multifmt_slice #(
   parameter fpnew_pkg::opgroup_e     OpGroup       = fpnew_pkg::CONV,
   parameter int unsigned             Width         = 64,

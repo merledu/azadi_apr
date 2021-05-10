@@ -106,7 +106,7 @@ module brq_idu_controller #(
 
   // FSM state encoding
   typedef enum logic [3:0] {
-    rst_ni, BOOT_SET, WAIT_SLEEP, SLEEP, FIRST_FETCH, DECODE, FLUSH,
+    RESET, BOOT_SET, WAIT_SLEEP, SLEEP, FIRST_FETCH, DECODE, FLUSH,
     IRQ_TAKEN, DBG_TAKEN_IF, DBG_TAKEN_ID
   } ctrl_fsm_e;
 
@@ -381,7 +381,7 @@ module brq_idu_controller #(
     controller_run_o       = 1'b0;
 
     unique case (ctrl_fsm_cs)
-      rst_ni: begin
+      RESET: begin
         instr_req_o   = 1'b0;
         pc_mux_o      = PC_BOOT;
         pc_set_o      = 1'b1;
@@ -757,7 +757,7 @@ module brq_idu_controller #(
 
       default: begin
         instr_req_o = 1'b0;
-        ctrl_fsm_ns = rst_ni;
+        ctrl_fsm_ns = RESET;
       end
     endcase
   end
@@ -792,7 +792,7 @@ module brq_idu_controller #(
   // update registers
   always_ff @(posedge clk_i or negedge rst_ni) begin : update_regs
     if (!rst_ni) begin
-      ctrl_fsm_cs    <= rst_ni;
+      ctrl_fsm_cs    <= RESET;
       nmi_mode_q     <= 1'b0;
       debug_mode_q   <= 1'b0;
       load_err_q     <= 1'b0;

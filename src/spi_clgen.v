@@ -1,4 +1,4 @@
-`include "/home/merl/Desktop/azadi_arty07/src/spi_host/rtl/spi_defines.v"
+`include "spi_defines.v"
 
 module spi_clgen (
   input                            clk_in,   // input clk_i (system clk_i)
