@@ -340,7 +340,7 @@ module brq_idu #(
       OP_A_FWD:    alu_operand_a = lsu_addr_last_i;
       OP_A_CURRPC: alu_operand_a = pc_id_i;
       OP_A_IMM:    alu_operand_a = imm_a;
-      default:     alu_operand_a = pc_id_i;
+//      default:     alu_operand_a = pc_id_i;
     endcase
   end
 
@@ -556,7 +556,7 @@ module brq_idu #(
     unique case (rf_wdata_sel)
       RF_WD_EX:  rf_wdata_id_o = result_wb;
       RF_WD_CSR: rf_wdata_id_o = csr_rdata_i;
-      default:   rf_wdata_id_o = result_wb;
+  //    default:   rf_wdata_id_o = result_wb;
     endcase
   end
 

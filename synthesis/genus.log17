@@ -1,0 +1,35 @@
+Cadence Genus(TM) Synthesis Solution.
+Copyright 2020 Cadence Design Systems, Inc. All rights reserved worldwide.
+Cadence and the Cadence logo are registered trademarks and Genus is a trademark
+of Cadence Design Systems, Inc. in the United States and other countries.
+
+Version: 20.10-p001_1, built Fri Dec 11 03:29:55 PST 2020
+Options: -files genus_script.tcl 
+Date:    Wed May 12 23:09:04 2021
+Host:    merl-HP-Z840 (x86_64 w/Linux 3.10.0-1160.15.2.el7.x86_64) (6cores*24cpus*2physical cpus*Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz 15360KB) (263878820KB)
+PID:     11052
+OS:      Red Hat Enterprise Linux Server release 7.9 (Maipo)
+
+Checking out license: Genus_Synthesis
+
+
+***********************************************************************************************************
+***********************************************************************************************************
+
+
+
+Loading tool scripts...
+
+Finished loading tool scripts (9 seconds elapsed).
+
+#@ Processing -files option
+@genus 1> source genus_script.tcl
+#@ Begin verbose source ./genus_script.tcl
+@file(genus_script.tcl) 1: set_attribute source_verbose true
+Error   : The tool is running in common ui mode. [TUI-509] [::unknown]
+        : Command 'set_attribute' is a legacy ui command.
+        : Use set_db/get_db instead or do set_db common_ui false at start of the run.
+#@ End verbose source ./genus_script.tcl
+
+Encountered problems processing file: genus_script.tcl
+@genus:root: 2> exit
