@@ -151,7 +151,7 @@ module brq_ifu #(
       EXC_PC_IRQ:     exc_pc = { csr_mtvec_i[31:8], 1'b0, irq_id[4:0], 2'b00 };
       EXC_PC_DBD:     exc_pc = DmHaltAddr;
       EXC_PC_DBG_EXC: exc_pc = DmExceptionAddr;
-      default:        exc_pc = { csr_mtvec_i[31:8], 8'h00                    };
+     // default:        exc_pc = { csr_mtvec_i[31:8], 8'h00                    };
     endcase
   end
 

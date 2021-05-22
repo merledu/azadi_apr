@@ -1,5 +1,5 @@
 
-`include "/home/merl/Desktop/azadi_arty07/src/spi_host/rtl/spi_defines.v"
+`include "spi_defines.v"
 module spi_shift (
   input                          clk,          // system clk_i
   input                          rst,          // rst_ni

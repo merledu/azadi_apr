@@ -58,7 +58,7 @@ module brq_core_top #(
 import brq_pkg::*;
 
   logic rst_ni;
-  assign rst_ni = rst_ni;
+ // assign rst_ni = rst_ni;
   // Instruction interface (internal)
   logic        instr_req;
   logic        instr_gnt;
