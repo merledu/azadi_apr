@@ -115,6 +115,5 @@ function automatic integer _clog2(integer value);
         default:  '0
     };
 
-
-
 endpackage
+
