@@ -160,7 +160,7 @@ module azadi_soc_top #(
 brq_core_top #(
     .PMPEnable        (1'b0),
     .PMPGranularity   (0), 
-    .PMPNumRegions    (0), 
+    .PMPNumRegions    (4), 
     .MHPMCounterNum   (0), 
     .MHPMCounterWidth (40), 
     .RV32E            (1'b0), 
