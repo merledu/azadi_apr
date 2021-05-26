@@ -1,4 +1,5 @@
- 
+`include "/home/merl/github_repos/azadi/src/spi_host/rtl/spi_defines.v"
+
 module azadi_soc_top #(
   
   parameter logic [31:0] JTAG_ID = 32'h 0000_0001,
@@ -6,74 +7,60 @@ module azadi_soc_top #(
 )(
   input clk_i,
   input rst_ni,
-//  input uart_rx_i,
 
-  input  logic [19:0] gpio_i,
-  output logic [19:0] gpio_o,
+  input  logic [32:0] gpio_i,
+  output logic [32:0] gpio_o,
+  output logic [32:0] gpio_oe,
 
   // jtag interface 
-  input               jtag_tck_i,
-  input               jtag_tms_i,
-  input               jtag_trst_ni,
-  input               jtag_tdi_i,
-  output              jtag_tdo_o,
+  input  logic       jtag_tck_i,
+  input  logic       jtag_tms_i,
+  input  logic       jtag_trst_ni,
+  input  logic       jtag_tdi_i,
+  output logic       jtag_tdo_o,
 
   // uart-periph interface
-  output              uart_tx,
-  input               uart_rx,
+  output logic       uart_tx,
+  input  logic       uart_rx,
 
   // PWM interface  
 
-  output              pwm_o,
-  output              pwm_o_2,
+  output logic       pwm_o,
+  output logic       pwm_o_2,
 
   // SPI interface
 
-  output          [`SPI_SS_NB-1:0] ss_o,        
-  output                           sclk_o,      
-  output                           sd_o,       
-  input                            sd_i 
+  output logic    [`SPI_SS_NB-1:0] ss_o,        
+  output logic                     sclk_o,      
+  output logic                     sd_o,       
+  input  logic                     sd_i,
+
+  // i2c interface 
+
+  input  logic scl_pad_i,
+  output logic scl_pad_o,
+  output logic scl_padoen_o,
+
+  input  logic sda_pad_i,
+  output logic sda_pad_o,
+  output logic sda_padoen_o 
 
 );
- logic [19:0] gpio_oe;
-//logic clk_i;
-//logic rst_ni;
-//assign rst_ni = ~rst_ni;
-//
-//clk_wiz_0 clk_m (
-//  // clk_i out ports
-//  .clk_out1(clk_i),
-//  // Status and control signals
-//  .resetn(rst_ni),
-//  .locked(),
-// // clk_i in ports
-//  .clk_in1(clk_i)
-// );
-
-  logic      uart_rx_i;
-
-//  logic               jtag_tck_i;
-//  logic               jtag_tms_i;
-//  logic               jtag_trst_ni;
-//  logic               jtag_tdi_i;
-//  logic              jtag_tdo_o;
-//
-//  logic [19:0] gpio_i;
-//  logic [19:0] gpio_o;
-//
-// logic          [`SPI_SS_NB-1:0] ss_o;        
-// logic                           sclk_o;      
-// logic                           sd_o;       
-// logic                            sd_i; 
 
 
-logic system_rst_ni;
+  logic system_rst_ni;
+  wire [32:0] gpio_in;
+  wire [32:0] gpio_out;
+  
+  assign gpio_in = gpio_i;
+  assign gpio_o = gpio_out; 
 
-wire [19:0] gpio_in;
-wire [19:0] gpio_out;
-
-assign gpio_in = gpio_i;
-assign gpio_o = gpio_out; 
+  logic         instr_valid;
+  logic [11:0]  tlul_addr;
+  logic         req_i;
+  logic [31:0]  tlul_data;
+  logic dbg_req;
+  logic dbg_rst;
 
 
 // end here
@@ -116,6 +103,9 @@ assign gpio_o = gpio_out;
   tlul_pkg::tl_h2d_t xbar_to_spi;
   tlul_pkg::tl_d2h_t spi_to_xbar;
 
+  tlul_pkg::tl_h2d_t xbar_to_i2c;
+  tlul_pkg::tl_d2h_t i2c_to_xbar;
+
   // interrupt vector
   logic [40:0] intr_vector;
 
@@ -131,8 +121,15 @@ assign gpio_o = gpio_out;
   logic        intr_uart0_rx_parity_err;
   logic        intr_req;
   logic        intr_spi;
+  logic        intr_i2c;
+  logic        intr_srx;
+  logic        intr_stx;
+  logic        intr_timer;
 
-  assign intr_vector = {  
+  assign intr_vector = { 
+      intr_srx,
+      intr_stx,
+      intr_i2c, 
       intr_gpio,
       intr_uart0_rx_parity_err,
       intr_uart0_rx_timeout,
@@ -145,23 +142,6 @@ assign gpio_o = gpio_out;
       intr_spi,
       1'b0
   };
-
-  logic [31:0] gpio_intr;
-  logic       rx_dv_i;
-  logic [7:0] rx_byte_i;
-
-
-logic instr_valid;
-logic [11:0] tlul_addr;
-logic req_i;
-logic [31:0] tlul_data;
-
-logic iccm_cntrl_reset;
-logic [11:0] iccm_cntrl_addr;
-logic [31:0] iccm_cntrl_data;
-logic iccm_cntrl_we;
-
-logic intr_timer;
 
 // jtag interface 
 
@@ -176,12 +156,6 @@ logic intr_timer;
   assign jtag_tdo_o      = jtag_rsp.tdo;
   assign unused_jtag_tdo_oe_o = jtag_rsp.tdo_oe;
 
-  logic dbg_req;
-  logic dbg_rst;
-//wire 
-
-  //tlul_pkg::tl_h2d_t core_to_gpio;
-  //tlul_pkg::tl_d2h_t gpio_to_core;
 
 brq_core_top #(
     .PMPEnable        (1'b0),
@@ -244,10 +218,10 @@ brq_core_top #(
   .DirectDmiTap (DirectDmiTap)
   ) debug_module (
   .clk_i(clk_i),       // clk_i
-  .rst_ni(rst_ni),      // asynchronous rst_ni active low, connect PoR
-                                          // here, not the system rst_ni
+  .rst_ni(rst_ni),      // asynchronous reset active low, connect PoR
+                                          // here, not the system reset
   .testmode_i(),
-  .ndmreset_o(dbg_rst),  // non-debug module rst_ni
+  .ndmreset_o(dbg_rst),  // non-debug module reset
   .dmactive_o(),  // debug module is active
   .debug_req_o(dbg_req), // async debug request
   .unavailable_i(1'b0), // communicate whether the hart is unavailable
@@ -269,8 +243,8 @@ brq_core_top #(
 
 // main xbar module
   tl_xbar_main main_swith (
-  .clk_main_i         (clk_i),
-  .rst_main_ni        (system_rst_ni),
+  .clk_i         (clk_i),
+  .rst_ni        (system_rst_ni),
 
   // Host interfaces
   .tl_brqif_i         (ifu_to_xbar),
@@ -332,8 +306,8 @@ rv_timer timer0(
 //peripheral xbar
 
 xbar_periph periph_switch (
-  .clk_peri_i         (clk_i),
-  .rst_peri_ni        (system_rst_ni),
+  .clk_i         (clk_i),
+  .rst_ni        (system_rst_ni),
 
   // Host interfaces
   .tl_xbar_main_i     (xbarm_to_xbarp),
@@ -354,8 +328,8 @@ xbar_periph periph_switch (
   .tl_pwm_i           (pwm_to_xbar),
   .tl_gpio_o          (xbarp_to_gpio),
   .tl_gpio_i          (gpio_to_xbarp),
-  .tl_i2c0_o          (),
-  .tl_i2c0_i          (),
+  .tl_i2c0_o          (xbar_to_i2c),
+  .tl_i2c0_i          (i2c_to_xbar),
   .tl_i2c1_o          (),
   .tl_i2c1_i          (),
   .tl_can0_o          (),
@@ -398,7 +372,8 @@ spi_top u_spi_host(
   .tl_o        (spi_to_xbar),
 
   // SPI signals                  
-  .intr_o      (intr_spi),                   
+  .intr_rx_o   (intr_srx),
+  .intr_tx_o   (intr_stx),                   
   .ss_o        (ss_o),         
   .sclk_o      (sclk_o),       
   .sd_o        (sd_o),       
@@ -415,13 +390,12 @@ spi_top u_spi_host(
   .tl_i           (xbarp_to_gpio),
   .tl_o           (gpio_to_xbarp),
 
-  .cio_gpio_i     ({12'b0,gpio_in}),
+  .cio_gpio_i     (gpio_in),
   .cio_gpio_o     (gpio_out),
-  .cio_gpio_en_o  (),
+  .cio_gpio_en_o  (gpio_oe),
 
   .intr_gpio_o    (intr_gpio )  
 );
-
 
 
 instr_mem_top iccm (
@@ -430,10 +404,10 @@ instr_mem_top iccm (
 
   .req        (req_i),
   .addr       (tlul_addr),
-  .wdata      (),
+  .wdata      (),//iccm_cntrl_data
   .rdata      (tlul_data),
   .rvalid     (instr_valid),
-  .we         ('0)
+  .we         ()//iccm_cntrl_we
 );
 
  tlul_sram_adapter #(
@@ -508,6 +482,25 @@ uart u_uart0(
   .intr_rx_break_err_o     (intr_uart0_rx_break_err ),
   .intr_rx_timeout_o       (intr_uart0_rx_timeout   ),
   .intr_rx_parity_err_o    (intr_uart0_rx_parity_err) 
+);
+
+i2c_master_top I2C (
+  .clk_i           (clk_i ),
+  .rst_ni          (system_rst_ni),
+
+  .tl_i            (xbar_to_i2c),
+  .tl_o            (i2c_to_xbar),
+
+  // i2c interface
+  .intr_o          (intr_i2c),
+
+  .scl_pad_i       (scl_pad_i),
+  .scl_pad_o       (scl_pad_o),
+  .scl_padoen_o    (scl_padoen_o),
+
+  .sda_pad_i       (sda_pad_i),
+  .sda_pad_o       (sda_pad_o),
+  .sda_padoen_o    (sda_padoen_o)
 );
 
 endmodule
