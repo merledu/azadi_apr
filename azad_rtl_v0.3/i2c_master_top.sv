@@ -23,11 +23,10 @@ module i2c_master_top (
   logic [7:0] wdata;
   logic [7:0] rdata;
   logic [7:0] addr;
-  logic [3:0] be_i;
+  logic       ben;
   logic       wen;
   logic       ren;
-  logic       ben;
-
+  
   i2c_master_core i2c_core(
 	  .clk_i        (clk_i), 
     .rst_ni       (rst_ni), 
@@ -39,7 +38,8 @@ module i2c_master_top (
     .ren_i        (ren), 
     .error_o      (err), 
     .ben_i        (ben),
-    .intra_o      (instr_o),
+    .intra_o      (intr_o),
+
 	.scl_pad_i    (scl_pad_i), 
     .scl_pad_o    (scl_pad_o), 
     .scl_padoen_o (scl_padoen_o), 
