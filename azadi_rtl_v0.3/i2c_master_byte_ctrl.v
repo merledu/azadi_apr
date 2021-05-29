@@ -105,7 +105,7 @@ module i2c_master_byte_ctrl (
 	output [7:0] dout;
 
 	// I2C signals
-	input  scl_i;`include "i2c_master_defines.v"
+	input  scl_i;
 	output scl_o;
 	output scl_oen;
 	input  sda_i;
