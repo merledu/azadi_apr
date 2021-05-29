@@ -97,7 +97,7 @@ module i2c_master_core(
 	input        we_i;      // write enable input
 	input        ren_i;     // stobe/core select signal
 	output       error_o;
-	input  [3:0] ben_i;
+	input         ben_i;
 	output       intra_o;   // interrupt request signal output
 
 	reg [7:0] rdata_o;
@@ -115,7 +115,7 @@ module i2c_master_core(
 	output sda_pad_o;       // SDA-line output (always 1'b0)
 	output sda_padoen_o;    // SDA-line output enable (active low)
 
-  wire [3:0] unused_ben;
+         wire  unused_ben;
 	assign unused_ben = ben_i;
 	//
 	// variable declarations
