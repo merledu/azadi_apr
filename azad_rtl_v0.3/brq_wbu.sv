@@ -83,9 +83,9 @@ module brq_wbu #(
     logic           wb_valid_d;
 
     // floating point
-    logic [31:0]    fp_rf_wdata_wb_q;
+    //logic [31:0]    fp_rf_wdata_wb_q;
     logic           fp_rf_we_wb_q;
-    logic [4:0]     fp_rf_waddr_wb_q;
+    //logic [4:0]     fp_rf_waddr_wb_q;
     logic           fp_load_q;
 
     // Stage becomes valid if an instruction enters for ID/EX and valid is cleared when instruction
@@ -117,8 +117,8 @@ module brq_wbu #(
 
         // added for floating point registers for wb stage
         fp_rf_we_wb_q    <= fp_rf_wen_id_i;
-        fp_rf_waddr_wb_q <= rf_waddr_id_i;
-        fp_rf_wdata_wb_q <= rf_wdata_id_i;
+      //  fp_rf_waddr_wb_q <= rf_waddr_id_i;
+        //fp_rf_wdata_wb_q <= rf_wdata_id_i;
         fp_load_q        <= fp_load_i;
       end
     end
