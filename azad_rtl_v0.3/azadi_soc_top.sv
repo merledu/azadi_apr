@@ -348,7 +348,7 @@ xbar_periph periph_switch (
   .tl_qspi_o          (),
   .tl_qspi_i          ('0),
 
-  .scanmode_i         ()
+  .scanmode_i         ('0)
 );
 
 
