@@ -20,7 +20,7 @@ module iccm_controller (
 	input wire rx_dv_i;
 	input wire [7:0] rx_byte_i;
 	output wire we_o;
-	output wire [13:0] addr_o;
+	output wire [11:0] addr_o;
 	output wire [31:0] wdata_o;
 	output wire reset_o;
 	reg [1:0] ctrl_fsm_cs;
@@ -32,8 +32,8 @@ module iccm_controller (
 	reg [7:0] rx_byte_q3;
 	reg we_q;
 	reg we_d;
-	reg [13:0] addr_q;
-	reg [13:0] addr_d;
+	reg [11:0] addr_q;
+	reg [11:0] addr_d;
 	reg reset_q;
 	reg reset_d;
 	reg [1:0] byte_count;
@@ -86,7 +86,7 @@ module iccm_controller (
 	always @(posedge clk_i or negedge rst_ni)
 		if (!rst_ni) begin
 			we_q <= 1'b0;
-			addr_q <= 14'b00000000000000;
+			addr_q <= 12'b000000000000;
 			rx_byte_q0 <= 8'b00000000;
 			rx_byte_q1 <= 8'b00000000;
 			rx_byte_q2 <= 8'b00000000;
@@ -97,7 +97,7 @@ module iccm_controller (
 		end 
 		else if (prog_i) begin
             we_q <= 1'b0;
-            addr_q <= 14'b00000000000000;
+            addr_q <= 12'b000000000000;
             rx_byte_q0 <= 8'b00000000;
             rx_byte_q1 <= 8'b00000000;
             rx_byte_q2 <= 8'b00000000;
