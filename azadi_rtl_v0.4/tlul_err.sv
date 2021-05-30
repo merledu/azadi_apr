@@ -1,8 +1,6 @@
 
 
 module tlul_err import tlul_pkg::*; (
-  input clk_i,
-  input rst_ni,
 
   input tl_h2d_t tl_i,
 
