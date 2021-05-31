@@ -15,6 +15,7 @@ module azadi_soc_top (
   input  logic       jtag_trst_ni,
   input  logic       jtag_tdi_i,
   output logic       jtag_tdo_o,
+  output logic       jtag_tdo_oe_o,
 
   // uart-periph interface
   output logic       uart_tx,
@@ -154,14 +155,14 @@ localparam logic [31:0] JTAG_ID = {
 
   jtag_pkg::jtag_req_t jtag_req;
   jtag_pkg::jtag_rsp_t jtag_rsp;
-  logic unused_jtag_tdo_oe_o;
+  
 
   assign jtag_req.tck    = jtag_tck_i;
   assign jtag_req.tms    = jtag_tms_i;
   assign jtag_req.trst_n = jtag_trst_ni;
   assign jtag_req.tdi    = jtag_tdi_i;
   assign jtag_tdo_o      = jtag_rsp.tdo;
-  assign unused_jtag_tdo_oe_o = jtag_rsp.tdo_oe;
+  assign jtag_tdo_oe_o = jtag_rsp.tdo_oe;
 
 
 brq_core_top #(
