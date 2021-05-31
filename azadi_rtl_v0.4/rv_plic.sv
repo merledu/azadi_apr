@@ -30,8 +30,6 @@ module rv_plic import rv_plic_reg_pkg::*; #(
 
   // Interrupt notification to targets
   output [NumTarget-1:0] irq_o,
-  output [SRCW:0]      irq_id_o [NumTarget],
-
 
   output logic [NumTarget-1:0] msip_o
 );
@@ -39,8 +37,10 @@ module rv_plic import rv_plic_reg_pkg::*; #(
   rv_plic_reg2hw_t reg2hw;
   rv_plic_hw2reg_t hw2reg;
 
-  localparam int MAX_PRIO    = 7;
+  localparam int MAX_PRIO    = 3;
   localparam int PRIOW = $clog2(MAX_PRIO+1);
+
+  logic [SRCW:0]      irq_id_o [NumTarget];
 
   logic [NumSrc-1:0] le; // 0:level 1:edge
   logic [NumSrc-1:0] ip;
@@ -65,15 +65,21 @@ module rv_plic import rv_plic_reg_pkg::*; #(
   assign cc_id = irq_id_o;
 
   always_comb begin
-    claim = '0;
     for (int i = 0 ; i < NumTarget ; i++) begin
-      if (claim_re[i]) claim[claim_id[i]] = 1'b1;
-    end
+      if (claim_re[i]) begin 
+         claim[claim_id[i]] = 1'b1;
+       end else begin 
+         claim = '0;
+       end
+     end
   end
   always_comb begin
-    complete = '0;
     for (int i = 0 ; i < NumTarget ; i++) begin
-      if (complete_we[i]) complete[complete_id[i]] = 1'b1;
+      if (complete_we[i]) begin 
+         complete[complete_id[i]] = 1'b1;
+      end else begin
+         complete = '0;
+      end
     end
   end
 
@@ -129,31 +135,10 @@ module rv_plic import rv_plic_reg_pkg::*; #(
   assign prio[41] = reg2hw.prio41.q;
   assign prio[42] = reg2hw.prio42.q;
   assign prio[43] = reg2hw.prio43.q;
-  assign prio[44] = reg2hw.prio44.q;
-  assign prio[45] = reg2hw.prio45.q;
-  assign prio[46] = reg2hw.prio46.q;
-  assign prio[47] = reg2hw.prio47.q;
-  assign prio[48] = reg2hw.prio48.q;
-  assign prio[49] = reg2hw.prio49.q;
-  assign prio[50] = reg2hw.prio50.q;
-  assign prio[51] = reg2hw.prio51.q;
-  assign prio[52] = reg2hw.prio52.q;
-  assign prio[53] = reg2hw.prio53.q;
-  assign prio[54] = reg2hw.prio54.q;
-  assign prio[55] = reg2hw.prio55.q;
-  assign prio[56] = reg2hw.prio56.q;
-  assign prio[57] = reg2hw.prio57.q;
-  assign prio[58] = reg2hw.prio58.q;
-  assign prio[59] = reg2hw.prio59.q;
-  assign prio[60] = reg2hw.prio60.q;
-  assign prio[61] = reg2hw.prio61.q;
-  assign prio[62] = reg2hw.prio62.q;
-  assign prio[63] = reg2hw.prio63.q;
-
   //////////////////////
   // Interrupt Enable //
   //////////////////////
-  for (genvar s = 0; s < 64; s++) begin : gen_ie0
+  for (genvar s = 0; s < 44; s++) begin : gen_ie0
     assign ie[0][s] = reg2hw.ie0[s].q;
   end
 
@@ -179,7 +164,7 @@ module rv_plic import rv_plic_reg_pkg::*; #(
   ////////
   // IP //
   ////////
-  for (genvar s = 0; s < 64; s++) begin : gen_ip
+  for (genvar s = 0; s < 44; s++) begin : gen_ip
     assign hw2reg.ip[s].de = 1'b1; // Always write
     assign hw2reg.ip[s].d  = ip[s];
   end
@@ -187,7 +172,7 @@ module rv_plic import rv_plic_reg_pkg::*; #(
   ///////////////////////////////////
   // Detection:: 0: Level, 1: Edge //
   ///////////////////////////////////
-  for (genvar s = 0; s < 64; s++) begin : gen_le
+  for (genvar s = 0; s < 44; s++) begin : gen_le
     assign le[s] = reg2hw.le[s].q;
   end
 
@@ -250,17 +235,7 @@ module rv_plic import rv_plic_reg_pkg::*; #(
     .devmode_i  (1'b1)
   );
 
-  // Assertions
-//  `ASSERT_KNOWN(TlDValidKnownO_A, tl_o.d_valid)
-//  `ASSERT_KNOWN(TlAReadyKnownO_A, tl_o.a_ready)
-//  `ASSERT_KNOWN(IrqKnownO_A, irq_o)
-//  `ASSERT_KNOWN(MsipKnownO_A, msip_o)
-//  for (genvar k = 0; k < NumTarget; k++) begin : gen_irq_id_known
-//    `ASSERT_KNOWN(IrqIdKnownO_A, irq_id_o[k])
-//  end
 
-//  // Assume
-//  `ASSUME(Irq0Tied_A, intr_src_i[0] == 1'b0)
 
 endmodule
 
