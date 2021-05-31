@@ -3,8 +3,8 @@ module azadi_soc_top (
   input clk_i,
   input rst_ni,
   input prog,
-  output system_rst_ni,
-  output prog_rst_ni,
+  //output system_rst_ni,
+  //output prog_rst_ni,
   input  logic [31:0] gpio_i,
   output logic [31:0] gpio_o,
   output logic [31:0] gpio_oe,
@@ -45,8 +45,8 @@ localparam logic [31:0] JTAG_ID = {
 };
 
 
-//  logic prog_rst_n;
-//  logic system_rst_ni;
+ logic prog_rst_n;
+ logic system_rst_ni;
   logic [31:0] gpio_in;
   logic [31:0] gpio_out;
   
