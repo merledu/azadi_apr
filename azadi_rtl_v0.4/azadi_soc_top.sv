@@ -76,6 +76,10 @@ localparam logic [31:0] JTAG_ID = {
   logic [3:0]  data_wmask;
   logic        data_we;
   logic [31:0] data_rdata;
+  
+  logic [31:0] iccm_ctrl_data;
+  logic        iccm_ctrl_we;
+  logic [11:0] iccm_ctrl_addr_o;
 
         
   tlul_pkg::tl_h2d_t ifu_to_xbar;
@@ -114,7 +118,7 @@ localparam logic [31:0] JTAG_ID = {
   tlul_pkg::tl_d2h_t spi_to_xbar;
 
   // interrupt vector
-  logic [63:0] intr_vector;
+  logic [43:0] intr_vector;
 
   // Interrupt source list 
   logic [31:0] intr_gpio;
@@ -134,7 +138,6 @@ localparam logic [31:0] JTAG_ID = {
   assign intr_vector = { 
       intr_srx,
       intr_stx,
-      intr_gpio,
       intr_uart0_rx_parity_err,
       intr_uart0_rx_timeout,
       intr_uart0_rx_break_err,
@@ -143,7 +146,7 @@ localparam logic [31:0] JTAG_ID = {
       intr_uart0_tx_empty,
       intr_uart0_rx_watermark,
       intr_uart0_tx_watermark,
-      intr_stx,
+      intr_gpio,
       1'b0
   };
 
@@ -344,14 +347,6 @@ gpio GPIO (
 
   .intr_gpio_o    (intr_gpio )  
 );
-logic [31:0] iccm_ctrl_data;
-logic        iccm_ctrl_we;
-logic [11:0] iccm_ctrl_addr_o;
-//wire        prog_rst_n;
-//logic iccm_wen;
-//assign instr_addr = ( prog_rst_n ? tlul_addr : addr_o[11:0] ); 
-//assign iccm_wen = ( prog_rst_n ? 1'b0 : iccm_cntrl_we );
-
 
 
 rstmgr reset_manager(
@@ -375,8 +370,6 @@ rv_plic intr_controller (
 
   // Interrupt notification to targets
   .irq_o (intr_req),
-  .irq_id_o(),
-
   .msip_o()
 );
 
