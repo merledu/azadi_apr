@@ -3,7 +3,7 @@ module azadi_soc_top (
   input clk_i,
   input rst_ni,
   input prog,
-  input [15:0] prog_buade;
+  input [15:0] prog_buade,
 
   input  logic [31:0] gpio_i,
   output logic [31:0] gpio_o,
