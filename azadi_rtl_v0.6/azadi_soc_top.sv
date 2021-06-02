@@ -447,26 +447,26 @@ instr_mem_top iccm_adapter(
 );
 
 
-  sram_top #(  
+  sram #(  
      .NUM_WMASKS  (4),
-     .MEMD        (2048),
+     //.MEMD        (2048),
      .DATA_WIDTH  (32), // data width
-     .nRPORTS     (1) , // number of reading ports
-     .nWPORTS     (1), // number of write ports
+     //.nRPORTS     (1) , // number of reading ports
+     //.nWPORTS     (1), // number of write ports
      .IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
-     .BASIC_MODEL (1024),
-     .ADDR_WIDTH  (11)
+     //.BASIC_MODEL (1024),
+     .ADDR_WIDTH  (10)
     ) u_iccm ( /*`ifdef USE_POWER_PINS
     inout vdd;
     inout gnd;
   `endif*/
-    .clk      (~clk_i), // clock
-    .csb      (instr_csb), // active low chip select
-    .web      (instr_we), // active low write control
-    .wmask    (instr_wmask), // write mask
-    .addr     (instr_addr[10:0]),
-    .din      (instr_wdata),
-    .dout     (instr_rdata),
+    .clk0      (~clk_i), // clock
+    .csb0      (instr_csb), // active low chip select
+    .web0      (instr_we), // active low write control
+    .wmask0    (instr_wmask), // write mask
+    .addr0     (instr_addr[9:0]),
+    .din0      (instr_wdata),
+    .dout0     (instr_rdata),
     .clk1     (1'b0),
     .csb1     (1'b1),
     .addr1    ('0),
@@ -492,26 +492,26 @@ data_mem_top dccm_adapter(
 );
 
 
-sram_top #(  
+sram #(  
    .NUM_WMASKS  (4),
-   .MEMD        (2048),
+   //.MEMD        (2048),
    .DATA_WIDTH  (32), // data width
-   .nRPORTS     (1) , // number of reading ports
-   .nWPORTS     (1), // number of write ports
+   //.nRPORTS     (1) , // number of reading ports
+   //.nWPORTS     (1), // number of write ports
    .IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
-   .BASIC_MODEL (1024),
-   .ADDR_WIDTH  (11)
+   //.BASIC_MODEL (1024),
+   .ADDR_WIDTH  (10)
   ) u_dccm ( /*`ifdef USE_POWER_PINS
   inout vdd;
   inout gnd;
 `endif*/
-  .clk      (~clk_i), // clock
-  .csb      (data_csb), // active low chip select
-  .web      (data_we), // active low write control
-  .wmask    (data_wmask), // write mask
-  .addr     (data_addr[10:0]),
-  .din      (data_wdata),
-  .dout     (data_rdata),
+  .clk0      (~clk_i), // clock
+  .csb0      (data_csb), // active low chip select
+  .web0      (data_we), // active low write control
+  .wmask0    (data_wmask), // write mask
+  .addr0     (data_addr[9:0]),
+  .din0      (data_wdata),
+  .dout0     (data_rdata),
   .clk1      (1'b0),
   .csb1      (1'b1),
   .addr1     ('0),
