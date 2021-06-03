@@ -92,10 +92,8 @@ fpnew_noncomp.sv
 dm_csrs.sv
 dmi_jtag.sv
 norm_div_sqrt_mvp.sv
-sram.v
 brq_core_top.sv
 debug_rom.sv
-sram_top.v
 fifo_sync.sv
 tlul_err_resp.sv
 timer_core.sv
@@ -113,3 +111,4 @@ brq_fp_register_file_ff.sv
 spi_clgen.v
 brq_idu.sv
 iccm_controller.v
+sky130_sram_4kbyte_1rw1r_32x1024_8.v
