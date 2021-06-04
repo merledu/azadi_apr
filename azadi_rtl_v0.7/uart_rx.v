@@ -25,11 +25,11 @@ module uart_rx (
   always @(posedge clk_i)
   begin
       if(~rst_ni) begin
-        r_Clock_Count = 0;
-        r_Bit_Index   = 0; //8 bits total
-        r_RX_Byte     = 0;
-        r_RX_DV       = 0;
-        r_SM_Main     = 0;
+        r_Clock_Count <= 0;
+        r_Bit_Index   <= 0; //8 bits total
+        r_RX_Byte     <= 0;
+        r_RX_DV       <= 0;
+        r_SM_Main     <= 0;
       end else if(rx_en) begin
     case (r_SM_Main)
       IDLE :
@@ -124,11 +124,11 @@ module uart_rx (
       
     endcase
     end else begin
-        r_Clock_Count = 0;
-        r_Bit_Index   = 0; //8 bits total
-        r_RX_Byte     = 0;
-        r_RX_DV       = 0;
-        r_SM_Main     = 0;
+        r_Clock_Count <= 0;
+        r_Bit_Index   <= 0; //8 bits total
+        r_RX_Byte     <= 0;
+        r_RX_DV       <= 0;
+        r_SM_Main     <= 0;
     end 
   end    
   

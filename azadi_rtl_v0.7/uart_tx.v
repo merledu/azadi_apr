@@ -25,11 +25,11 @@ module uart_tx (
   always @(posedge clk_i)
   begin
     if(~rst_ni) begin
-        r_SM_Main     = 0;
-        r_Clock_Count = 0;
-        r_Bit_Index   = 0;
-        r_TX_Data     = 0;
-        r_TX_Done     = 0;
+        r_SM_Main     <= 0;
+        r_Clock_Count <= 0;
+        r_Bit_Index   <= 0;
+        r_TX_Data     <= 0;
+        r_TX_Done     <= 0;
        // r_TX_Active   = 0;
     end else begin
     case (r_SM_Main)
