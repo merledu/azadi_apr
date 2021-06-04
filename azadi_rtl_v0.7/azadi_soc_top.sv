@@ -118,7 +118,7 @@ localparam logic [31:0] JTAG_ID = {
   tlul_pkg::tl_d2h_t spi_to_xbar;
 
   // interrupt vector
-  logic [42:0] intr_vector;
+  logic [35:0] intr_vector;
 
   // Interrupt source list 
   logic [31:0] intr_gpio;

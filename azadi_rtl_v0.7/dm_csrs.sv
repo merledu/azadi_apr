@@ -64,7 +64,7 @@ module dm_csrs #(
   // control signals in
   output logic                              sbreadonaddr_o,
   output logic                              sbautoincrement_o,
-  (* keep = "true" *) output logic [2:0]                        sbaccess_o,
+  output logic [2:0]                        sbaccess_o,
   // data out
   output logic                              sbreadondata_o,
   output logic [BusWidth-1:0]               sbdata_o,
@@ -206,7 +206,7 @@ module dm_csrs #(
 
   // helper variables
   dm::sbcs_t sbcs;
-   (* keep = "true" *) dm::dmcontrol_t dmcontrol;
+  dm::dmcontrol_t dmcontrol;
   dm::abstractcs_t a_abstractcs;
   logic [4:0] autoexecdata_idx;
   always_comb begin : csr_read_write
