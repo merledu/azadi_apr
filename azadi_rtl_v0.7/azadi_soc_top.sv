@@ -430,16 +430,7 @@ instr_mem_top iccm_adapter(
 );
 
 
-  sky130_sram_4kbyte_1rw1r_32x1024_8 #(  
-     .NUM_WMASKS  (4),
-     //.MEMD        (2048),
-     .DATA_WIDTH  (32), // data width
-     //.nRPORTS     (1) , // number of reading ports
-     //.nWPORTS     (1), // number of write ports
-     //.IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
-     //.BASIC_MODEL (1024),
-     .ADDR_WIDTH  (10)
-    ) u_iccm ( /*`ifdef USE_POWER_PINS
+  sky130_sram_4kbyte_1rw1r_32x1024_8 u_iccm ( /*`ifdef USE_POWER_PINS
     inout vdd;
     inout gnd;
   `endif*/
@@ -475,16 +466,7 @@ data_mem_top dccm_adapter(
 );
 
 
-sky130_sram_4kbyte_1rw1r_32x1024_8 #(  
-   .NUM_WMASKS  (4),
-   //.MEMD        (2048),
-   .DATA_WIDTH  (32), // data width
-   //.nRPORTS     (1) , // number of reading ports
-   //.nWPORTS     (1), // number of write ports
-  // .IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
-  // .BASIC_MODEL (1024),
-   .ADDR_WIDTH  (10)
-  ) u_dccm ( /*`ifdef USE_POWER_PINS
+sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm ( /*`ifdef USE_POWER_PINS
   inout vdd;
   inout gnd;
 `endif*/
