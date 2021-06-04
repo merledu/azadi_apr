@@ -1,3 +1,3045 @@
+// Copyright lowRISC contributors.
+// Copyright 2017 ETH Zurich and University of Bologna, see also CREDITS.md.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+
+/**
+ * Package with constants used by Ibex
+ */
+package brq_pkg;
+
+/////////////////////
+// Parameter Enums //
+/////////////////////
+
+typedef enum integer {
+  RegFileFF    = 0,
+  RegFileFPGA  = 1,
+  RegFileLatch = 2
+} regfile_e;
+
+typedef enum integer {
+  RV32MNone        = 0,
+  RV32MSlow        = 1,
+  RV32MFast        = 2,
+  RV32MSingleCycle = 3
+} rv32m_e;
+
+typedef enum integer {
+  RV32BNone     = 0,
+  RV32BBalanced = 1,
+  RV32BFull     = 2
+} rv32b_e;
+
+// floatig point
+typedef enum integer { 
+  RV32FNone     = 0,
+  RV32FSingle   = 1,
+  RV64FDouble   = 2
+  // RV32FQuad     = 3
+} rvfloat_e;
+
+/////////////
+// Opcodes //
+/////////////
+
+typedef enum logic [6:0] {
+  OPCODE_LOAD     = 7'h03,
+  OPCODE_MISC_MEM = 7'h0f,
+  OPCODE_OP_IMM   = 7'h13,
+  OPCODE_AUIPC    = 7'h17,
+  OPCODE_STORE    = 7'h23,
+  OPCODE_OP       = 7'h33,
+  OPCODE_LUI      = 7'h37,
+  OPCODE_BRANCH   = 7'h63,
+  OPCODE_JALR     = 7'h67,
+  OPCODE_JAL      = 7'h6f,
+  OPCODE_SYSTEM   = 7'h73,
+  // Floating Point
+  OPCODE_LOAD_FP  = 7'h07,
+  OPCODE_STORE_FP = 7'h27,
+  OPCODE_MADD_FP  = 7'h43,
+  OPCODE_MSUB_FP  = 7'h47,
+  OPCODE_NMSUB_FP = 7'h4b,
+  OPCODE_NMADD_FP = 7'h4f,
+  OPCODE_OP_FP    = 7'h53
+} opcode_e;
+
+
+////////////////////
+// ALU operations //
+////////////////////
+
+typedef enum logic [5:0] {
+  // Arithmetics
+  ALU_ADD,
+  ALU_SUB,
+
+  // Logics
+  ALU_XOR,
+  ALU_OR,
+  ALU_AND,
+  // RV32B
+  ALU_XNOR,
+  ALU_ORN,
+  ALU_ANDN,
+
+  // Shifts
+  ALU_SRA,
+  ALU_SRL,
+  ALU_SLL,
+  // RV32B
+  ALU_SRO,
+  ALU_SLO,
+  ALU_ROR,
+  ALU_ROL,
+  ALU_GREV,
+  ALU_GORC,
+  ALU_SHFL,
+  ALU_UNSHFL,
+
+  // Comparisons
+  ALU_LT,
+  ALU_LTU,
+  ALU_GE,
+  ALU_GEU,
+  ALU_EQ,
+  ALU_NE,
+  // RV32B
+  ALU_MIN,
+  ALU_MINU,
+  ALU_MAX,
+  ALU_MAXU,
+
+  // Pack
+  // RV32B
+  ALU_PACK,
+  ALU_PACKU,
+  ALU_PACKH,
+
+  // Sign-Extend
+  // RV32B
+  ALU_SEXTB,
+  ALU_SEXTH,
+
+  // Bitcounting
+  // RV32B
+  ALU_CLZ,
+  ALU_CTZ,
+  ALU_PCNT,
+
+  // Set lower than
+  ALU_SLT,
+  ALU_SLTU,
+
+  // Ternary Bitmanip Operations
+  // RV32B
+  ALU_CMOV,
+  ALU_CMIX,
+  ALU_FSL,
+  ALU_FSR,
+
+  // Single-Bit Operations
+  // RV32B
+  ALU_SBSET,
+  ALU_SBCLR,
+  ALU_SBINV,
+  ALU_SBEXT,
+
+  // Bit Extract / Deposit
+  // RV32B
+  ALU_BEXT,
+  ALU_BDEP,
+
+  // Bit Field Place
+  // RV32B
+  ALU_BFP,
+
+  // Carry-less Multiply
+  // RV32B
+  ALU_CLMUL,
+  ALU_CLMULR,
+  ALU_CLMULH,
+
+  // Cyclic Redundancy Check
+  ALU_CRC32_B,
+  ALU_CRC32C_B,
+  ALU_CRC32_H,
+  ALU_CRC32C_H,
+  ALU_CRC32_W,
+  ALU_CRC32C_W
+} alu_op_e;
+
+typedef enum logic [1:0] {
+  // Multiplier/divider
+  MD_OP_MULL,
+  MD_OP_MULH,
+  MD_OP_DIV,
+  MD_OP_REM
+} md_op_e;
+
+// define which type instruction
+// is catered
+typedef enum logic {
+  SINGLE_FP,
+  DOUBLE_FP
+} fp_type_e;
+
+//////////////////////////////////
+// Control and status registers //
+//////////////////////////////////
+
+// CSR operations
+typedef enum logic [1:0] {
+  CSR_OP_READ,
+  CSR_OP_WRITE,
+  CSR_OP_SET,
+  CSR_OP_CLEAR
+} csr_op_e;
+
+// Privileged mode
+typedef enum logic[1:0] {
+  PRIV_LVL_M = 2'b11,
+  PRIV_LVL_H = 2'b10,
+  PRIV_LVL_S = 2'b01,
+  PRIV_LVL_U = 2'b00
+} priv_lvl_e;
+
+// Constants for the dcsr.xdebugver fields
+typedef enum logic[3:0] {
+   XDEBUGVER_NO     = 4'd0, // no external debug support
+   XDEBUGVER_STD    = 4'd4, // external debug according to RISC-V debug spec
+   XDEBUGVER_NONSTD = 4'd15 // debug not conforming to RISC-V debug spec
+} x_debug_ver_e;
+
+//////////////
+// WB stage //
+//////////////
+
+// Type of instruction present in writeback stage
+typedef enum logic[1:0] {
+  WB_INSTR_LOAD,  // Instruction is awaiting load data
+  WB_INSTR_STORE, // Instruction is awaiting store response
+  WB_INSTR_OTHER  // Instruction doesn't fit into above categories
+} wb_instr_type_e;
+
+//////////////
+// ID stage //
+//////////////
+
+// Operand a selection
+typedef enum logic[1:0] {
+  OP_A_REG_A,
+  OP_A_FWD,
+  OP_A_CURRPC,
+  OP_A_IMM
+} op_a_sel_e;
+
+// Immediate a selection
+typedef enum logic {
+  IMM_A_Z,
+  IMM_A_ZERO
+} imm_a_sel_e;
+
+// Operand b selection
+typedef enum logic {
+  OP_B_REG_B,
+  OP_B_IMM
+} op_b_sel_e;
+
+// Immediate b selection
+typedef enum logic [2:0] {
+  IMM_B_I,
+  IMM_B_S,
+  IMM_B_B,
+  IMM_B_U,
+  IMM_B_J,
+  IMM_B_INCR_PC,
+  IMM_B_INCR_ADDR
+} imm_b_sel_e;
+
+// Regfile write data selection
+typedef enum logic {
+  RF_WD_EX,
+  RF_WD_CSR
+} rf_wd_sel_e;
+
+//////////////
+// IF stage //
+//////////////
+
+// PC mux selection
+typedef enum logic [2:0] {
+  PC_BOOT,
+  PC_JUMP,
+  PC_EXC,
+  PC_ERET,
+  PC_DRET,
+  PC_BP
+} pc_sel_e;
+
+// Exception PC mux selection
+typedef enum logic [1:0] {
+  EXC_PC_EXC,
+  EXC_PC_IRQ,
+  EXC_PC_DBD,
+  EXC_PC_DBG_EXC // Exception while in debug mode
+} exc_pc_sel_e;
+
+// Interrupt requests
+typedef struct packed {
+  logic        irq_software;
+  logic        irq_timer;
+  logic        irq_external;
+  logic [14:0] irq_fast; // 15 fast interrupts,
+                         // one interrupt is reserved for NMI (not visible through mip/mie)
+} irqs_t;
+
+// Exception cause
+typedef enum logic [5:0] {
+  EXC_CAUSE_IRQ_SOFTWARE_M     = {1'b1, 5'd03},
+  EXC_CAUSE_IRQ_TIMER_M        = {1'b1, 5'd07},
+  EXC_CAUSE_IRQ_EXTERNAL_M     = {1'b1, 5'd11},
+  // EXC_CAUSE_IRQ_FAST_0      = {1'b1, 5'd16},
+  // EXC_CAUSE_IRQ_FAST_14     = {1'b1, 5'd30},
+  EXC_CAUSE_IRQ_NM             = {1'b1, 5'd31}, // == EXC_CAUSE_IRQ_FAST_15
+  EXC_CAUSE_INSN_ADDR_MISA     = {1'b0, 5'd00},
+  EXC_CAUSE_INSTR_ACCESS_FAULT = {1'b0, 5'd01},
+  EXC_CAUSE_ILLEGAL_INSN       = {1'b0, 5'd02},
+  EXC_CAUSE_BREAKPOINT         = {1'b0, 5'd03},
+  EXC_CAUSE_LOAD_ACCESS_FAULT  = {1'b0, 5'd05},
+  EXC_CAUSE_STORE_ACCESS_FAULT = {1'b0, 5'd07},
+  EXC_CAUSE_ECALL_UMODE        = {1'b0, 5'd08},
+  EXC_CAUSE_ECALL_MMODE        = {1'b0, 5'd11}
+} exc_cause_e;
+
+// Debug cause
+typedef enum logic [2:0] {
+  DBG_CAUSE_NONE    = 3'h0,
+  DBG_CAUSE_EBREAK  = 3'h1,
+  DBG_CAUSE_TRIGGER = 3'h2,
+  DBG_CAUSE_HALTREQ = 3'h3,
+  DBG_CAUSE_STEP    = 3'h4
+} dbg_cause_e;
+
+// PMP constants
+parameter int unsigned PMP_MAX_REGIONS      = 16;
+parameter int unsigned PMP_CFG_W            = 8;
+
+// PMP acces type
+parameter int unsigned PMP_I = 0;
+parameter int unsigned PMP_D = 1;
+
+typedef enum logic [1:0] {
+  PMP_ACC_EXEC    = 2'b00,
+  PMP_ACC_WRITE   = 2'b01,
+  PMP_ACC_READ    = 2'b10
+} pmp_req_e;
+
+// PMP cfg structures
+typedef enum logic [1:0] {
+  PMP_MODE_OFF   = 2'b00,
+  PMP_MODE_TOR   = 2'b01,
+  PMP_MODE_NA4   = 2'b10,
+  PMP_MODE_NAPOT = 2'b11
+} pmp_cfg_mode_e;
+
+typedef struct packed {
+  logic          lock;
+  pmp_cfg_mode_e mode;
+  logic          exec;
+  logic          write;
+  logic          read;
+} pmp_cfg_t;
+
+// CSRs
+typedef enum logic[11:0] {
+  // Machine information
+  CSR_MHARTID   = 12'hF14,
+
+  // Machine trap setup
+  CSR_MSTATUS   = 12'h300,
+  CSR_MISA      = 12'h301,
+  CSR_MIE       = 12'h304,
+  CSR_MTVEC     = 12'h305,
+
+  // Machine trap handling
+  CSR_MSCRATCH  = 12'h340,
+  CSR_MEPC      = 12'h341,
+  CSR_MCAUSE    = 12'h342,
+  CSR_MTVAL     = 12'h343,
+  CSR_MIP       = 12'h344,
+
+  // Physical memory protection
+  CSR_PMPCFG0   = 12'h3A0,
+  CSR_PMPCFG1   = 12'h3A1,
+  CSR_PMPCFG2   = 12'h3A2,
+  CSR_PMPCFG3   = 12'h3A3,
+  CSR_PMPADDR0  = 12'h3B0,
+  CSR_PMPADDR1  = 12'h3B1,
+  CSR_PMPADDR2  = 12'h3B2,
+  CSR_PMPADDR3  = 12'h3B3,
+  CSR_PMPADDR4  = 12'h3B4,
+  CSR_PMPADDR5  = 12'h3B5,
+  CSR_PMPADDR6  = 12'h3B6,
+  CSR_PMPADDR7  = 12'h3B7,
+  CSR_PMPADDR8  = 12'h3B8,
+  CSR_PMPADDR9  = 12'h3B9,
+  CSR_PMPADDR10 = 12'h3BA,
+  CSR_PMPADDR11 = 12'h3BB,
+  CSR_PMPADDR12 = 12'h3BC,
+  CSR_PMPADDR13 = 12'h3BD,
+  CSR_PMPADDR14 = 12'h3BE,
+  CSR_PMPADDR15 = 12'h3BF,
+
+  // Debug trigger
+  CSR_TSELECT   = 12'h7A0,
+  CSR_TDATA1    = 12'h7A1,
+  CSR_TDATA2    = 12'h7A2,
+  CSR_TDATA3    = 12'h7A3,
+  CSR_MCONTEXT  = 12'h7A8,
+  CSR_SCONTEXT  = 12'h7AA,
+
+  // Debug/trace
+  CSR_DCSR      = 12'h7b0,
+  CSR_DPC       = 12'h7b1,
+
+  // Debug
+  CSR_DSCRATCH0 = 12'h7b2, // optional
+  CSR_DSCRATCH1 = 12'h7b3, // optional
+
+  // Machine Counter/Timers
+  CSR_MCOUNTINHIBIT  = 12'h320,
+  CSR_MHPMEVENT3     = 12'h323,
+  CSR_MHPMEVENT4     = 12'h324,
+  CSR_MHPMEVENT5     = 12'h325,
+  CSR_MHPMEVENT6     = 12'h326,
+  CSR_MHPMEVENT7     = 12'h327,
+  CSR_MHPMEVENT8     = 12'h328,
+  CSR_MHPMEVENT9     = 12'h329,
+  CSR_MHPMEVENT10    = 12'h32A,
+  CSR_MHPMEVENT11    = 12'h32B,
+  CSR_MHPMEVENT12    = 12'h32C,
+  CSR_MHPMEVENT13    = 12'h32D,
+  CSR_MHPMEVENT14    = 12'h32E,
+  CSR_MHPMEVENT15    = 12'h32F,
+  CSR_MHPMEVENT16    = 12'h330,
+  CSR_MHPMEVENT17    = 12'h331,
+  CSR_MHPMEVENT18    = 12'h332,
+  CSR_MHPMEVENT19    = 12'h333,
+  CSR_MHPMEVENT20    = 12'h334,
+  CSR_MHPMEVENT21    = 12'h335,
+  CSR_MHPMEVENT22    = 12'h336,
+  CSR_MHPMEVENT23    = 12'h337,
+  CSR_MHPMEVENT24    = 12'h338,
+  CSR_MHPMEVENT25    = 12'h339,
+  CSR_MHPMEVENT26    = 12'h33A,
+  CSR_MHPMEVENT27    = 12'h33B,
+  CSR_MHPMEVENT28    = 12'h33C,
+  CSR_MHPMEVENT29    = 12'h33D,
+  CSR_MHPMEVENT30    = 12'h33E,
+  CSR_MHPMEVENT31    = 12'h33F,
+  CSR_MCYCLE         = 12'hB00,
+  CSR_MINSTRET       = 12'hB02,
+  CSR_MHPMCOUNTER3   = 12'hB03,
+  CSR_MHPMCOUNTER4   = 12'hB04,
+  CSR_MHPMCOUNTER5   = 12'hB05,
+  CSR_MHPMCOUNTER6   = 12'hB06,
+  CSR_MHPMCOUNTER7   = 12'hB07,
+  CSR_MHPMCOUNTER8   = 12'hB08,
+  CSR_MHPMCOUNTER9   = 12'hB09,
+  CSR_MHPMCOUNTER10  = 12'hB0A,
+  CSR_MHPMCOUNTER11  = 12'hB0B,
+  CSR_MHPMCOUNTER12  = 12'hB0C,
+  CSR_MHPMCOUNTER13  = 12'hB0D,
+  CSR_MHPMCOUNTER14  = 12'hB0E,
+  CSR_MHPMCOUNTER15  = 12'hB0F,
+  CSR_MHPMCOUNTER16  = 12'hB10,
+  CSR_MHPMCOUNTER17  = 12'hB11,
+  CSR_MHPMCOUNTER18  = 12'hB12,
+  CSR_MHPMCOUNTER19  = 12'hB13,
+  CSR_MHPMCOUNTER20  = 12'hB14,
+  CSR_MHPMCOUNTER21  = 12'hB15,
+  CSR_MHPMCOUNTER22  = 12'hB16,
+  CSR_MHPMCOUNTER23  = 12'hB17,
+  CSR_MHPMCOUNTER24  = 12'hB18,
+  CSR_MHPMCOUNTER25  = 12'hB19,
+  CSR_MHPMCOUNTER26  = 12'hB1A,
+  CSR_MHPMCOUNTER27  = 12'hB1B,
+  CSR_MHPMCOUNTER28  = 12'hB1C,
+  CSR_MHPMCOUNTER29  = 12'hB1D,
+  CSR_MHPMCOUNTER30  = 12'hB1E,
+  CSR_MHPMCOUNTER31  = 12'hB1F,
+  CSR_MCYCLEH        = 12'hB80,
+  CSR_MINSTRETH      = 12'hB82,
+  CSR_MHPMCOUNTER3H  = 12'hB83,
+  CSR_MHPMCOUNTER4H  = 12'hB84,
+  CSR_MHPMCOUNTER5H  = 12'hB85,
+  CSR_MHPMCOUNTER6H  = 12'hB86,
+  CSR_MHPMCOUNTER7H  = 12'hB87,
+  CSR_MHPMCOUNTER8H  = 12'hB88,
+  CSR_MHPMCOUNTER9H  = 12'hB89,
+  CSR_MHPMCOUNTER10H = 12'hB8A,
+  CSR_MHPMCOUNTER11H = 12'hB8B,
+  CSR_MHPMCOUNTER12H = 12'hB8C,
+  CSR_MHPMCOUNTER13H = 12'hB8D,
+  CSR_MHPMCOUNTER14H = 12'hB8E,
+  CSR_MHPMCOUNTER15H = 12'hB8F,
+  CSR_MHPMCOUNTER16H = 12'hB90,
+  CSR_MHPMCOUNTER17H = 12'hB91,
+  CSR_MHPMCOUNTER18H = 12'hB92,
+  CSR_MHPMCOUNTER19H = 12'hB93,
+  CSR_MHPMCOUNTER20H = 12'hB94,
+  CSR_MHPMCOUNTER21H = 12'hB95,
+  CSR_MHPMCOUNTER22H = 12'hB96,
+  CSR_MHPMCOUNTER23H = 12'hB97,
+  CSR_MHPMCOUNTER24H = 12'hB98,
+  CSR_MHPMCOUNTER25H = 12'hB99,
+  CSR_MHPMCOUNTER26H = 12'hB9A,
+  CSR_MHPMCOUNTER27H = 12'hB9B,
+  CSR_MHPMCOUNTER28H = 12'hB9C,
+  CSR_MHPMCOUNTER29H = 12'hB9D,
+  CSR_MHPMCOUNTER30H = 12'hB9E,
+  CSR_MHPMCOUNTER31H = 12'hB9F,
+  CSR_CPUCTRL        = 12'h7C0,
+  CSR_SECURESEED     = 12'h7C1,
+
+  // Floating point fcsr
+  CSR_FCSR           = 12'h003,
+  CSR_FRM            = 12'h002,
+  CSR_FFLAG          = 12'h001
+} csr_num_e;
+
+// CSR pmp-related offsets
+parameter logic [11:0] CSR_OFF_PMP_CFG  = 12'h3A0; // pmp_cfg  @ 12'h3a0 - 12'h3a3
+parameter logic [11:0] CSR_OFF_PMP_ADDR = 12'h3B0; // pmp_addr @ 12'h3b0 - 12'h3bf
+
+// CSR status bits
+parameter int unsigned CSR_MSTATUS_MIE_BIT      = 3;
+parameter int unsigned CSR_MSTATUS_MPIE_BIT     = 7;
+parameter int unsigned CSR_MSTATUS_MPP_BIT_LOW  = 11;
+parameter int unsigned CSR_MSTATUS_MPP_BIT_HIGH = 12;
+parameter int unsigned CSR_MSTATUS_MPRV_BIT     = 17;
+parameter int unsigned CSR_MSTATUS_TW_BIT       = 21;
+
+// CSR machine ISA
+parameter logic [1:0] CSR_MISA_MXL = 2'd1; // M-XLEN: XLEN in M-Mode for RV32
+
+// CSR interrupt pending/enable bits
+parameter int unsigned CSR_MSIX_BIT      = 3;
+parameter int unsigned CSR_MTIX_BIT      = 7;
+parameter int unsigned CSR_MEIX_BIT      = 11;
+parameter int unsigned CSR_MFIX_BIT_LOW  = 16;
+parameter int unsigned CSR_MFIX_BIT_HIGH = 30;
+
+endpackage
+// Copyright 2016 ETH Zurich and University of Bologna.
+// Copyright and related rights are licensed under the Solderpad Hardware
+// License, Version 0.51 (the "License"); you may not use this file except in
+// compliance with the License.  You may obtain a copy of the License at
+// http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
+// or agreed to in writing, software, hardware and materials distributed under
+// this License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
+// specific language governing permissions and limitations under the License.
+
+/// cf_math_pkg: Constant Function Implementations of Mathematical Functions for HDL Elaboration
+///
+/// This package contains a collection of mathematical functions that are commonly used when defining
+/// the value of constants in HDL code.  These functions are implemented as Verilog constants
+/// functions.  Introduced in Verilog 2001 (IEEE Std 1364-2001), a constant function (§ 10.3.5) is a
+/// function whose value can be evaluated at compile time or during elaboration.  A constant function
+/// must be called with arguments that are constants.
+package cf_math_pkg;
+
+    /// Ceiled Division of Two Natural Numbers
+    ///
+    /// Returns the quotient of two natural numbers, rounded towards plus infinity.
+    function automatic integer ceil_div (input longint dividend, input longint divisor);
+        automatic longint remainder;
+
+        // pragma translate_off
+        `ifndef VERILATOR
+        if (dividend < 0) begin
+            $fatal(1, "Dividend %0d is not a natural number!", dividend);
+        end
+
+        if (divisor < 0) begin
+            $fatal(1, "Divisor %0d is not a natural number!", divisor);
+        end
+
+        if (divisor == 0) begin
+            $fatal(1, "Division by zero!");
+        end
+        `endif
+        // pragma translate_on
+
+        remainder = dividend;
+        for (ceil_div = 0; remainder > 0; ceil_div++) begin
+            remainder = remainder - divisor;
+        end
+    endfunction
+
+    /// Index width required to be able to represent up to `num_idx` indices as a binary
+    /// encoded signal.
+    /// Ensures that the minimum width if an index signal is `1`, regardless of parametrization.
+    ///
+    /// Sample usage in type definition:
+    /// As parameter:
+    ///   `parameter type idx_t = logic[cf_math_pkg::idx_width(NumIdx)-1:0]`
+    /// As typedef:
+    ///   `typedef logic [cf_math_pkg::idx_width(NumIdx)-1:0] idx_t`
+    function automatic integer unsigned idx_width (input integer unsigned num_idx);
+        return (num_idx > 32'd1) ? unsigned'($clog2(num_idx)) : 32'd1;
+    endfunction
+
+endpackage
+/* Copyright 2018 ETH Zurich and University of Bologna.
+ * Copyright and related rights are licensed under the Solderpad Hardware
+ * License, Version 0.51 (the “License”); you may not use this file except in
+ * compliance with the License.  You may obtain a copy of the License at
+ * http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
+ * or agreed to in writing, software, hardware and materials distributed under
+ * this License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * File:   dm_pkg.sv
+ * Author: Florian Zaruba <zarubaf@iis.ee.ethz.ch>
+ * Date:   30.6.2018
+ *
+ * Description: Debug-module package, contains common system definitions.
+ *
+ */
+
+package dm;
+  localparam logic [3:0] DbgVersion013 = 4'h2;
+  // size of program buffer in junks of 32-bit words
+  localparam logic [4:0] ProgBufSize   = 5'h8;
+
+  // amount of data count registers implemented
+  localparam logic [3:0] DataCount     = 4'h2;
+
+  // address to which a hart should jump when it was requested to halt
+  localparam logic [63:0] HaltAddress = 64'h800;
+  localparam logic [63:0] ResumeAddress = HaltAddress + 4;
+  localparam logic [63:0] ExceptionAddress = HaltAddress + 8;
+
+  // address where data0-15 is shadowed or if shadowed in a CSR
+  // address of the first CSR used for shadowing the data
+  localparam logic [11:0] DataAddr = 12'h380; // we are aligned with Rocket here
+
+  // debug registers
+  typedef enum logic [7:0] {
+    Data0        = 8'h04,
+    Data1        = 8'h05,
+    Data2        = 8'h06,
+    Data3        = 8'h07,
+    Data4        = 8'h08,
+    Data5        = 8'h09,
+    Data6        = 8'h0A,
+    Data7        = 8'h0B,
+    Data8        = 8'h0C,
+    Data9        = 8'h0D,
+    Data10       = 8'h0E,
+    Data11       = 8'h0F,
+    DMControl    = 8'h10,
+    DMStatus     = 8'h11, // r/o
+    Hartinfo     = 8'h12,
+    HaltSum1     = 8'h13,
+    HAWindowSel  = 8'h14,
+    HAWindow     = 8'h15,
+    AbstractCS   = 8'h16,
+    Command      = 8'h17,
+    AbstractAuto = 8'h18,
+    DevTreeAddr0 = 8'h19,
+    DevTreeAddr1 = 8'h1A,
+    DevTreeAddr2 = 8'h1B,
+    DevTreeAddr3 = 8'h1C,
+    NextDM       = 8'h1D,
+    ProgBuf0     = 8'h20,
+    ProgBuf15    = 8'h2F,
+    AuthData     = 8'h30,
+    HaltSum2     = 8'h34,
+    HaltSum3     = 8'h35,
+    SBAddress3   = 8'h37,
+    SBCS         = 8'h38,
+    SBAddress0   = 8'h39,
+    SBAddress1   = 8'h3A,
+    SBAddress2   = 8'h3B,
+    SBData0      = 8'h3C,
+    SBData1      = 8'h3D,
+    SBData2      = 8'h3E,
+    SBData3      = 8'h3F,
+    HaltSum0     = 8'h40
+  } dm_csr_e;
+
+  // debug causes
+  localparam logic [2:0] CauseBreakpoint = 3'h1;
+  localparam logic [2:0] CauseTrigger    = 3'h2;
+  localparam logic [2:0] CauseRequest    = 3'h3;
+  localparam logic [2:0] CauseSingleStep = 3'h4;
+
+  typedef struct packed {
+    logic [31:23] zero1;
+    logic         impebreak;
+    logic [21:20] zero0;
+    logic         allhavereset;
+    logic         anyhavereset;
+    logic         allresumeack;
+    logic         anyresumeack;
+    logic         allnonexistent;
+    logic         anynonexistent;
+    logic         allunavail;
+    logic         anyunavail;
+    logic         allrunning;
+    logic         anyrunning;
+    logic         allhalted;
+    logic         anyhalted;
+    logic         authenticated;
+    logic         authbusy;
+    logic         hasresethaltreq;
+    logic         devtreevalid;
+    logic [3:0]   version;
+  } dmstatus_t;
+
+  typedef struct packed {
+    logic         haltreq;
+    logic         resumereq;
+    logic         hartreset;
+    logic         ackhavereset;
+    logic         zero1;
+    logic         hasel;
+    logic [25:16] hartsello;
+    logic [15:6]  hartselhi;
+    logic [5:4]   zero0;
+    logic         setresethaltreq;
+    logic         clrresethaltreq;
+    logic         ndmreset;
+    logic         dmactive;
+  } dmcontrol_t;
+
+  typedef struct packed {
+    logic [31:24] zero1;
+    logic [23:20] nscratch;
+    logic [19:17] zero0;
+    logic         dataaccess;
+    logic [15:12] datasize;
+    logic [11:0]  dataaddr;
+  } hartinfo_t;
+
+  typedef enum logic [2:0] {
+    CmdErrNone, CmdErrBusy, CmdErrNotSupported,
+    CmdErrorException, CmdErrorHaltResume,
+    CmdErrorBus, CmdErrorOther = 7
+  } cmderr_e;
+
+  typedef struct packed {
+    logic [31:29] zero3;
+    logic [28:24] progbufsize;
+    logic [23:13] zero2;
+    logic         busy;
+    logic         zero1;
+    cmderr_e      cmderr;
+    logic [7:4]   zero0;
+    logic [3:0]   datacount;
+  } abstractcs_t;
+
+  typedef enum logic [7:0] {
+    AccessRegister = 8'h0,
+    QuickAccess    = 8'h1,
+    AccessMemory   = 8'h2
+  } cmd_e;
+
+  typedef struct packed {
+    cmd_e        cmdtype;
+    logic [23:0] control;
+  } command_t;
+
+  typedef struct packed {
+    logic [31:16] autoexecprogbuf;
+    logic [15:12] zero0;
+    logic [11:0]  autoexecdata;
+  } abstractauto_t;
+
+  typedef struct packed {
+    logic         zero1;
+    logic [22:20] aarsize;
+    logic         aarpostincrement;
+    logic         postexec;
+    logic         transfer;
+    logic         write;
+    logic [15:0]  regno;
+  } ac_ar_cmd_t;
+
+  // DTM
+  typedef enum logic [1:0] {
+    DTM_NOP   = 2'h0,
+    DTM_READ  = 2'h1,
+    DTM_WRITE = 2'h2
+  } dtm_op_e;
+
+  typedef struct packed {
+    logic [31:29] sbversion;
+    logic [28:23] zero0;
+    logic         sbbusyerror;
+    logic         sbbusy;
+    logic         sbreadonaddr;
+    logic [19:17] sbaccess;
+    logic         sbautoincrement;
+    logic         sbreadondata;
+    logic [14:12] sberror;
+    logic [11:5]  sbasize;
+    logic         sbaccess128;
+    logic         sbaccess64;
+    logic         sbaccess32;
+    logic         sbaccess16;
+    logic         sbaccess8;
+  } sbcs_t;
+
+  localparam logic [1:0] DTM_SUCCESS = 2'h0;
+
+  typedef struct packed {
+    logic [6:0]  addr;
+    dtm_op_e     op;
+    logic [31:0] data;
+  } dmi_req_t;
+
+  typedef struct packed  {
+    logic [31:0] data;
+    logic [1:0]  resp;
+  } dmi_resp_t;
+
+  // privilege levels
+  typedef enum logic[1:0] {
+    PRIV_LVL_M = 2'b11,
+    PRIV_LVL_S = 2'b01,
+    PRIV_LVL_U = 2'b00
+  } priv_lvl_t;
+
+  // debugregs in core
+  typedef struct packed {
+    logic [31:28]     xdebugver;
+    logic [27:16]     zero2;
+    logic             ebreakm;
+    logic             zero1;
+    logic             ebreaks;
+    logic             ebreaku;
+    logic             stepie;
+    logic             stopcount;
+    logic             stoptime;
+    logic [8:6]       cause;
+    logic             zero0;
+    logic             mprven;
+    logic             nmip;
+    logic             step;
+    priv_lvl_t        prv;
+  } dcsr_t;
+
+  // CSRs
+  typedef enum logic [11:0] {
+    // Floating-Point CSRs
+    CSR_FFLAGS         = 12'h001,
+    CSR_FRM            = 12'h002,
+    CSR_FCSR           = 12'h003,
+    CSR_FTRAN          = 12'h800,
+    // Supervisor Mode CSRs
+    CSR_SSTATUS        = 12'h100,
+    CSR_SIE            = 12'h104,
+    CSR_STVEC          = 12'h105,
+    CSR_SCOUNTEREN     = 12'h106,
+    CSR_SSCRATCH       = 12'h140,
+    CSR_SEPC           = 12'h141,
+    CSR_SCAUSE         = 12'h142,
+    CSR_STVAL          = 12'h143,
+    CSR_SIP            = 12'h144,
+    CSR_SATP           = 12'h180,
+    // Machine Mode CSRs
+    CSR_MSTATUS        = 12'h300,
+    CSR_MISA           = 12'h301,
+    CSR_MEDELEG        = 12'h302,
+    CSR_MIDELEG        = 12'h303,
+    CSR_MIE            = 12'h304,
+    CSR_MTVEC          = 12'h305,
+    CSR_MCOUNTEREN     = 12'h306,
+    CSR_MSCRATCH       = 12'h340,
+    CSR_MEPC           = 12'h341,
+    CSR_MCAUSE         = 12'h342,
+    CSR_MTVAL          = 12'h343,
+    CSR_MIP            = 12'h344,
+    CSR_PMPCFG0        = 12'h3A0,
+    CSR_PMPADDR0       = 12'h3B0,
+    CSR_MVENDORID      = 12'hF11,
+    CSR_MARCHID        = 12'hF12,
+    CSR_MIMPID         = 12'hF13,
+    CSR_MHARTID        = 12'hF14,
+    CSR_MCYCLE         = 12'hB00,
+    CSR_MINSTRET       = 12'hB02,
+    CSR_DCACHE         = 12'h701,
+    CSR_ICACHE         = 12'h700,
+
+    CSR_TSELECT        = 12'h7A0,
+    CSR_TDATA1         = 12'h7A1,
+    CSR_TDATA2         = 12'h7A2,
+    CSR_TDATA3         = 12'h7A3,
+    CSR_TINFO          = 12'h7A4,
+
+    // Debug CSR
+    CSR_DCSR           = 12'h7b0,
+    CSR_DPC            = 12'h7b1,
+    CSR_DSCRATCH0      = 12'h7b2, // optional
+    CSR_DSCRATCH1      = 12'h7b3, // optional
+
+    // Counters and Timers
+    CSR_CYCLE          = 12'hC00,
+    CSR_TIME           = 12'hC01,
+    CSR_INSTRET        = 12'hC02
+  } csr_reg_t;
+
+
+  // Instruction Generation Helpers
+  function automatic logic [31:0] jal (logic [4:0]  rd,
+                                       logic [20:0] imm);
+    // OpCode Jal
+    return {imm[20], imm[10:1], imm[11], imm[19:12], rd, 7'h6f};
+  endfunction
+
+  function automatic logic [31:0] jalr (logic [4:0]  rd,
+                                        logic [4:0]  rs1,
+                                        logic [11:0] offset);
+    // OpCode Jal
+    return {offset[11:0], rs1, 3'b0, rd, 7'h67};
+  endfunction
+
+  function automatic logic [31:0] andi (logic [4:0]  rd,
+                                        logic [4:0]  rs1,
+                                        logic [11:0] imm);
+    // OpCode andi
+    return {imm[11:0], rs1, 3'h7, rd, 7'h13};
+  endfunction
+
+  function automatic logic [31:0] slli (logic [4:0] rd,
+                                        logic [4:0] rs1,
+                                        logic [5:0] shamt);
+    // OpCode slli
+    return {6'b0, shamt[5:0], rs1, 3'h1, rd, 7'h13};
+  endfunction
+
+  function automatic logic [31:0] srli (logic [4:0] rd,
+                                        logic [4:0] rs1,
+                                        logic [5:0] shamt);
+    // OpCode srli
+    return {6'b0, shamt[5:0], rs1, 3'h5, rd, 7'h13};
+  endfunction
+
+  function automatic logic [31:0] load (logic [2:0]  size,
+                                        logic [4:0]  dest,
+                                        logic [4:0]  base,
+                                        logic [11:0] offset);
+    // OpCode Load
+    return {offset[11:0], base, size, dest, 7'h03};
+  endfunction
+
+  function automatic logic [31:0] auipc (logic [4:0]  rd,
+                                         logic [20:0] imm);
+    // OpCode Auipc
+    return {imm[20], imm[10:1], imm[11], imm[19:12], rd, 7'h17};
+  endfunction
+
+  function automatic logic [31:0] store (logic [2:0]  size,
+                                         logic [4:0]  src,
+                                         logic [4:0]  base,
+                                         logic [11:0] offset);
+    // OpCode Store
+    return {offset[11:5], src, base, size, offset[4:0], 7'h23};
+  endfunction
+
+  function automatic logic [31:0] float_load (logic [2:0]  size,
+                                              logic [4:0]  dest,
+                                              logic [4:0]  base,
+                                              logic [11:0] offset);
+    // OpCode Load
+    return {offset[11:0], base, size, dest, 7'b00_001_11};
+  endfunction
+
+  function automatic logic [31:0] float_store (logic [2:0]  size,
+                                               logic [4:0]  src,
+                                               logic [4:0]  base,
+                                               logic [11:0] offset);
+    // OpCode Store
+    return {offset[11:5], src, base, size, offset[4:0], 7'b01_001_11};
+  endfunction
+
+  function automatic logic [31:0] csrw (csr_reg_t   csr,
+                                        logic [4:0] rs1);
+    // CSRRW, rd, OpCode System
+    return {csr, rs1, 3'h1, 5'h0, 7'h73};
+  endfunction
+
+  function automatic logic [31:0] csrr (csr_reg_t   csr,
+                                        logic [4:0] dest);
+    // rs1, CSRRS, rd, OpCode System
+    return {csr, 5'h0, 3'h2, dest, 7'h73};
+  endfunction
+
+  function automatic logic [31:0] branch(logic [4:0]  src2,
+                                         logic [4:0]  src1,
+                                         logic [2:0]  funct3,
+                                         logic [11:0] offset);
+    // OpCode Branch
+    return {offset[11], offset[9:4], src2, src1, funct3,
+        offset[3:0], offset[10], 7'b11_000_11};
+  endfunction
+
+  function automatic logic [31:0] ebreak ();
+    return 32'h00100073;
+  endfunction
+
+  function automatic logic [31:0] wfi ();
+    return 32'h10500073;
+  endfunction
+
+  function automatic logic [31:0] nop ();
+    return 32'h00000013;
+  endfunction
+
+  function automatic logic [31:0] illegal ();
+    return 32'h00000000;
+  endfunction
+
+endpackage : dm
+// Copyright 2019 ETH Zurich and University of Bologna.
+//
+// Copyright and related rights are licensed under the Solderpad Hardware
+// License, Version 0.51 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
+// or agreed to in writing, software, hardware and materials distributed under
+// this License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
+// specific language governing permissions and limitations under the License.
+
+// Author: Stefan Mach <smach@iis.ee.ethz.ch>
+
+package fpnew_pkg;
+
+  // ---------
+  // FP TYPES
+  // ---------
+  // | Enumerator | Format           | Width  | EXP_BITS | MAN_BITS
+  // |:----------:|------------------|-------:|:--------:|:--------:
+  // | FP32       | IEEE binary32    | 32 bit | 8        | 23
+  // | FP64       | IEEE binary64    | 64 bit | 11       | 52
+  // | FP16       | IEEE binary16    | 16 bit | 5        | 10
+  // | FP8        | binary8          |  8 bit | 5        | 2
+  // | FP16ALT    | binary16alt      | 16 bit | 8        | 7
+  // *NOTE:* Add new formats only at the end of the enumeration for backwards compatibilty!
+
+  // Encoding for a format
+  typedef struct packed {
+    int unsigned exp_bits;
+    int unsigned man_bits;
+  } fp_encoding_t;
+
+  localparam int unsigned NUM_FP_FORMATS = 5; // change me to add formats
+  localparam int unsigned FP_FORMAT_BITS = $clog2(NUM_FP_FORMATS);
+
+  // FP formats
+  typedef enum logic [FP_FORMAT_BITS-1:0] {
+    FP32    = 'd0,
+    FP64    = 'd1,
+    FP16    = 'd2,
+    FP8     = 'd3,
+    FP16ALT = 'd4
+    // add new formats here
+  } fp_format_e;
+
+  // Encodings for supported FP formats
+  localparam fp_encoding_t [0:NUM_FP_FORMATS-1] FP_ENCODINGS  = '{
+    '{8,  23}, // IEEE binary32 (single)
+    '{11, 52}, // IEEE binary64 (double)
+    '{5,  10}, // IEEE binary16 (half)
+    '{5,  2},  // custom binary8
+    '{8,  7}   // custom binary16alt
+    // add new formats here
+  };
+
+  typedef logic [0:NUM_FP_FORMATS-1]       fmt_logic_t;    // Logic indexed by FP format (for masks)
+  typedef logic [0:NUM_FP_FORMATS-1][31:0] fmt_unsigned_t; // Unsigned indexed by FP format
+
+  localparam fmt_logic_t CPK_FORMATS = 5'b11000; // FP32 and FP64 can provide CPK only
+
+  // ---------
+  // INT TYPES
+  // ---------
+  // | Enumerator | Width  |
+  // |:----------:|-------:|
+  // | INT8       |  8 bit |
+  // | INT16      | 16 bit |
+  // | INT32      | 32 bit |
+  // | INT64      | 64 bit |
+  // *NOTE:* Add new formats only at the end of the enumeration for backwards compatibilty!
+
+  localparam int unsigned NUM_INT_FORMATS = 4; // change me to add formats
+  localparam int unsigned INT_FORMAT_BITS = $clog2(NUM_INT_FORMATS);
+
+  // Int formats
+  typedef enum logic [INT_FORMAT_BITS-1:0] {
+    INT8,
+    INT16,
+    INT32,
+    INT64
+    // add new formats here
+  } int_format_e;
+
+  // Returns the width of an INT format by index
+  function automatic int unsigned int_width(int_format_e ifmt);
+    unique case (ifmt)
+      INT8:  return 8;
+      INT16: return 16;
+      INT32: return 32;
+      INT64: return 64;
+     // default: begin
+        // pragma translate_off
+       // $fatal(1, "Invalid INT format supplied");
+        // pragma translate_on
+        // just return any integer to avoid any latches
+        // hopefully this error is caught by simulation
+        //return INT8;
+      //end
+    endcase
+  endfunction
+
+  typedef logic [0:NUM_INT_FORMATS-1] ifmt_logic_t; // Logic indexed by INT format (for masks)
+
+  // --------------
+  // FP OPERATIONS
+  // --------------
+  localparam int unsigned NUM_OPGROUPS = 4;
+
+  // Each FP operation belongs to an operation group
+  typedef enum logic [1:0] {
+    ADDMUL, DIVSQRT, NONCOMP, CONV
+  } opgroup_e;
+
+  localparam int unsigned OP_BITS = 4;
+
+  typedef enum logic [OP_BITS-1:0] {
+    FMADD, FNMSUB, ADD, MUL,     // ADDMUL operation group
+    DIV, SQRT,                   // DIVSQRT operation group
+    SGNJ, MINMAX, CMP, CLASSIFY, // NONCOMP operation group
+    F2F, F2I, I2F, CPKAB, CPKCD  // CONV operation group
+  } operation_e;
+
+  // -------------------
+  // RISC-V FP-SPECIFIC
+  // -------------------
+  // Rounding modes
+  typedef enum logic [2:0] {
+    RNE = 3'b000,
+    RTZ = 3'b001,
+    RDN = 3'b010,
+    RUP = 3'b011,
+    RMM = 3'b100,
+    DYN = 3'b111
+  } roundmode_e;
+
+  // Status flags
+  typedef struct packed {
+    logic NV; // Invalid
+    logic DZ; // Divide by zero
+    logic OF; // Overflow
+    logic UF; // Underflow
+    logic NX; // Inexact
+  } status_t;
+
+  // Information about a floating point value
+  typedef struct packed {
+    logic is_normal;     // is the value normal
+    logic is_subnormal;  // is the value subnormal
+    logic is_zero;       // is the value zero
+    logic is_inf;        // is the value infinity
+    logic is_nan;        // is the value NaN
+    logic is_signalling; // is the value a signalling NaN
+    logic is_quiet;      // is the value a quiet NaN
+    logic is_boxed;      // is the value properly NaN-boxed (RISC-V specific)
+  } fp_info_t;
+
+  // Classification mask
+  typedef enum logic [9:0] {
+    NEGINF     = 10'b00_0000_0001,
+    NEGNORM    = 10'b00_0000_0010,
+    NEGSUBNORM = 10'b00_0000_0100,
+    NEGZERO    = 10'b00_0000_1000,
+    POSZERO    = 10'b00_0001_0000,
+    POSSUBNORM = 10'b00_0010_0000,
+    POSNORM    = 10'b00_0100_0000,
+    POSINF     = 10'b00_1000_0000,
+    SNAN       = 10'b01_0000_0000,
+    QNAN       = 10'b10_0000_0000
+  } classmask_e;
+
+  // ------------------
+  // FPU configuration
+  // ------------------
+  // Pipelining registers can be inserted (at elaboration time) into operational units
+  typedef enum logic [1:0] {
+    BEFORE,     // registers are inserted at the inputs of the unit
+    AFTER,      // registers are inserted at the outputs of the unit
+    INSIDE,     // registers are inserted at predetermined (suboptimal) locations in the unit
+    DISTRIBUTED // registers are evenly distributed, INSIDE >= AFTER >= BEFORE
+  } pipe_config_t;
+
+  // Arithmetic units can be arranged in parallel (per format), merged (multi-format) or not at all.
+  typedef enum logic [1:0] {
+    DISABLED, // arithmetic units are not generated
+    PARALLEL, // arithmetic units are generated in prallel slices, one for each format
+    MERGED    // arithmetic units are contained within a merged unit holding multiple formats
+  } unit_type_t;
+
+  // Array of unit types indexed by format
+  typedef unit_type_t [0:NUM_FP_FORMATS-1] fmt_unit_types_t;
+
+  // Array of format-specific unit types by opgroup
+  typedef fmt_unit_types_t [0:NUM_OPGROUPS-1] opgrp_fmt_unit_types_t;
+  // same with unsigned
+  typedef fmt_unsigned_t [0:NUM_OPGROUPS-1] opgrp_fmt_unsigned_t;
+
+  // FPU configuration: features
+  typedef struct packed {
+    int unsigned Width;
+    logic        EnableVectors;
+    logic        EnableNanBox;
+    fmt_logic_t  FpFmtMask;
+    ifmt_logic_t IntFmtMask;
+  } fpu_features_t;
+
+  localparam fpu_features_t RV64D = '{
+    Width:         64,
+    EnableVectors: 1'b0,
+    EnableNanBox:  1'b1,
+    FpFmtMask:     5'b11000,
+    IntFmtMask:    4'b0011
+  };
+
+  localparam fpu_features_t RV32D = '{
+    Width:         64,
+    EnableVectors: 1'b1,
+    EnableNanBox:  1'b1,
+    FpFmtMask:     5'b11000,
+    IntFmtMask:    4'b0010
+  };
+
+  localparam fpu_features_t RV32F = '{
+    Width:         32,
+    EnableVectors: 1'b0,
+    EnableNanBox:  1'b1,
+    FpFmtMask:     5'b10000,
+    IntFmtMask:    4'b0010
+  };
+
+  localparam fpu_features_t RV64D_Xsflt = '{
+    Width:         64,
+    EnableVectors: 1'b1,
+    EnableNanBox:  1'b1,
+    FpFmtMask:     5'b11111,
+    IntFmtMask:    4'b1111
+  };
+
+  localparam fpu_features_t RV32F_Xsflt = '{
+    Width:         32,
+    EnableVectors: 1'b1,
+    EnableNanBox:  1'b1,
+    FpFmtMask:     5'b10111,
+    IntFmtMask:    4'b1110
+  };
+
+  localparam fpu_features_t RV32F_Xf16alt_Xfvec = '{
+    Width:         32,
+    EnableVectors: 1'b1,
+    EnableNanBox:  1'b1,
+    FpFmtMask:     5'b10001,
+    IntFmtMask:    4'b0110
+  };
+
+  // FPU configuraion: implementation
+  typedef struct packed {
+    opgrp_fmt_unsigned_t   PipeRegs;
+    opgrp_fmt_unit_types_t UnitTypes;
+    pipe_config_t          PipeConfig;
+  } fpu_implementation_t;
+
+  localparam fpu_implementation_t DEFAULT_NOREGS = '{
+    PipeRegs:   '{default: 0},
+    UnitTypes:  '{'{default: PARALLEL}, // ADDMUL
+                  '{default: MERGED},   // DIVSQRT
+                  '{default: PARALLEL}, // NONCOMP
+                  '{default: MERGED}},  // CONV
+    PipeConfig: BEFORE
+  };
+
+  localparam fpu_implementation_t DEFAULT_SNITCH = '{
+    PipeRegs:   '{default: 1},
+    UnitTypes:  '{'{default: PARALLEL}, // ADDMUL
+                  '{default: DISABLED}, // DIVSQRT
+                  '{default: PARALLEL}, // NONCOMP
+                  '{default: MERGED}},  // CONV
+    PipeConfig: BEFORE
+  };
+
+  // -----------------------
+  // Synthesis optimization
+  // -----------------------
+  localparam logic DONT_CARE = 1'b1; // the value to assign as don't care
+
+  // -------------------------
+  // General helper functions
+  // -------------------------
+  function automatic int minimum(int a, int b);
+    return (a < b) ? a : b;
+  endfunction
+
+  function automatic int maximum(int a, int b);
+    return (a > b) ? a : b;
+  endfunction
+
+  // -------------------------------------------
+  // Helper functions for FP formats and values
+  // -------------------------------------------
+  // Returns the width of a FP format
+  function automatic int unsigned fp_width(fp_format_e fmt);
+    return FP_ENCODINGS[fmt].exp_bits + FP_ENCODINGS[fmt].man_bits + 1;
+  endfunction
+
+  // Returns the widest FP format present
+  function automatic int unsigned max_fp_width(fmt_logic_t cfg);
+    automatic int unsigned res = 0;
+    for (int unsigned i = 0; i < NUM_FP_FORMATS; i++)
+      if (cfg[i])
+        res = unsigned'(maximum(res, fp_width(fp_format_e'(i))));
+    return res;
+  endfunction
+
+  // Returns the narrowest FP format present
+  function automatic int unsigned min_fp_width(fmt_logic_t cfg);
+    automatic int unsigned res = max_fp_width(cfg);
+    for (int unsigned i = 0; i < NUM_FP_FORMATS; i++)
+      if (cfg[i])
+        res = unsigned'(minimum(res, fp_width(fp_format_e'(i))));
+    return res;
+  endfunction
+
+  // Returns the number of expoent bits for a format
+  function automatic int unsigned exp_bits(fp_format_e fmt);
+    return FP_ENCODINGS[fmt].exp_bits;
+  endfunction
+
+  // Returns the number of mantissa bits for a format
+  function automatic int unsigned man_bits(fp_format_e fmt);
+    return FP_ENCODINGS[fmt].man_bits;
+  endfunction
+
+  // Returns the bias value for a given format (as per IEEE 754-2008)
+  function automatic int unsigned bias(fp_format_e fmt);
+    return unsigned'(2**(FP_ENCODINGS[fmt].exp_bits-1)-1); // symmetrical bias
+  endfunction
+
+  function automatic fp_encoding_t super_format(fmt_logic_t cfg);
+    automatic fp_encoding_t res;
+    res = '0;
+    for (int unsigned fmt = 0; fmt < NUM_FP_FORMATS; fmt++)
+      if (cfg[fmt]) begin // only active format
+        res.exp_bits = unsigned'(maximum(res.exp_bits, exp_bits(fp_format_e'(fmt))));
+        res.man_bits = unsigned'(maximum(res.man_bits, man_bits(fp_format_e'(fmt))));
+      end
+    return res;
+  endfunction
+
+  // -------------------------------------------
+  // Helper functions for INT formats and values
+  // -------------------------------------------
+  // Returns the widest INT format present
+  function automatic int unsigned max_int_width(ifmt_logic_t cfg);
+    automatic int unsigned res = 0;
+    for (int ifmt = 0; ifmt < NUM_INT_FORMATS; ifmt++) begin
+      if (cfg[ifmt]) res = maximum(res, int_width(int_format_e'(ifmt)));
+    end
+    return res;
+  endfunction
+
+  // --------------------------------------------------
+  // Helper functions for operations and FPU structure
+  // --------------------------------------------------
+  // Returns the operation group of the given operation
+  function automatic opgroup_e get_opgroup(operation_e op);
+    unique case (op)
+      FMADD, FNMSUB, ADD, MUL:     return ADDMUL;
+      DIV, SQRT:                   return DIVSQRT;
+      SGNJ, MINMAX, CMP, CLASSIFY: return NONCOMP;
+      F2F, F2I, I2F, CPKAB, CPKCD: return CONV;
+      default:                     return NONCOMP;
+    endcase
+  endfunction
+
+  // Returns the number of operands by operation group
+  function automatic int unsigned num_operands(opgroup_e grp);
+    unique case (grp)
+      ADDMUL:  return 3;
+      DIVSQRT: return 2;
+      NONCOMP: return 2;
+      CONV:    return 3; // vectorial casts use 3 operands
+      default: return 0;
+    endcase
+  endfunction
+
+  // Returns the number of lanes according to width, format and vectors
+  function automatic int unsigned num_lanes(int unsigned width, fp_format_e fmt, logic vec);
+    return vec ? width / fp_width(fmt) : 1; // if no vectors, only one lane
+  endfunction
+
+  // Returns the maximum number of lanes in the FPU according to width, format config and vectors
+  function automatic int unsigned max_num_lanes(int unsigned width, fmt_logic_t cfg, logic vec);
+    return vec ? width / min_fp_width(cfg) : 1; // if no vectors, only one lane
+  endfunction
+
+  // Returns a mask of active FP formats that are present in lane lane_no of a multiformat slice
+  function automatic fmt_logic_t get_lane_formats(int unsigned width,
+                                                  fmt_logic_t cfg,
+                                                  int unsigned lane_no);
+    automatic fmt_logic_t res;
+    for (int unsigned fmt = 0; fmt < NUM_FP_FORMATS; fmt++)
+      // Mask active formats with the number of lanes for that format
+      res[fmt] = cfg[fmt] & (width / fp_width(fp_format_e'(fmt)) > lane_no);
+    return res;
+  endfunction
+
+  // Returns a mask of active INT formats that are present in lane lane_no of a multiformat slice
+  function automatic ifmt_logic_t get_lane_int_formats(int unsigned width,
+                                                       fmt_logic_t cfg,
+                                                       ifmt_logic_t icfg,
+                                                       int unsigned lane_no);
+    automatic ifmt_logic_t res;
+    automatic fmt_logic_t lanefmts;
+    res = '0;
+    lanefmts = get_lane_formats(width, cfg, lane_no);
+
+    for (int unsigned ifmt = 0; ifmt < NUM_INT_FORMATS; ifmt++)
+      for (int unsigned fmt = 0; fmt < NUM_FP_FORMATS; fmt++)
+        // Mask active int formats with the width of the float formats
+        if ((fp_width(fp_format_e'(fmt)) == int_width(int_format_e'(ifmt))))
+          res[ifmt] |= icfg[ifmt] && lanefmts[fmt];
+    return res;
+  endfunction
+
+  // Returns a mask of active FP formats that are present in lane lane_no of a CONV slice
+  function automatic fmt_logic_t get_conv_lane_formats(int unsigned width,
+                                                       fmt_logic_t cfg,
+                                                       int unsigned lane_no);
+    automatic fmt_logic_t res;
+    for (int unsigned fmt = 0; fmt < NUM_FP_FORMATS; fmt++)
+      // Mask active formats with the number of lanes for that format, CPK at least twice
+      res[fmt] = cfg[fmt] && ((width / fp_width(fp_format_e'(fmt)) > lane_no) ||
+                             (CPK_FORMATS[fmt] && (lane_no < 2)));
+    return res;
+  endfunction
+
+  // Returns a mask of active INT formats that are present in lane lane_no of a CONV slice
+  function automatic ifmt_logic_t get_conv_lane_int_formats(int unsigned width,
+                                                            fmt_logic_t cfg,
+                                                            ifmt_logic_t icfg,
+                                                            int unsigned lane_no);
+    automatic ifmt_logic_t res;
+    automatic fmt_logic_t lanefmts;
+    res = '0;
+    lanefmts = get_conv_lane_formats(width, cfg, lane_no);
+
+    for (int unsigned ifmt = 0; ifmt < NUM_INT_FORMATS; ifmt++)
+      for (int unsigned fmt = 0; fmt < NUM_FP_FORMATS; fmt++)
+        // Mask active int formats with the width of the float formats
+        res[ifmt] |= icfg[ifmt] && lanefmts[fmt] &&
+                     (fp_width(fp_format_e'(fmt)) == int_width(int_format_e'(ifmt)));
+    return res;
+  endfunction
+
+  // Return whether any active format is set as MERGED
+  function automatic logic any_enabled_multi(fmt_unit_types_t types, fmt_logic_t cfg);
+    for (int unsigned i = 0; i < NUM_FP_FORMATS; i++)
+      if (cfg[i] && types[i] == MERGED)
+        return 1'b1;
+      return 1'b0;
+  endfunction
+
+  // Return whether the given format is the first active one set as MERGED
+  function automatic logic is_first_enabled_multi(fp_format_e fmt,
+                                                  fmt_unit_types_t types,
+                                                  fmt_logic_t cfg);
+    for (int unsigned i = 0; i < NUM_FP_FORMATS; i++) begin
+      if (cfg[i] && types[i] == MERGED) return (fp_format_e'(i) == fmt);
+    end
+    return 1'b0;
+  endfunction
+
+  // Returns the first format that is active and is set as MERGED
+  function automatic fp_format_e get_first_enabled_multi(fmt_unit_types_t types, fmt_logic_t cfg);
+    for (int unsigned i = 0; i < NUM_FP_FORMATS; i++)
+      if (cfg[i] && types[i] == MERGED)
+        return fp_format_e'(i);
+      return fp_format_e'(0);
+  endfunction
+
+  // Returns the largest number of regs that is active and is set as MERGED
+  function automatic int unsigned get_num_regs_multi(fmt_unsigned_t regs,
+                                                     fmt_unit_types_t types,
+                                                     fmt_logic_t cfg);
+    automatic int unsigned res = 0;
+    for (int unsigned i = 0; i < NUM_FP_FORMATS; i++) begin
+      if (cfg[i] && types[i] == MERGED) res = maximum(res, regs[i]);
+    end
+    return res;
+  endfunction
+
+endpackage
+// Copyright lowRISC contributors.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Register Package auto-generated by `reggen` containing data structure
+
+package gpio_reg_pkg;
+
+  // Address width within the block
+  parameter int BlockAw = 6;
+
+  ////////////////////////////
+  // Typedefs for registers //
+  ////////////////////////////
+  typedef struct packed {
+    logic [31:0] q;
+  } gpio_reg2hw_intr_state_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+  } gpio_reg2hw_intr_enable_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+    logic        qe;
+  } gpio_reg2hw_intr_test_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+    logic        qe;
+  } gpio_reg2hw_direct_out_reg_t;
+
+  typedef struct packed {
+    struct packed {
+      logic [15:0] q;
+      logic        qe;
+    } data;
+    struct packed {
+      logic [15:0] q;
+      logic        qe;
+    } mask;
+  } gpio_reg2hw_masked_out_lower_reg_t;
+
+  typedef struct packed {
+    struct packed {
+      logic [15:0] q;
+      logic        qe;
+    } data;
+    struct packed {
+      logic [15:0] q;
+      logic        qe;
+    } mask;
+  } gpio_reg2hw_masked_out_upper_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+    logic        qe;
+  } gpio_reg2hw_direct_oe_reg_t;
+
+  typedef struct packed {
+    struct packed {
+      logic [15:0] q;
+      logic        qe;
+    } data;
+    struct packed {
+      logic [15:0] q;
+      logic        qe;
+    } mask;
+  } gpio_reg2hw_masked_oe_lower_reg_t;
+
+  typedef struct packed {
+    struct packed {
+      logic [15:0] q;
+      logic        qe;
+    } data;
+    struct packed {
+      logic [15:0] q;
+      logic        qe;
+    } mask;
+  } gpio_reg2hw_masked_oe_upper_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+  } gpio_reg2hw_intr_ctrl_en_rising_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+  } gpio_reg2hw_intr_ctrl_en_falling_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+  } gpio_reg2hw_intr_ctrl_en_lvlhigh_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+  } gpio_reg2hw_intr_ctrl_en_lvllow_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+  } gpio_reg2hw_ctrl_en_input_filter_reg_t;
+
+
+  typedef struct packed {
+    logic [31:0] d;
+    logic        de;
+  } gpio_hw2reg_intr_state_reg_t;
+
+  typedef struct packed {
+    logic [31:0] d;
+    logic        de;
+  } gpio_hw2reg_data_in_reg_t;
+
+  typedef struct packed {
+    logic [31:0] d;
+  } gpio_hw2reg_direct_out_reg_t;
+
+  typedef struct packed {
+    struct packed {
+      logic [15:0] d;
+    } data;
+    struct packed {
+      logic [15:0] d;
+    } mask;
+  } gpio_hw2reg_masked_out_lower_reg_t;
+
+  typedef struct packed {
+    struct packed {
+      logic [15:0] d;
+    } data;
+    struct packed {
+      logic [15:0] d;
+    } mask;
+  } gpio_hw2reg_masked_out_upper_reg_t;
+
+  typedef struct packed {
+    logic [31:0] d;
+  } gpio_hw2reg_direct_oe_reg_t;
+
+  typedef struct packed {
+    struct packed {
+      logic [15:0] d;
+    } data;
+    struct packed {
+      logic [15:0] d;
+    } mask;
+  } gpio_hw2reg_masked_oe_lower_reg_t;
+
+  typedef struct packed {
+    struct packed {
+      logic [15:0] d;
+    } data;
+    struct packed {
+      logic [15:0] d;
+    } mask;
+  } gpio_hw2reg_masked_oe_upper_reg_t;
+
+
+  ///////////////////////////////////////
+  // Register to internal design logic //
+  ///////////////////////////////////////
+  typedef struct packed {
+    gpio_reg2hw_intr_state_reg_t intr_state; // [458:427]
+    gpio_reg2hw_intr_enable_reg_t intr_enable; // [426:395]
+    gpio_reg2hw_intr_test_reg_t intr_test; // [394:362]
+    gpio_reg2hw_direct_out_reg_t direct_out; // [361:329]
+    gpio_reg2hw_masked_out_lower_reg_t masked_out_lower; // [328:295]
+    gpio_reg2hw_masked_out_upper_reg_t masked_out_upper; // [294:261]
+    gpio_reg2hw_direct_oe_reg_t direct_oe; // [260:228]
+    gpio_reg2hw_masked_oe_lower_reg_t masked_oe_lower; // [227:194]
+    gpio_reg2hw_masked_oe_upper_reg_t masked_oe_upper; // [193:160]
+    gpio_reg2hw_intr_ctrl_en_rising_reg_t intr_ctrl_en_rising; // [159:128]
+    gpio_reg2hw_intr_ctrl_en_falling_reg_t intr_ctrl_en_falling; // [127:96]
+    gpio_reg2hw_intr_ctrl_en_lvlhigh_reg_t intr_ctrl_en_lvlhigh; // [95:64]
+    gpio_reg2hw_intr_ctrl_en_lvllow_reg_t intr_ctrl_en_lvllow; // [63:32]
+    gpio_reg2hw_ctrl_en_input_filter_reg_t ctrl_en_input_filter; // [31:0]
+  } gpio_reg2hw_t;
+
+  ///////////////////////////////////////
+  // Internal design logic to register //
+  ///////////////////////////////////////
+  typedef struct packed {
+    gpio_hw2reg_intr_state_reg_t intr_state; // [257:225]
+    gpio_hw2reg_data_in_reg_t data_in; // [224:192]
+    gpio_hw2reg_direct_out_reg_t direct_out; // [191:160]
+    gpio_hw2reg_masked_out_lower_reg_t masked_out_lower; // [159:128]
+    gpio_hw2reg_masked_out_upper_reg_t masked_out_upper; // [127:96]
+    gpio_hw2reg_direct_oe_reg_t direct_oe; // [95:64]
+    gpio_hw2reg_masked_oe_lower_reg_t masked_oe_lower; // [63:32]
+    gpio_hw2reg_masked_oe_upper_reg_t masked_oe_upper; // [31:0]
+  } gpio_hw2reg_t;
+
+  // Register Address
+  parameter logic [BlockAw-1:0] GPIO_INTR_STATE_OFFSET = 6'h 0;
+  parameter logic [BlockAw-1:0] GPIO_INTR_ENABLE_OFFSET = 6'h 4;
+  parameter logic [BlockAw-1:0] GPIO_INTR_TEST_OFFSET = 6'h 8;
+  parameter logic [BlockAw-1:0] GPIO_DATA_IN_OFFSET = 6'h c;
+  parameter logic [BlockAw-1:0] GPIO_DIRECT_OUT_OFFSET = 6'h 10;
+  parameter logic [BlockAw-1:0] GPIO_MASKED_OUT_LOWER_OFFSET = 6'h 14;
+  parameter logic [BlockAw-1:0] GPIO_MASKED_OUT_UPPER_OFFSET = 6'h 18;
+  parameter logic [BlockAw-1:0] GPIO_DIRECT_OE_OFFSET = 6'h 1c;
+  parameter logic [BlockAw-1:0] GPIO_MASKED_OE_LOWER_OFFSET = 6'h 20;
+  parameter logic [BlockAw-1:0] GPIO_MASKED_OE_UPPER_OFFSET = 6'h 24;
+  parameter logic [BlockAw-1:0] GPIO_INTR_CTRL_EN_RISING_OFFSET = 6'h 28;
+  parameter logic [BlockAw-1:0] GPIO_INTR_CTRL_EN_FALLING_OFFSET = 6'h 2c;
+  parameter logic [BlockAw-1:0] GPIO_INTR_CTRL_EN_LVLHIGH_OFFSET = 6'h 30;
+  parameter logic [BlockAw-1:0] GPIO_INTR_CTRL_EN_LVLLOW_OFFSET = 6'h 34;
+  parameter logic [BlockAw-1:0] GPIO_CTRL_EN_INPUT_FILTER_OFFSET = 6'h 38;
+
+
+  // Register Index
+  typedef enum int {
+    GPIO_INTR_STATE,
+    GPIO_INTR_ENABLE,
+    GPIO_INTR_TEST,
+    GPIO_DATA_IN,
+    GPIO_DIRECT_OUT,
+    GPIO_MASKED_OUT_LOWER,
+    GPIO_MASKED_OUT_UPPER,
+    GPIO_DIRECT_OE,
+    GPIO_MASKED_OE_LOWER,
+    GPIO_MASKED_OE_UPPER,
+    GPIO_INTR_CTRL_EN_RISING,
+    GPIO_INTR_CTRL_EN_FALLING,
+    GPIO_INTR_CTRL_EN_LVLHIGH,
+    GPIO_INTR_CTRL_EN_LVLLOW,
+    GPIO_CTRL_EN_INPUT_FILTER
+  } gpio_id_e;
+
+  // Register width information to check illegal writes
+  parameter logic [3:0] GPIO_PERMIT [15] = '{
+    4'b 1111, // index[ 0] GPIO_INTR_STATE
+    4'b 1111, // index[ 1] GPIO_INTR_ENABLE
+    4'b 1111, // index[ 2] GPIO_INTR_TEST
+    4'b 1111, // index[ 3] GPIO_DATA_IN
+    4'b 1111, // index[ 4] GPIO_DIRECT_OUT
+    4'b 1111, // index[ 5] GPIO_MASKED_OUT_LOWER
+    4'b 1111, // index[ 6] GPIO_MASKED_OUT_UPPER
+    4'b 1111, // index[ 7] GPIO_DIRECT_OE
+    4'b 1111, // index[ 8] GPIO_MASKED_OE_LOWER
+    4'b 1111, // index[ 9] GPIO_MASKED_OE_UPPER
+    4'b 1111, // index[10] GPIO_INTR_CTRL_EN_RISING
+    4'b 1111, // index[11] GPIO_INTR_CTRL_EN_FALLING
+    4'b 1111, // index[12] GPIO_INTR_CTRL_EN_LVLHIGH
+    4'b 1111, // index[13] GPIO_INTR_CTRL_EN_LVLLOW
+    4'b 1111  // index[14] GPIO_CTRL_EN_INPUT_FILTER
+  };
+endpackage
+
+// Copyright lowRISC contributors.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+
+package jtag_pkg;
+
+  typedef struct packed {
+    logic tck;
+    logic tms;
+    logic trst_n;
+    logic tdi;
+  } jtag_req_t;
+
+  parameter jtag_req_t JTAG_REQ_DEFAULT = '0;
+
+  typedef struct packed {
+    logic tdo;
+    logic tdo_oe;
+  } jtag_rsp_t;
+
+  parameter jtag_rsp_t JTAG_RSP_DEFAULT = '0;
+
+endpackage : jtag_pkg
+// Copyright lowRISC contributors.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Constants for use in primitives
+//
+// This file is a stop-gap until the DV file list is generated by FuseSoC.
+// Its contents are taken from the file which would be generated by FuseSoC.
+// https://github.com/lowRISC/ibex/issues/893
+
+package prim_pkg;
+
+  // Implementation target specialization
+  typedef enum integer {
+    ImplGeneric,
+    ImplXilinx
+  } impl_e;
+endpackage : prim_pkg// Copyright lowRISC contributors.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+
+
+/**
+ * Utility functions
+ */
+package prim_util_pkg;
+  /**
+   * Math function: $clog2 as specified in Verilog-2005
+   *
+   * Do not use this function if $clog2() is available.
+   *
+   * clog2 =          0        for value == 0
+   *         ceil(log2(value)) for value >= 1
+   *
+   * This implementation is a synthesizable variant of the $clog2 function as
+   * specified in the Verilog-2005 standard (IEEE 1364-2005).
+   *
+   * To quote the standard:
+   *   The system function $clog2 shall return the ceiling of the log
+   *   base 2 of the argument (the log rounded up to an integer
+   *   value). The argument can be an integer or an arbitrary sized
+   *   vector value. The argument shall be treated as an unsigned
+   *   value, and an argument value of 0 shall produce a result of 0.
+   */
+  function automatic integer _clog2(integer value);
+    integer result;
+    // Use an intermediate value to avoid assigning to an input port, which produces a warning in
+    // Synopsys DC.
+    integer v = value;
+    v = v - 1;
+    for (result = 0; v > 0; result++) begin
+      v = v >> 1;
+    end
+    return result;
+  endfunction
+
+
+  /**
+   * Math function: Number of bits needed to address |value| items.
+   *
+   *                  0        for value == 0
+   * vbits =          1        for value == 1
+   *         ceil(log2(value)) for value > 1
+   *
+   *
+   * The primary use case for this function is the definition of registers/arrays
+   * which are wide enough to contain |value| items.
+   *
+   * This function identical to $clog2() for all input values except the value 1;
+   * it could be considered an "enhanced" $clog2() function.
+   *
+   *
+   * Example 1:
+   *   parameter Items = 1;
+   *   localparam ItemsWidth = vbits(Items); // 1
+   *   logic [ItemsWidth-1:0] item_register; // items_register is now [0:0]
+   *
+   * Example 2:
+   *   parameter Items = 64;
+   *   localparam ItemsWidth = vbits(Items); // 6
+   *   logic [ItemsWidth-1:0] item_register; // items_register is now [5:0]
+   *
+   * Note: If you want to store the number "value" inside a register, you need
+   * a register with size vbits(value + 1), since you also need to store
+   * the number 0.
+   *
+   * Example 3:
+   *   logic [vbits(64)-1:0]     store_64_logic_values; // width is [5:0]
+   *   logic [vbits(64 + 1)-1:0] store_number_64;       // width is [6:0]
+   */
+  function automatic integer vbits(integer value);
+`ifdef XCELIUM
+    // The use of system functions was not allowed here in Verilog-2001, but is
+    // valid since (System)Verilog-2005, which is also when $clog2() first
+    // appeared.
+    // Xcelium < 19.10 does not yet support the use of $clog2() here, fall back
+    // to an implementation without a system function. Remove this workaround
+    // if we require a newer Xcelium version.
+    // See #2579 and #2597.
+    return (value == 1) ? 1 : _clog2(value);
+`else
+    return (value == 1) ? 1 : $clog2(value);
+`endif
+  endfunction
+
+endpackage// Copyright 2018 ETH Zurich and University of Bologna.
+//
+// Copyright and related rights are licensed under the Solderpad Hardware
+// License, Version 0.51 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
+// or agreed to in writing, software, hardware and materials distributed under
+// this License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
+// specific language governing permissions and limitations under the License.
+
+// Common register defines for RTL designs
+`ifndef COMMON_CELLS_REGISTERS_SVH_
+`define COMMON_CELLS_REGISTERS_SVH_
+
+// Abridged Summary of available FF macros:
+// `FF:      asynchronous active-low reset (implicit clock and reset)
+// `FFAR:    asynchronous active-high reset
+// `FFARN:   asynchronous active-low reset
+// `FFSR:    synchronous active-high reset
+// `FFSRN:   synchronous active-low reset
+// `FFNR:    without reset
+// `FFL:     load-enable and asynchronous active-low reset (implicit clock and reset)
+// `FFLAR:   load-enable and asynchronous active-high reset
+// `FFLARN:  load-enable and asynchronous active-low reset
+// `FFLARNC: load-enable and asynchronous active-low reset and synchronous active-high clear
+// `FFLSR:   load-enable and synchronous active-high reset
+// `FFLSRN:  load-enable and synchronous active-low reset
+// `FFLNR:   load-enable without reset
+
+
+// Flip-Flop with asynchronous active-low reset (implicit clock and reset)
+// __q: Q output of FF
+// __d: D input of FF
+// __reset_value: value assigned upon reset
+// Implicit:
+// clk_i: clock input
+// rst_ni: reset input (asynchronous, active low)
+`define FF(__q, __d, __reset_value)                  \
+  always_ff @(posedge clk_i or negedge rst_ni) begin \
+    if (!rst_ni) begin                               \
+      __q <= (__reset_value);                        \
+    end else begin                                   \
+      __q <= (__d);                                  \
+    end                                              \
+  end
+
+// Flip-Flop with asynchronous active-high reset
+// __q: Q output of FF
+// __d: D input of FF
+// __reset_value: value assigned upon reset
+// __clk: clock input
+// __arst: asynchronous reset
+`define FFAR(__q, __d, __reset_value, __clk, __arst)     \
+  always_ff @(posedge (__clk) or posedge (__arst)) begin \
+    if (__arst) begin                                    \
+      __q <= (__reset_value);                            \
+    end else begin                                       \
+      __q <= (__d);                                      \
+    end                                                  \
+  end
+
+// Flip-Flop with asynchronous active-low reset
+// __q: Q output of FF
+// __d: D input of FF
+// __reset_value: value assigned upon reset
+// __clk: clock input
+// __arst_n: asynchronous reset
+`define FFARN(__q, __d, __reset_value, __clk, __arst_n)    \
+  always_ff @(posedge (__clk) or negedge (__arst_n)) begin \
+    if (!__arst_n) begin                                   \
+      __q <= (__reset_value);                              \
+    end else begin                                         \
+      __q <= (__d);                                        \
+    end                                                    \
+  end
+
+// Flip-Flop with synchronous active-high reset
+// __q: Q output of FF
+// __d: D input of FF
+// __reset_value: value assigned upon reset
+// __clk: clock input
+// __reset_clk: reset input
+`define FFSR(__q, __d, __reset_value, __clk, __reset_clk) \
+  `ifndef VERILATOR                       \
+  /``* synopsys sync_set_reset `"__reset_clk`" *``/       \
+    `endif                        \
+  always_ff @(posedge (__clk)) begin                      \
+    __q <= (__reset_clk) ? (__reset_value) : (__d);       \
+  end
+
+// Flip-Flop with synchronous active-low reset
+// __q: Q output of FF
+// __d: D input of FF
+// __reset_value: value assigned upon reset
+// __clk: clock input
+// __reset_n_clk: reset input
+`define FFSRN(__q, __d, __reset_value, __clk, __reset_n_clk) \
+    `ifndef VERILATOR                       \
+  /``* synopsys sync_set_reset `"__reset_n_clk`" *``/        \
+    `endif                        \
+  always_ff @(posedge (__clk)) begin                         \
+    __q <= (!__reset_n_clk) ? (__reset_value) : (__d);       \
+  end
+
+// Always-enable Flip-Flop without reset
+// __q: Q output of FF
+// __d: D input of FF
+// __clk: clock input
+`define FFNR(__q, __d, __clk)        \
+  always_ff @(posedge (__clk)) begin \
+    __q <= (__d);                    \
+  end
+
+// Flip-Flop with load-enable and asynchronous active-low reset (implicit clock and reset)
+// __q: Q output of FF
+// __d: D input of FF
+// __load: load d value into FF
+// __reset_value: value assigned upon reset
+// Implicit:
+// clk_i: clock input
+// rst_ni: reset input (asynchronous, active low)
+`define FFL(__q, __d, __load, __reset_value)         \
+  always_ff @(posedge clk_i or negedge rst_ni) begin \
+    if (!rst_ni) begin                               \
+      __q <= (__reset_value);                        \
+    end else begin                                   \
+      __q <= (__load) ? (__d) : (__q);               \
+    end                                              \
+  end
+
+// Flip-Flop with load-enable and asynchronous active-high reset
+// __q: Q output of FF
+// __d: D input of FF
+// __load: load d value into FF
+// __reset_value: value assigned upon reset
+// __clk: clock input
+// __arst: asynchronous reset
+`define FFLAR(__q, __d, __load, __reset_value, __clk, __arst) \
+  always_ff @(posedge (__clk) or posedge (__arst)) begin      \
+    if (__arst) begin                                         \
+      __q <= (__reset_value);                                 \
+    end else begin                                            \
+      __q <= (__load) ? (__d) : (__q);                        \
+    end                                                       \
+  end
+
+// Flip-Flop with load-enable and asynchronous active-low reset
+// __q: Q output of FF
+// __d: D input of FF
+// __load: load d value into FF
+// __reset_value: value assigned upon reset
+// __clk: clock input
+// __arst_n: asynchronous reset
+`define FFLARN(__q, __d, __load, __reset_value, __clk, __arst_n) \
+  always_ff @(posedge (__clk) or negedge (__arst_n)) begin       \
+    if (!__arst_n) begin                                         \
+      __q <= (__reset_value);                                    \
+    end else begin                                               \
+      __q <= (__load) ? (__d) : (__q);                           \
+    end                                                          \
+  end
+
+// Flip-Flop with load-enable and synchronous active-high reset
+// __q: Q output of FF
+// __d: D input of FF
+// __load: load d value into FF
+// __reset_value: value assigned upon reset
+// __clk: clock input
+// __reset_clk: reset input
+`define FFLSR(__q, __d, __load, __reset_value, __clk, __reset_clk)       \
+    `ifndef VERILATOR                       \
+  /``* synopsys sync_set_reset `"__reset_clk`" *``/                      \
+    `endif                        \
+  always_ff @(posedge (__clk)) begin                                     \
+    __q <= (__reset_clk) ? (__reset_value) : ((__load) ? (__d) : (__q)); \
+  end
+
+// Flip-Flop with load-enable and synchronous active-low reset
+// __q: Q output of FF
+// __d: D input of FF
+// __load: load d value into FF
+// __reset_value: value assigned upon reset
+// __clk: clock input
+// __reset_n_clk: reset input
+`define FFLSRN(__q, __d, __load, __reset_value, __clk, __reset_n_clk)       \
+    `ifndef VERILATOR                       \
+  /``* synopsys sync_set_reset `"__reset_n_clk`" *``/                       \
+    `endif                        \
+  always_ff @(posedge (__clk)) begin                                        \
+    __q <= (!__reset_n_clk) ? (__reset_value) : ((__load) ? (__d) : (__q)); \
+  end
+
+// Flip-Flop with load-enable and asynchronous active-low reset and synchronous clear
+// __q: Q output of FF
+// __d: D input of FF
+// __load: load d value into FF
+// __clear: assign reset value into FF
+// __reset_value: value assigned upon reset
+// __clk: clock input
+// __arst_n: asynchronous reset
+`define FFLARNC(__q, __d, __load, __clear, __reset_value, __clk, __arst_n) \
+    `ifndef VERILATOR                       \
+  /``* synopsys sync_set_reset `"__clear`" *``/                       \
+    `endif                        \
+  always_ff @(posedge (__clk) or negedge (__arst_n)) begin                 \
+    if (!__arst_n) begin                                                   \
+      __q <= (__reset_value);                                              \
+    end else begin                                                         \
+      __q <= (__clear) ? (__reset_value) : (__load) ? (__d) : (__q);       \
+    end                                                                    \
+  end
+
+// Load-enable Flip-Flop without reset
+// __q: Q output of FF
+// __d: D input of FF
+// __load: load d value into FF
+// __clk: clock input
+`define FFLNR(__q, __d, __load, __clk) \
+  always_ff @(posedge (__clk)) begin   \
+    __q <= (__load) ? (__d) : (__q);   \
+  end
+
+`endif
+// Copyright lowRISC contributors.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Register Package auto-generated by `reggen` containing data structure
+
+package rv_plic_reg_pkg;
+
+  // Param list
+  parameter int NumSrc = 36;
+  parameter int NumTarget = 1;
+  parameter int PrioWidth = 2;
+
+  // Address width within the block
+  parameter int BlockAw = 10;
+
+  ////////////////////////////
+  // Typedefs for registers //
+  ////////////////////////////
+  typedef struct packed {
+    logic        q;
+  } rv_plic_reg2hw_le_mreg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio0_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio1_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio2_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio3_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio4_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio5_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio6_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio7_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio8_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio9_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio10_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio11_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio12_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio13_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio14_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio15_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio16_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio17_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio18_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio19_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio20_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio21_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio22_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio23_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio24_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio25_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio26_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio27_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio28_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio29_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio30_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio31_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio32_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio33_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio34_reg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_prio35_reg_t;
+
+  typedef struct packed {
+    logic        q;
+  } rv_plic_reg2hw_ie0_mreg_t;
+
+  typedef struct packed {
+    logic [1:0]  q;
+  } rv_plic_reg2hw_threshold0_reg_t;
+
+  typedef struct packed {
+    logic [5:0]  q;
+    logic        qe;
+    logic        re;
+  } rv_plic_reg2hw_cc0_reg_t;
+
+  typedef struct packed {
+    logic        q;
+  } rv_plic_reg2hw_msip0_reg_t;
+
+
+  typedef struct packed {
+    logic        d;
+    logic        de;
+  } rv_plic_hw2reg_ip_mreg_t;
+
+  typedef struct packed {
+    logic [5:0]  d;
+  } rv_plic_hw2reg_cc0_reg_t;
+
+
+  ///////////////////////////////////////
+  // Register to internal design logic //
+  ///////////////////////////////////////
+  typedef struct packed {
+    rv_plic_reg2hw_le_mreg_t [35:0] le; // [700:529]
+    rv_plic_reg2hw_prio0_reg_t prio0; // [528:527]
+    rv_plic_reg2hw_prio1_reg_t prio1; // [526:525]
+    rv_plic_reg2hw_prio2_reg_t prio2; // [524:523]
+    rv_plic_reg2hw_prio3_reg_t prio3; // [522:521]
+    rv_plic_reg2hw_prio4_reg_t prio4; // [520:519]
+    rv_plic_reg2hw_prio5_reg_t prio5; // [518:517]
+    rv_plic_reg2hw_prio6_reg_t prio6; // [516:515]
+    rv_plic_reg2hw_prio7_reg_t prio7; // [514:513]
+    rv_plic_reg2hw_prio8_reg_t prio8; // [512:511]
+    rv_plic_reg2hw_prio9_reg_t prio9; // [510:509]
+    rv_plic_reg2hw_prio10_reg_t prio10; // [508:507]
+    rv_plic_reg2hw_prio11_reg_t prio11; // [506:505]
+    rv_plic_reg2hw_prio12_reg_t prio12; // [504:503]
+    rv_plic_reg2hw_prio13_reg_t prio13; // [502:501]
+    rv_plic_reg2hw_prio14_reg_t prio14; // [500:499]
+    rv_plic_reg2hw_prio15_reg_t prio15; // [498:497]
+    rv_plic_reg2hw_prio16_reg_t prio16; // [496:495]
+    rv_plic_reg2hw_prio17_reg_t prio17; // [494:493]
+    rv_plic_reg2hw_prio18_reg_t prio18; // [492:491]
+    rv_plic_reg2hw_prio19_reg_t prio19; // [490:489]
+    rv_plic_reg2hw_prio20_reg_t prio20; // [488:487]
+    rv_plic_reg2hw_prio21_reg_t prio21; // [486:485]
+    rv_plic_reg2hw_prio22_reg_t prio22; // [484:483]
+    rv_plic_reg2hw_prio23_reg_t prio23; // [482:481]
+    rv_plic_reg2hw_prio24_reg_t prio24; // [480:479]
+    rv_plic_reg2hw_prio25_reg_t prio25; // [478:477]
+    rv_plic_reg2hw_prio26_reg_t prio26; // [476:475]
+    rv_plic_reg2hw_prio27_reg_t prio27; // [474:473]
+    rv_plic_reg2hw_prio28_reg_t prio28; // [472:471]
+    rv_plic_reg2hw_prio29_reg_t prio29; // [470:469]
+    rv_plic_reg2hw_prio30_reg_t prio30; // [468:467]
+    rv_plic_reg2hw_prio31_reg_t prio31; // [466:465]
+    rv_plic_reg2hw_prio32_reg_t prio32; // [464:463]
+    rv_plic_reg2hw_prio33_reg_t prio33; // [462:461]
+    rv_plic_reg2hw_prio34_reg_t prio34; // [460:459]
+    rv_plic_reg2hw_prio35_reg_t prio35; // [458:457]
+    rv_plic_reg2hw_ie0_mreg_t [35:0] ie0; // [184:13]
+    rv_plic_reg2hw_threshold0_reg_t threshold0; // [12:11]
+    rv_plic_reg2hw_cc0_reg_t cc0; // [10:1]
+    rv_plic_reg2hw_msip0_reg_t msip0; // [0:0]
+  } rv_plic_reg2hw_t;
+
+  ///////////////////////////////////////
+  // Internal design logic to register //
+  ///////////////////////////////////////
+  typedef struct packed {
+    rv_plic_hw2reg_ip_mreg_t [35:0] ip; // [351:8]
+    rv_plic_hw2reg_cc0_reg_t cc0; // [7:0]
+  } rv_plic_hw2reg_t;
+
+  // Register Address
+  parameter logic [BlockAw-1:0] RV_PLIC_IP_0_OFFSET = 10'h 0;
+  parameter logic [BlockAw-1:0] RV_PLIC_IP_1_OFFSET = 10'h 4;
+  parameter logic [BlockAw-1:0] RV_PLIC_LE_0_OFFSET = 10'h 8;
+  parameter logic [BlockAw-1:0] RV_PLIC_LE_1_OFFSET = 10'h c;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO0_OFFSET = 10'h 10;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO1_OFFSET = 10'h 14;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO2_OFFSET = 10'h 18;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO3_OFFSET = 10'h 1c;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO4_OFFSET = 10'h 20;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO5_OFFSET = 10'h 24;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO6_OFFSET = 10'h 28;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO7_OFFSET = 10'h 2c;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO8_OFFSET = 10'h 30;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO9_OFFSET = 10'h 34;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO10_OFFSET = 10'h 38;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO11_OFFSET = 10'h 3c;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO12_OFFSET = 10'h 40;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO13_OFFSET = 10'h 44;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO14_OFFSET = 10'h 48;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO15_OFFSET = 10'h 4c;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO16_OFFSET = 10'h 50;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO17_OFFSET = 10'h 54;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO18_OFFSET = 10'h 58;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO19_OFFSET = 10'h 5c;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO20_OFFSET = 10'h 60;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO21_OFFSET = 10'h 64;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO22_OFFSET = 10'h 68;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO23_OFFSET = 10'h 6c;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO24_OFFSET = 10'h 70;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO25_OFFSET = 10'h 74;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO26_OFFSET = 10'h 78;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO27_OFFSET = 10'h 7c;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO28_OFFSET = 10'h 80;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO29_OFFSET = 10'h 84;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO30_OFFSET = 10'h 88;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO31_OFFSET = 10'h 8c;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO32_OFFSET = 10'h 90;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO33_OFFSET = 10'h 94;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO34_OFFSET = 10'h 98;
+  parameter logic [BlockAw-1:0] RV_PLIC_PRIO35_OFFSET = 10'h 9c;
+  parameter logic [BlockAw-1:0] RV_PLIC_IE0_0_OFFSET  = 10'h a0;
+  parameter logic [BlockAw-1:0] RV_PLIC_IE0_1_OFFSET  = 10'h a4;
+  parameter logic [BlockAw-1:0] RV_PLIC_THRESHOLD0_OFFSET = 10'h a8;
+  parameter logic [BlockAw-1:0] RV_PLIC_CC0_OFFSET = 10'h ac;
+  parameter logic [BlockAw-1:0] RV_PLIC_MSIP0_OFFSET = 10'h b0;
+
+
+  // Register Index
+  typedef enum int {
+    RV_PLIC_IP_0,
+    RV_PLIC_IP_1,
+    RV_PLIC_LE_0,
+    RV_PLIC_LE_1,
+    RV_PLIC_PRIO0,
+    RV_PLIC_PRIO1,
+    RV_PLIC_PRIO2,
+    RV_PLIC_PRIO3,
+    RV_PLIC_PRIO4,
+    RV_PLIC_PRIO5,
+    RV_PLIC_PRIO6,
+    RV_PLIC_PRIO7,
+    RV_PLIC_PRIO8,
+    RV_PLIC_PRIO9,
+    RV_PLIC_PRIO10,
+    RV_PLIC_PRIO11,
+    RV_PLIC_PRIO12,
+    RV_PLIC_PRIO13,
+    RV_PLIC_PRIO14,
+    RV_PLIC_PRIO15,
+    RV_PLIC_PRIO16,
+    RV_PLIC_PRIO17,
+    RV_PLIC_PRIO18,
+    RV_PLIC_PRIO19,
+    RV_PLIC_PRIO20,
+    RV_PLIC_PRIO21,
+    RV_PLIC_PRIO22,
+    RV_PLIC_PRIO23,
+    RV_PLIC_PRIO24,
+    RV_PLIC_PRIO25,
+    RV_PLIC_PRIO26,
+    RV_PLIC_PRIO27,
+    RV_PLIC_PRIO28,
+    RV_PLIC_PRIO29,
+    RV_PLIC_PRIO30,
+    RV_PLIC_PRIO31,
+    RV_PLIC_PRIO32,
+    RV_PLIC_PRIO33,
+    RV_PLIC_PRIO34,
+    RV_PLIC_PRIO35,
+    RV_PLIC_IE0_0,
+    RV_PLIC_IE0_1,
+    RV_PLIC_THRESHOLD0,
+    RV_PLIC_CC0,
+    RV_PLIC_MSIP0
+  } rv_plic_id_e;
+
+  // Register width information to check illegal writes
+  parameter logic [3:0] RV_PLIC_PERMIT [45] = '{
+    4'b 1111, // index[  0] RV_PLIC_IP_0
+    4'b 1111, // index[  1] RV_PLIC_IP_1
+    4'b 1111, // index[  6] RV_PLIC_LE_0
+    4'b 1111, // index[  7] RV_PLIC_LE_1
+    4'b 0001, // index[ 12] RV_PLIC_PRIO0
+    4'b 0001, // index[ 13] RV_PLIC_PRIO1
+    4'b 0001, // index[ 14] RV_PLIC_PRIO2
+    4'b 0001, // index[ 15] RV_PLIC_PRIO3
+    4'b 0001, // index[ 16] RV_PLIC_PRIO4
+    4'b 0001, // index[ 17] RV_PLIC_PRIO5
+    4'b 0001, // index[ 18] RV_PLIC_PRIO6
+    4'b 0001, // index[ 19] RV_PLIC_PRIO7
+    4'b 0001, // index[ 20] RV_PLIC_PRIO8
+    4'b 0001, // index[ 21] RV_PLIC_PRIO9
+    4'b 0001, // index[ 22] RV_PLIC_PRIO10
+    4'b 0001, // index[ 23] RV_PLIC_PRIO11
+    4'b 0001, // index[ 24] RV_PLIC_PRIO12
+    4'b 0001, // index[ 25] RV_PLIC_PRIO13
+    4'b 0001, // index[ 26] RV_PLIC_PRIO14
+    4'b 0001, // index[ 27] RV_PLIC_PRIO15
+    4'b 0001, // index[ 28] RV_PLIC_PRIO16
+    4'b 0001, // index[ 29] RV_PLIC_PRIO17
+    4'b 0001, // index[ 30] RV_PLIC_PRIO18
+    4'b 0001, // index[ 31] RV_PLIC_PRIO19
+    4'b 0001, // index[ 32] RV_PLIC_PRIO20
+    4'b 0001, // index[ 33] RV_PLIC_PRIO21
+    4'b 0001, // index[ 34] RV_PLIC_PRIO22
+    4'b 0001, // index[ 35] RV_PLIC_PRIO23
+    4'b 0001, // index[ 36] RV_PLIC_PRIO24
+    4'b 0001, // index[ 37] RV_PLIC_PRIO25
+    4'b 0001, // index[ 38] RV_PLIC_PRIO26
+    4'b 0001, // index[ 39] RV_PLIC_PRIO27
+    4'b 0001, // index[ 40] RV_PLIC_PRIO28
+    4'b 0001, // index[ 41] RV_PLIC_PRIO29
+    4'b 0001, // index[ 42] RV_PLIC_PRIO30
+    4'b 0001, // index[ 43] RV_PLIC_PRIO31
+    4'b 0001, // index[ 44] RV_PLIC_PRIO32
+    4'b 0001, // index[ 45] RV_PLIC_PRIO33
+    4'b 0001, // index[ 46] RV_PLIC_PRIO34
+    4'b 0001, // index[ 47] RV_PLIC_PRIO35
+    4'b 1111, // index[184] RV_PLIC_IE0_0
+    4'b 1111, // index[185] RV_PLIC_IE0_1
+    4'b 0001, // index[190] RV_PLIC_THRESHOLD0
+    4'b 0001, // index[191] RV_PLIC_CC0
+    4'b 0001  // index[192] RV_PLIC_MSIP0
+  };
+endpackage
+
+// Copyright lowRISC contributors.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Register Package auto-generated by `reggen` containing data structure
+
+package rv_timer_reg_pkg;
+
+  // Param list
+  parameter int N_HARTS = 1;
+  parameter int N_TIMERS = 1;
+
+  // Address width within the block
+  parameter int BlockAw = 9;
+
+  ////////////////////////////
+  // Typedefs for registers //
+  ////////////////////////////
+  typedef struct packed {
+    logic        q;
+  } rv_timer_reg2hw_ctrl_mreg_t;
+
+  typedef struct packed {
+    struct packed {
+      logic [11:0] q;
+    } prescale;
+    struct packed {
+      logic [7:0]  q;
+    } step;
+  } rv_timer_reg2hw_cfg0_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+  } rv_timer_reg2hw_timer_v_lower0_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+  } rv_timer_reg2hw_timer_v_upper0_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+    logic        qe;
+  } rv_timer_reg2hw_compare_lower0_0_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+    logic        qe;
+  } rv_timer_reg2hw_compare_upper0_0_reg_t;
+
+  typedef struct packed {
+    logic        q;
+  } rv_timer_reg2hw_intr_enable0_mreg_t;
+
+  typedef struct packed {
+    logic        q;
+  } rv_timer_reg2hw_intr_state0_mreg_t;
+
+  typedef struct packed {
+    logic        q;
+    logic        qe;
+  } rv_timer_reg2hw_intr_test0_mreg_t;
+
+
+  typedef struct packed {
+    logic [31:0] d;
+    logic        de;
+  } rv_timer_hw2reg_timer_v_lower0_reg_t;
+
+  typedef struct packed {
+    logic [31:0] d;
+    logic        de;
+  } rv_timer_hw2reg_timer_v_upper0_reg_t;
+
+  typedef struct packed {
+    logic        d;
+    logic        de;
+  } rv_timer_hw2reg_intr_state0_mreg_t;
+
+
+  ///////////////////////////////////////
+  // Register to internal design logic //
+  ///////////////////////////////////////
+  typedef struct packed {
+    rv_timer_reg2hw_ctrl_mreg_t [0:0] ctrl; // [154:154]
+    rv_timer_reg2hw_cfg0_reg_t cfg0; // [153:134]
+    rv_timer_reg2hw_timer_v_lower0_reg_t timer_v_lower0; // [133:102]
+    rv_timer_reg2hw_timer_v_upper0_reg_t timer_v_upper0; // [101:70]
+    rv_timer_reg2hw_compare_lower0_0_reg_t compare_lower0_0; // [69:37]
+    rv_timer_reg2hw_compare_upper0_0_reg_t compare_upper0_0; // [36:4]
+    rv_timer_reg2hw_intr_enable0_mreg_t [0:0] intr_enable0; // [3:3]
+    rv_timer_reg2hw_intr_state0_mreg_t [0:0] intr_state0; // [2:2]
+    rv_timer_reg2hw_intr_test0_mreg_t [0:0] intr_test0; // [1:0]
+  } rv_timer_reg2hw_t;
+
+  ///////////////////////////////////////
+  // Internal design logic to register //
+  ///////////////////////////////////////
+  typedef struct packed {
+    rv_timer_hw2reg_timer_v_lower0_reg_t timer_v_lower0; // [67:35]
+    rv_timer_hw2reg_timer_v_upper0_reg_t timer_v_upper0; // [34:2]
+    rv_timer_hw2reg_intr_state0_mreg_t [0:0] intr_state0; // [1:0]
+  } rv_timer_hw2reg_t;
+
+  // Register Address
+  parameter logic [BlockAw-1:0] RV_TIMER_CTRL_OFFSET = 9'h 0;
+  parameter logic [BlockAw-1:0] RV_TIMER_CFG0_OFFSET = 9'h 100;
+  parameter logic [BlockAw-1:0] RV_TIMER_TIMER_V_LOWER0_OFFSET = 9'h 104;
+  parameter logic [BlockAw-1:0] RV_TIMER_TIMER_V_UPPER0_OFFSET = 9'h 108;
+  parameter logic [BlockAw-1:0] RV_TIMER_COMPARE_LOWER0_0_OFFSET = 9'h 10c;
+  parameter logic [BlockAw-1:0] RV_TIMER_COMPARE_UPPER0_0_OFFSET = 9'h 110;
+  parameter logic [BlockAw-1:0] RV_TIMER_INTR_ENABLE0_OFFSET = 9'h 114;
+  parameter logic [BlockAw-1:0] RV_TIMER_INTR_STATE0_OFFSET = 9'h 118;
+  parameter logic [BlockAw-1:0] RV_TIMER_INTR_TEST0_OFFSET = 9'h 11c;
+
+
+  // Register Index
+  typedef enum int {
+    RV_TIMER_CTRL,
+    RV_TIMER_CFG0,
+    RV_TIMER_TIMER_V_LOWER0,
+    RV_TIMER_TIMER_V_UPPER0,
+    RV_TIMER_COMPARE_LOWER0_0,
+    RV_TIMER_COMPARE_UPPER0_0,
+    RV_TIMER_INTR_ENABLE0,
+    RV_TIMER_INTR_STATE0,
+    RV_TIMER_INTR_TEST0
+  } rv_timer_id_e;
+
+  // Register width information to check illegal writes
+  parameter logic [3:0] RV_TIMER_PERMIT [9] = '{
+    4'b 0001, // index[0] RV_TIMER_CTRL
+    4'b 0111, // index[1] RV_TIMER_CFG0
+    4'b 1111, // index[2] RV_TIMER_TIMER_V_LOWER0
+    4'b 1111, // index[3] RV_TIMER_TIMER_V_UPPER0
+    4'b 1111, // index[4] RV_TIMER_COMPARE_LOWER0_0
+    4'b 1111, // index[5] RV_TIMER_COMPARE_UPPER0_0
+    4'b 0001, // index[6] RV_TIMER_INTR_ENABLE0
+    4'b 0001, // index[7] RV_TIMER_INTR_STATE0
+    4'b 0001  // index[8] RV_TIMER_INTR_TEST0
+  };
+endpackage
+
+
+// Number of bits used for devider register. If used in system with
+// low frequency of system clock this can be reduced.
+// Use SPI_DIVIDER_LEN for fine tuning theexact number.
+//
+//`define SPI_DIVIDER_LEN_8
+`define SPI_DIVIDER_LEN_16
+//`define SPI_DIVIDER_LEN_24
+//`define SPI_DIVIDER_LEN_32
+
+`ifdef SPI_DIVIDER_LEN_8
+  `define SPI_DIVIDER_LEN       8    // Can be set from 1 to 8
+`endif                                                          
+`ifdef SPI_DIVIDER_LEN_16                                       
+  `define SPI_DIVIDER_LEN       16   // Can be set from 9 to 16
+`endif                                                          
+`ifdef SPI_DIVIDER_LEN_24                                       
+  `define SPI_DIVIDER_LEN       24   // Can be set from 17 to 24
+`endif                                                          
+`ifdef SPI_DIVIDER_LEN_32                                       
+  `define SPI_DIVIDER_LEN       32   // Can be set from 25 to 32 
+`endif
+
+//
+// Maximum nuber of bits that can be send/received at once. 
+// Use SPI_MAX_CHAR for fine tuning the exact number, when using
+// SPI_MAX_CHAR_32, SPI_MAX_CHAR_24, SPI_MAX_CHAR_16, SPI_MAX_CHAR_8.
+//
+`define SPI_MAX_CHAR_32
+//`define SPI_MAX_CHAR_64
+//`define SPI_MAX_CHAR_32
+//`define SPI_MAX_CHAR_24
+//`define SPI_MAX_CHAR_16
+//`define SPI_MAX_CHAR_8
+
+`ifdef SPI_MAX_CHAR_128
+  `define SPI_MAX_CHAR          128  // Can only be set to 128 
+  `define SPI_CHAR_LEN_BITS     7
+`endif
+`ifdef SPI_MAX_CHAR_64
+  `define SPI_MAX_CHAR          64   // Can only be set to 64 
+  `define SPI_CHAR_LEN_BITS     6
+`endif
+`ifdef SPI_MAX_CHAR_32
+  `define SPI_MAX_CHAR          32   // Can be set from 25 to 32 
+  `define SPI_CHAR_LEN_BITS     5
+`endif
+`ifdef SPI_MAX_CHAR_24
+  `define SPI_MAX_CHAR          24   // Can be set from 17 to 24 
+  `define SPI_CHAR_LEN_BITS     5
+`endif
+`ifdef SPI_MAX_CHAR_16
+  `define SPI_MAX_CHAR          16   // Can be set from 9 to 16 
+  `define SPI_CHAR_LEN_BITS     4
+`endif
+`ifdef SPI_MAX_CHAR_8
+  `define SPI_MAX_CHAR          8    // Can be set from 1 to 8 
+  `define SPI_CHAR_LEN_BITS     3
+`endif
+
+//
+// Number of device select signals. Use SPI_SS_NB for fine tuning the 
+// exact number.
+//
+`define SPI_SS_NB_4
+//`define SPI_SS_NB_16
+//`define SPI_SS_NB_24
+//`define SPI_SS_NB_32
+`ifdef SPI_SS_NB_4
+  `define SPI_SS_NB             4    // Can be set from 1 to 4
+`endif
+`ifdef SPI_SS_NB_8
+  `define SPI_SS_NB             8    // Can be set from 1 to 8
+`endif
+`ifdef SPI_SS_NB_16
+  `define SPI_SS_NB             16   // Can be set from 9 to 16
+`endif
+`ifdef SPI_SS_NB_24
+  `define SPI_SS_NB             24   // Can be set from 17 to 24
+`endif
+`ifdef SPI_SS_NB_32
+  `define SPI_SS_NB             32   // Can be set from 25 to 32
+`endif
+
+//
+// Bits of WISHBONE address used for partial decoding of SPI registers.
+//
+`define SPI_OFS_BITS	          6:2
+
+//
+// Register offset
+//
+`define SPI_RX_0                8
+`define SPI_TX_0                0
+`define SPI_CTRL                4
+`define SPI_DEVIDE              5
+`define SPI_SS                  6
+
+//
+// Number of bits in ctrl register
+//
+`define SPI_CTRL_BIT_NB         16
+
+//
+// Control register bit position
+//
+`define SPI_RX_SEL              15
+`define SPI_TX_SEL              14
+`define SPI_CTRL_ASS            13
+`define SPI_CTRL_IE             12
+`define SPI_CTRL_LSB            11
+`define SPI_CTRL_TX_NEGEDGE     10
+`define SPI_CTRL_RX_NEGEDGE     9
+`define SPI_CTRL_GO             8
+`define SPI_CTRL_RES_1          7
+`define SPI_CTRL_CHAR_LEN       6:0
+
+// Copyright lowRISC contributors.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+// tl_main package generated by `tlgen.py` tool
+
+package tl_main_pkg;
+
+  localparam logic [31:0] ADDR_SPACE_ICCM       = 32'h 20000000;
+  localparam logic [31:0] ADDR_SPACE_DEBUG_ROM  = 32'h 10040000;
+  localparam logic [31:0] ADDR_SPACE_DCCM       = 32'h 10000000;
+  localparam logic [31:0] ADDR_SPACE_TIMER0     = 32'h 40000000;
+  localparam logic [31:0] ADDR_SPACE_UART0      = 32'h 40060000;
+  localparam logic [31:0] ADDR_SPACE_SPI0       = 32'h 40080000;
+  localparam logic [31:0] ADDR_SPACE_PWM        = 32'h 400b0000; 
+  localparam logic [31:0] ADDR_SPACE_GPIO       = 32'h 400c0000;
+  localparam logic [31:0] ADDR_SPACE_PLIC       = 32'h 40050000;
+
+  localparam logic [31:0] ADDR_MASK_ICCM       = 32'h 0000ffff;
+  localparam logic [31:0] ADDR_MASK_DEBUG_ROM  = 32'h 0000ffff;
+  localparam logic [31:0] ADDR_MASK_DCCM       = 32'h 0000ffff;
+  localparam logic [31:0] ADDR_MASK_TIMER0     = 32'h 0000ffff;
+  localparam logic [31:0] ADDR_MASK_UART0      = 32'h 0000ffff;
+  localparam logic [31:0] ADDR_MASK_SPI0       = 32'h 0000ffff;
+  localparam logic [31:0] ADDR_MASK_PWM        = 32'h 0000ffff;
+  localparam logic [31:0] ADDR_MASK_GPIO       = 32'h 0000ffff;
+  localparam logic [31:0] ADDR_MASK_PLIC       = 32'h 0000ffff;
+
+  localparam int N_HOST   = 3;
+  localparam int N_DEVICE = 9;
+
+  typedef enum int {
+    TlIccm = 0,
+    TlDebugRom = 1,
+    TlDccm = 2,
+    TlTimer0 = 3,
+    TlUart0 = 4,
+    TlSpi0 = 5,
+    TlPwm = 6,
+    TlGpio = 7,
+    TlPlic = 8
+  } tl_device_e;
+
+  typedef enum int {
+    TlBrqif = 0,
+    TlBrqlsu = 1,
+    TlDmSba = 2
+  } tl_host_e;
+
+endpackage
+package tlul_pkg;
+
+
+    parameter ArbiterImpl = "PPC";
+function automatic integer _clog2(integer value);
+    integer result;
+    value = value - 1;
+    for (result = 0; value > 0; result = result + 1) begin
+      value = value >> 1;
+    end
+    return result;
+  endfunction
+
+
+  /**
+   * Math function: Number of bits needed to address |value| items.
+   *
+   *                  0        for value == 0
+   * vbits =          1        for value == 1
+   *         ceil(log2(value)) for value > 1
+   *
+   *
+   * The primary use case for this function is the definition of registers/arrays
+   * which are wide enough to contain |value| items.
+   *
+   * This function identical to $clog2() for all input values except the value 1;
+   * it could be considered an "enhanced" $clog2() function.
+   *
+   *
+   * Example 1:
+   *   parameter Items = 1;
+   *   localparam ItemsWidth = vbits(Items); // 1
+   *   logic [ItemsWidth-1:0] item_register; // items_register is now [0:0]
+   *
+   * Example 2:
+   *   parameter Items = 64;
+   *   localparam ItemsWidth = vbits(Items); // 6
+   *   logic [ItemsWidth-1:0] item_register; // items_register is now [5:0]
+   *
+   * Note: If you want to store the number "value" inside a register, you need
+   * a register with size vbits(value + 1), since you also need to store
+   * the number 0.
+   *
+   * Example 3:
+   *   logic [vbits(64)-1:0]     store_64_logic_values; // width is [5:0]
+   *   logic [vbits(64 + 1)-1:0] store_number_64;       // width is [6:0]
+   */
+  function automatic integer vbits(integer value);
+`ifdef XCELIUM
+    // The use of system functions was not allowed here in Verilog-2001, but is
+    // valid since (System)Verilog-2005, which is also when $clog2() first
+    // appeared.
+    // Xcelium < 19.10 does not yet support the use of $clog2() here, fall back
+    // to an implementation without a system function. Remove this workaround
+    // if we require a newer Xcelium version.
+    // See #2579 and #2597.
+    return (value == 1) ? 1 : prim_util_pkg::_clog2(value);
+`else
+    return (value == 1) ? 1 : $clog2(value);
+`endif
+  endfunction
+
+    localparam int TL_AW=32;
+    localparam int TL_DW=32;
+    localparam int TL_AIW=8;
+    localparam int TL_DIW=1;
+    localparam int TL_DBW=(TL_DW>>3);
+    localparam int TL_SZW=$clog2($clog2(TL_DBW)+1);
+
+// opcodes for channel D messages/operations defined in official TileLink spec
+    typedef enum logic [2:0] {
+        PutFullData     = 3'h0,
+        PutPartialData  = 3'h1,
+        Get             = 3'h4
+    } tl_a_m_op;
+// opcodes for channel D messages/operations defined in official TileLink spec
+    typedef enum logic [2:0] {
+        AccessAck     = 3'h0,
+        AccessAckData = 3'h1
+    } tl_d_m_op;
+
+    typedef struct packed {
+        logic                        a_valid;
+        tl_a_m_op                    a_opcode;
+        logic           [2:0]        a_param;
+        logic           [TL_SZW-1:0] a_size;
+        logic           [TL_AIW-1:0] a_source;
+        logic           [TL_AW-1:0]  a_address;
+        logic           [TL_DBW-1:0] a_mask;
+        logic           [TL_DW-1:0]  a_data;
+        logic                        d_ready;
+    } tl_h2d_t;
+
+    localparam tl_h2d_t TL_H2D_DEFAULT = '{
+        d_ready:  1'b1,
+        a_opcode: tl_a_m_op'('0),
+        default:  '0
+    };
+
+    typedef struct packed {
+        logic                   d_valid;
+        tl_d_m_op               d_opcode;
+        logic             [2:0] d_param;
+        logic      [TL_SZW-1:0] d_size;
+        logic      [TL_AIW-1:0] d_source;
+        logic      [TL_DIW-1:0] d_sink;
+        logic      [TL_DW-1:0]  d_data;
+        logic                   d_error;
+        logic                   a_ready;
+    } tl_d2h_t;
+
+    localparam tl_d2h_t TL_D2H_DEFAULT = '{
+        a_ready:  1'b1,
+        d_opcode: tl_d_m_op'('0),
+        default:  '0
+    };
+
+
+
+endpackage
+////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2013, University of British Columbia (UBC); All rights reserved. //
+//                                                                                //
+// Redistribution  and  use  in  source   and  binary  forms,   with  or  without //
+// modification,  are permitted  provided that  the following conditions are met: //
+//   * Redistributions   of  source   code  must  retain   the   above  copyright //
+//     notice,  this   list   of   conditions   and   the  following  disclaimer. //
+//   * Redistributions  in  binary  form  must  reproduce  the  above   copyright //
+//     notice, this  list  of  conditions  and the  following  disclaimer in  the //
+//     documentation and/or  other  materials  provided  with  the  distribution. //
+//   * Neither the name of the University of British Columbia (UBC) nor the names //
+//     of   its   contributors  may  be  used  to  endorse  or   promote products //
+//     derived from  this  software without  specific  prior  written permission. //
+//                                                                                //
+// THIS  SOFTWARE IS  PROVIDED  BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" //
+// AND  ANY EXPRESS  OR IMPLIED WARRANTIES,  INCLUDING,  BUT NOT LIMITED TO,  THE //
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE //
+// DISCLAIMED.  IN NO  EVENT SHALL University of British Columbia (UBC) BE LIABLE //
+// FOR ANY DIRECT,  INDIRECT,  INCIDENTAL,  SPECIAL,  EXEMPLARY, OR CONSEQUENTIAL //
+// DAMAGES  (INCLUDING,  BUT NOT LIMITED TO,  PROCUREMENT OF  SUBSTITUTE GOODS OR //
+// SERVICES;  LOSS OF USE,  DATA,  OR PROFITS;  OR BUSINESS INTERRUPTION) HOWEVER //
+// CAUSED AND ON ANY THEORY OF LIABILITY,  WHETHER IN CONTRACT, STRICT LIABILITY, //
+// OR TORT  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE //
+// OF  THIS SOFTWARE,  EVEN  IF  ADVISED  OF  THE  POSSIBILITY  OF  SUCH  DAMAGE. //
+////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////
+//                    utils.vh: Design utilities (pre-compile)                    //
+//                                                                                //
+//    Author: Ameer M. Abdelhadi (ameer@ece.ubc.ca, ameer.abdelhadi@gmail.com)    //
+// SRAM-based Multi-ported RAMs; University of British Columbia (UBC), March 2013 //
+////////////////////////////////////////////////////////////////////////////////////
+
+`ifndef __UTILS_VH__
+`define __UTILS_VH__
+
+`define DEBUG_MODE // debug mode, comment this line for other modes
+`define VERBOSE    // verbose debug, comment this line for other modes
+
+// Initiate Array structure - use once before calling packing/unpacking modules
+`define ARRINIT integer _i_,_j_
+// pack/unpack 1D/2D/3D arrays; use in "always @*" if combinatorial
+`define ARR2D1D(D1W,D2W,    SRC,DST) for(_i_=1;_i_<=(D1W);_i_=_i_+1)                                 DST[((D2W)*_i_-1)-:D2W] = SRC[_i_-1]
+`define ARR1D2D(D1W,D2W,    SRC,DST) for(_i_=1;_i_<=(D1W);_i_=_i_+1)                                 DST[_i_-1] = SRC[((D2W)*_i_-1)-:D2W]
+`define ARR2D3D(D1W,D2W,D3W,SRC,DST) for(_i_=0;_i_< (D1W);_i_=_i_+1) for(_j_=1;_j_<=(D2W);_j_=_j_+1) DST[_i_][_j_-1] = SRC[_i_][((D3W)*_j_-1)-:D3W]
+`define ARR3D2D(D1W,D2W,D3W,SRC,DST) for(_i_=0;_i_< (D1W);_i_=_i_+1) for(_j_=1;_j_<=(D2W);_j_=_j_+1) DST[_i_][((D3W)*_j_-1)-:D3W] = SRC[_i_][_j_-1]
+
+// print a 2-D array in a comma-delimited list
+`define ARRPRN(ARRLEN,PRNSRC) for (_i_=(ARRLEN)-1;_i_>=0;_i_=_i_-1) $write("%c%h%c",(_i_==(ARRLEN)-1)?"[":"",PRNSRC[_i_],!_i_?"]":",")
+// Initialize a vector with a specific width random number; extra bits are zero padded
+`define GETRAND(RAND,RANDW) RAND=0; repeat ((RANDW)/32) RAND=(RAND<<32)|{$random}; RAND=(RAND<<((RANDW)%32))|({$random}>>(32-(RANDW)%32))
+
+// factorial (n!)
+`define fact(n)  ( ( ((n) >= 2      ) ? 2  : 1) * \
+                   ( ((n) >= 3      ) ? 3  : 1) * \
+                   ( ((n) >= 4      ) ? 4  : 1) * \
+                   ( ((n) >= 5      ) ? 5  : 1) * \
+                   ( ((n) >= 6      ) ? 6  : 1) * \
+                   ( ((n) >= 7      ) ? 7  : 1) * \
+                   ( ((n) >= 8      ) ? 8  : 1) * \
+                   ( ((n) >= 9      ) ? 9  : 1) * \
+                   ( ((n) >= 10     ) ? 10 : 1)   )
+
+// ceiling of log2
+`define log2(x)  ( ( ((x) >  1      ) ? 1  : 0) + \
+                   ( ((x) >  2      ) ? 1  : 0) + \
+                   ( ((x) >  4      ) ? 1  : 0) + \
+                   ( ((x) >  8      ) ? 1  : 0) + \
+                   ( ((x) >  16     ) ? 1  : 0) + \
+                   ( ((x) >  32     ) ? 1  : 0) + \
+                   ( ((x) >  64     ) ? 1  : 0) + \
+                   ( ((x) >  128    ) ? 1  : 0) + \
+                   ( ((x) >  256    ) ? 1  : 0) + \
+                   ( ((x) >  512    ) ? 1  : 0) + \
+                   ( ((x) >  1024   ) ? 1  : 0) + \
+                   ( ((x) >  2048   ) ? 1  : 0) + \
+                   ( ((x) >  4096   ) ? 1  : 0) + \
+                   ( ((x) >  8192   ) ? 1  : 0) + \
+                   ( ((x) >  16384  ) ? 1  : 0) + \
+                   ( ((x) >  32768  ) ? 1  : 0) + \
+                   ( ((x) >  65536  ) ? 1  : 0) + \
+                   ( ((x) >  131072 ) ? 1  : 0) + \
+                   ( ((x) >  262144 ) ? 1  : 0) + \
+                   ( ((x) >  524288 ) ? 1  : 0) + \
+                   ( ((x) >  1048576) ? 1  : 0) + \
+                   ( ((x) >  2097152) ? 1  : 0) + \
+                   ( ((x) >  4194304) ? 1  : 0)   )
+
+// floor of log2
+`define log2f(x) ( ( ((x) >= 2      ) ? 1  : 0) + \
+                   ( ((x) >= 4      ) ? 1  : 0) + \
+                   ( ((x) >= 8      ) ? 1  : 0) + \
+                   ( ((x) >= 16     ) ? 1  : 0) + \
+                   ( ((x) >= 32     ) ? 1  : 0) + \
+                   ( ((x) >= 64     ) ? 1  : 0) + \
+                   ( ((x) >= 128    ) ? 1  : 0) + \
+                   ( ((x) >= 256    ) ? 1  : 0) + \
+                   ( ((x) >= 512    ) ? 1  : 0) + \
+                   ( ((x) >= 1024   ) ? 1  : 0) + \
+                   ( ((x) >= 2048   ) ? 1  : 0) + \
+                   ( ((x) >= 4096   ) ? 1  : 0) + \
+                   ( ((x) >= 8192   ) ? 1  : 0) + \
+                   ( ((x) >= 16384  ) ? 1  : 0) + \
+                   ( ((x) >= 32768  ) ? 1  : 0) + \
+                   ( ((x) >= 65536  ) ? 1  : 0) + \
+                   ( ((x) >= 131072 ) ? 1  : 0) + \
+                   ( ((x) >= 262144 ) ? 1  : 0) + \
+                   ( ((x) >= 524288 ) ? 1  : 0) + \
+                   ( ((x) >= 1048576) ? 1  : 0) + \
+                   ( ((x) >= 2097152) ? 1  : 0) + \
+                   ( ((x) >= 4194304) ? 1  : 0)   )
+
+`endif //__UTILS_VH__
 
 module azadi_soc_top (
   input clk_i,
