@@ -2077,17 +2077,14 @@ endpackage// Copyright 2018 ETH Zurich and University of Bologna.
 // __reset_value: value assigned upon reset
 // __clk: clock input
 // __arst_n: asynchronous reset
-`define FFLARNC(__q, __d, __load, __clear, __reset_value, __clk, __arst_n) \
-    `ifndef VERILATOR                       \
-  /``* synopsys sync_set_reset `"__clear`" *``/                       \
-    `endif                        \
-  always_ff @(posedge (__clk) or negedge (__arst_n)) begin                 \
-    if (!__arst_n) begin                                                   \
-      __q <= (__reset_value);                                              \
-    end else begin                                                         \
-      __q <= (__clear) ? (__reset_value) : (__load) ? (__d) : (__q);       \
-    end                                                                    \
-  end
+// `define FFLARNC(__q, __d, __load, __clear, __reset_value, __clk, __arst_n)                        \
+//   always_ff @(posedge (__clk) or negedge (__arst_n)) begin                 
+//     if (!__arst_n) begin                                                   
+//       __q <= (__reset_value);                                              
+//     end else begin                                                         
+//       __q <= (__clear) ? (__reset_value) : (__load) ? (__d) : (__q);       
+//     end                                                                    
+//   end
 
 // Load-enable Flip-Flop without reset
 // __q: Q output of FF
@@ -21298,7 +21295,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/coregisters.svh"
-`include "registers.svh"
+// `include "registers.svh"
 module fpnew_cast_multi #(
   parameter fpnew_pkg::fmt_logic_t   FpFmtConfig  = '1,
   parameter fpnew_pkg::ifmt_logic_t  IntFmtConfig = '1,
@@ -21341,6 +21338,27 @@ module fpnew_cast_multi #(
   // Indication of valid data in flight
   output logic                   busy_o
 );
+
+  `define FFLARNC(__q, __d, __load, __clear, __reset_value, __clk, __arst_n) 
+  //   `ifndef VERILATOR                       
+  // ``* synopsys sync_set_reset `"__clear`" *``                       
+  //   `endif                        
+  always_ff @(posedge (__clk) or negedge (__arst_n)) begin                 
+    if (!__arst_n) begin                                                   
+      __q <= (__reset_value);                                              
+    end else begin                                                         
+      __q <= (__clear) ? (__reset_value) : (__load) ? (__d) : (__q);       
+    end                                                                    
+  end
+
+  `define FFL(__q, __d, __load, __reset_value)         
+  always_ff @(posedge clk_i or negedge rst_ni) begin 
+    if (!rst_ni) begin                               
+      __q <= (__reset_value);                        
+    end else begin                                   
+      __q <= (__load) ? (__d) : (__q);               
+    end                                              
+  end
 
   // ----------
   // Constants
@@ -22130,7 +22148,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-`include "registers.svh"
+// `include "registers.svh"
 module fpnew_divsqrt_multi #(
   parameter fpnew_pkg::fmt_logic_t   FpFmtConfig  = '1,
   // FPU configuration
@@ -22470,7 +22488,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-`include "registers.svh"
+// `include "registers.svh"
 module fpnew_fma_multi #(
   parameter fpnew_pkg::fmt_logic_t   FpFmtConfig = '1,
   parameter int unsigned             NumPipeRegs = 0,
@@ -23292,7 +23310,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-`include "registers.svh"
+// `include "registers.svh"
 module fpnew_fma #(
   parameter fpnew_pkg::fp_format_e   FpFormat    = fpnew_pkg::fp_format_e'(0),
   parameter int unsigned             NumPipeRegs = 0,
@@ -23965,7 +23983,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-`include "registers.svh"
+// `include "registers.svh"
 module fpnew_noncomp #(
   parameter fpnew_pkg::fp_format_e   FpFormat    = fpnew_pkg::fp_format_e'(0),
   parameter int unsigned             NumPipeRegs = 0,
@@ -24875,7 +24893,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-`include "registers.svh"
+// `include "registers.svh"
 module fpnew_opgroup_multifmt_slice #(
   parameter fpnew_pkg::opgroup_e     OpGroup       = fpnew_pkg::CONV,
   parameter int unsigned             Width         = 64,
@@ -28697,10 +28715,10 @@ module rr_arb_tree #(
 );
 
   // pragma translate_off
-  `ifndef VERILATOR
-  // Default SVA rst_ni
-  default disable iff (!rst_ni || flush_i);
-  `endif
+  // `ifndef VERILATOR
+  // // Default SVA rst_ni
+  // default disable iff (!rst_ni || flush_i);
+  // `endif
   // pragma translate_on
 
   // just pass through in this corner case
@@ -35452,7 +35470,7 @@ reg [DATA_WIDTH-1:0]    mem [0:RAM_DEPTH-1];
 
 endmodule
 // `include "/home/merl/github_repos/azadi/src/spi_host/rtl/spi_defines.v"
-`include "spi_defines.v"
+// `include "spi_defines.v"
 
 module spi_clgen (
   input                            clk_i,   // input clock (system clock)
@@ -35520,7 +35538,7 @@ endmodule
  
 // `include "/home/merl/github_repos/azadi/src/spi_host/rtl/spi_defines.v"
 //`include "/home/zeeshan/fyp/azadi/src/spi_host/rtl/spi_defines.v"
-`include "spi_defines.v"
+// `include "spi_defines.v"
 module spi_core
 (
   // tlul signals
@@ -35719,7 +35737,7 @@ module spi_core
     );
 endmodule
   
-`include "spi_defines.v"
+// `include "spi_defines.v"
 
 module spi_shift (
   input                          clk_i,          // system clock
@@ -35824,7 +35842,7 @@ endmodule
 
 // `include "/home/merl/github_repos/azadi/src/spi_host/rtl/spi_defines.v"
 //`include "/home/zeeshan/fyp/azadi/src/spi_host/rtl/spi_defines.v"
-`include "spi_defines.v"
+// `include "spi_defines.v"
 module spi_top(
 
   input clk_i,
@@ -37835,7 +37853,8 @@ module uart_rx_prog (
   assign o_Rx_DV   = r_Rx_DV;
   assign o_Rx_Byte = r_Rx_Byte;
    
-endmodule // uart_rxmodule uart_rx (
+endmodule // uart_rxmodule 
+module uart_rx (
    input        clk_i,
    input        rst_ni,
    input        i_RX_Serial,
