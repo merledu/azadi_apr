@@ -1402,7 +1402,7 @@ module brq_cs_registers #(
         .wr_data_i  (tmatch_value_d),
         .wr_en_i    (tmatch_value_we[i]),
         .rd_data_o  (tmatch_value_q[i]),
-        .rd_error_o (unused_error7)
+        .rd_error_o (unused_error17)
       );
     end
 
