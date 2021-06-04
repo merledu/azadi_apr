@@ -443,7 +443,7 @@ instr_mem_top iccm_adapter(
     .dout0     (instr_rdata),
     .clk1     (1'b0),
     .csb1     (1'b1),
-    .addr1    ('0),
+    .addr1    (10'b0),
     .dout1    ()
     );
 // dummy data memory
@@ -479,7 +479,7 @@ sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm ( /*`ifdef USE_POWER_PINS
   .dout0     (data_rdata),
   .clk1      (1'b0),
   .csb1      (1'b1),
-  .addr1     ('0),
+  .addr1     (10'b0),
   .dout1     ()
   );
 endmodule
