@@ -18,7 +18,7 @@ module uart_core (
     localparam ADDR_TX   = 4;
     localparam ADDR_RX   = 8;
     
-    reg [20:0] control;
+    reg [18:0] control;
     reg [7:0]  tx;
     wire [7:0] rx;
     wire       rx_status;
@@ -31,7 +31,7 @@ module uart_core (
           if(~ren & we) begin
             if(addr == ADDR_CTRL) begin
                 control[1:0] <= wdata[1:0];
-                control[19:3]<= wdata[19:3];
+                control[18:3]<= wdata[18:3];
                 control[2]   <= rx_status;
             end else if (addr == ADDR_TX) begin
                 tx  <= wdata[7:0];
@@ -50,7 +50,7 @@ uart_tx u_tx (
    .rst_ni      (rst_ni),
    .tx_en       (control[0]),
    .i_TX_Byte   (tx), 
-   .CLKS_PER_BIT(control[19:3]),
+   .CLKS_PER_BIT(control[18:3]),
        //output      o_TX_Active,
    .o_TX_Serial (tx_o),
    .o_TX_Done   (intr_tx)
@@ -62,7 +62,7 @@ uart_rx u_rx(
   .i_RX_Serial  (rx_i),
   .o_RX_DV      (rx_status),
   .rx_en        (control[1]),
-  .CLKS_PER_BIT (control[19:3]),
+  .CLKS_PER_BIT (control[18:3]),
   .o_RX_Byte    (rx)
 );
   
