@@ -60,15 +60,15 @@ always@(posedge clk_i)
 		ctrl[4:2]	<=	0;
 		ctrl[0]  	<=	0;
 		ctrl[1] <= 1'b0;
-		ctrl[7:6]	<=	0;
-		DC_1			<=	0;
+		ctrl[7:5]	<=	0;
+		DC_1	    <=	0;
 		period		<=	0;
 		divisor		<=	0;
 
 		
 		ctrl_2[4:2]	 <=	0;
 		ctrl_2[0]  	 <=	1'b0;
-		ctrl_2[7:6]	 <=	0;
+		ctrl_2[7:5]	 <=	0;
 		ctrl_2[1]   <=  1'b0;
 		DC_2		<=	0;
 		period_2	<=	0;
@@ -80,14 +80,14 @@ always@(posedge clk_i)
 				ctrl[0]	<=	wdata_i[0];
 				ctrl[1] <= 1'b1;
 				ctrl[4:2]	<=	wdata_i[4:2];
-				ctrl[7:6]	<=	wdata_i[7:6];
+				ctrl[7:5]	<=	wdata_i[7:5];
 			end
 
 			adr_ctrl_2:begin
 				ctrl_2[0]	<=	wdata_i[0];
 				ctrl_2[1]   <= 1'b1;
 				ctrl_2[4:2]	<=	wdata_i[4:2];
-				ctrl_2[7:6]	<=	wdata_i[7:6];
+				ctrl_2[7:5]	<=	wdata_i[7:5];
 			end
 
 			adr_divisor_1	:  divisor	<=	wdata_i[15:0];
