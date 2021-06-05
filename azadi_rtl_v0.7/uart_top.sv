@@ -24,7 +24,7 @@ module uart_top (
     logic [3:0] addr;
     logic        we;
     logic        re;
-    logic        rdata;
+    logic [31:0] rdata;
     logic [3:0]  be;
     
 uart_core u_uart_core(
