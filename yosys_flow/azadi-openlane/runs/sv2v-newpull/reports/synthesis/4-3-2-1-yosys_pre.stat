@@ -1,0 +1,45 @@
+
+10. Printing statistics.
+
+=== azadi_soc_top ===
+
+   Number of wires:              46259
+   Number of wire bits:          56054
+   Number of public wires:         968
+   Number of public wire bits:   10473
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:              53408
+     $_ANDNOT_                    9884
+     $_AND_                       1291
+     $_DFFE_NN0P_                   53
+     $_DFFE_NN1P_                    1
+     $_DFFE_NP_                      8
+     $_DFFE_PN0N_                   32
+     $_DFFE_PN0P_                 4107
+     $_DFFE_PN1N_                    2
+     $_DFFE_PN1P_                   73
+     $_DFFE_PP_                    998
+     $_DFF_NN0_                     11
+     $_DFF_NN1_                      2
+     $_DFF_PN0_                    622
+     $_DFF_PN1_                     31
+     $_DFF_P_                       43
+     $_MUX_                      13728
+     $_NAND_                      1289
+     $_NOR_                       2567
+     $_NOT_                       4581
+     $_ORNOT_                     1645
+     $_OR_                        9092
+     $_SDFFCE_PN0P_                  3
+     $_SDFFCE_PN1P_                  1
+     $_SDFFCE_PP0P_                  1
+     $_SDFFE_PN0P_                 287
+     $_SDFF_NN1_                     2
+     $_SDFF_PN0_                    34
+     $_SDFF_PP0_                     3
+     $_XNOR_                      1029
+     $_XOR_                       1987
+     sky130_fd_sc_hd__dlclkp_1       1
+
