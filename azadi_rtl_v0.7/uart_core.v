@@ -7,7 +7,7 @@ module uart_core (
     input  we,
     input  [31:0] wdata,
     output [31:0] rdata,
-    input  [7:0]  addr,    
+    input  [3:0]  addr,    
     output tx_o,
     input  rx_i,
     
