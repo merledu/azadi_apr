@@ -57,22 +57,22 @@ assign	   write = we_i & ~re_i;
 
 always@(posedge clk_i)
 	if(~rst_ni)begin
-		ctrl[4:2]	<=	0;
-		ctrl[0]  	<=	0;
-		ctrl[1] <= 1'b0;
-		ctrl[7:5]	<=	0;
-		DC_1	    <=	0;
-		period		<=	0;
-		divisor		<=	0;
+		ctrl[4:2]	<=	3'b0;
+		ctrl[0]  	<=	1'b0;
+		ctrl[1]     <= 1'b0;
+		ctrl[7:5]	<=	3'b0;
+		DC_1		<=	16'b0;
+		period		<=	16'b0;
+		divisor		<=	16'b0;
 
 		
-		ctrl_2[4:2]	 <=	0;
+		ctrl_2[4:2]	 <=	3'b0;
 		ctrl_2[0]  	 <=	1'b0;
-		ctrl_2[7:5]	 <=	0;
+		ctrl_2[7:5]	 <=	3'b0;
 		ctrl_2[1]   <=  1'b0;
-		DC_2		<=	0;
-		period_2	<=	0;
-		divisor_2	<=	0;
+		DC_2		<=	16'b0;
+		period_2	<=	16'b0;
+		divisor_2	<=	16'b0;
 	end
 	else if(write)begin
 		case(addr_i)
@@ -122,22 +122,22 @@ always @(posedge clk_i or negedge rst_ni) begin
   if(~rst_ni) begin
     clock_p1   <= 1'b0;
     clock_p2   <= 1'b0;
-    counter_p1 <= 0;
-    counter_p2 <= 0;
+    counter_p1 <= 16'b0;
+    counter_p2 <= 16'b0;
   end else begin
     if(pwm_1) begin
-      counter_p1 <= counter_p1 + 1;
+      counter_p1 <= counter_p1 + 16'b1;
       if(counter_p1 == divisor-1) begin
-        counter_p1 <= 0;
+        counter_p1 <= 16'b0;
         clock_p1   <= ~clock_p1;
       end
     end
 
     
     if(pwm_2) begin
-      counter_p2 <= counter_p2 + 1;
+      counter_p2 <= counter_p2 + 16'b1;
       if(counter_p2 == divisor_2-1) begin
-        counter_p2 <= 0;
+        counter_p2 <= 16'b0;
         clock_p2    <= ~clock_p2;
       end
     end
@@ -151,14 +151,14 @@ end
 
 always@(posedge clock_p1 )
 	if(~rst_ni)begin
-		pts   <= 0;
-		period_counter1    <= 0;
+		pts   <= 1'b0;
+		period_counter1    <= 16'b0;
 	end
 	else begin
 	if(ctrl[2])begin
 		if(pwm_1) begin
 		    oe_pwm1 <= 1'b1;
-			if(period_counter1	>=	period) period_counter1 <=	0;
+			if(period_counter1	>=	period) period_counter1 <=	16'b0;
 			else period_counter1	<=	period_counter1+1;
 
 			if(period_counter1	<	DC_1)	pts	<=	1'b1;
@@ -167,8 +167,8 @@ always@(posedge clock_p1 )
 	end
 	else begin
 			pts	    <= 1'b0;
-			period_counter1	    <= 0;
-			oe_pwm1 <= 0;
+			period_counter1	    <= 16'b0;
+			oe_pwm1 <= 1'b0;
 	end
 end
 
@@ -176,14 +176,14 @@ end
 
 always@(posedge clock_p2 )
 	if(~rst_ni)begin
-		pts_2	<=	0;
-		period_counter2	<=	0;
+		pts_2	<=	1'b0;
+		period_counter2	<=	16'b0;
 	end
 	else begin
 	if(ctrl_2[2])begin
 		if(pwm_2) begin
 		     oe_pwm2 <= 1'b1;
-			if(period_counter2	>=	period_2) period_counter2	<=	0;
+			if(period_counter2	>=	period_2) period_counter2	<=	16'b0;
 			else period_counter2	<=	period_counter2+1;
 
 			if(period_counter2	<	DC_2)	pts_2	<=	1'b1;
@@ -192,14 +192,14 @@ always@(posedge clock_p2 )
 	end
 	else begin
 			pts_2	<=	1'b0;
-			period_counter2	<=	0;
+			period_counter2	<=	16'b0;
 			oe_pwm2 <=  1'b0;
 	end
 end
 //////////////////////////////////////////////////////////
 
-assign	o_pwm   = ctrl[4]? pts: 0;
-assign	o_pwm_2 = ctrl_2[4]? pts_2: 0;
+assign	o_pwm   = ctrl[4]? pts: 16'b0;
+assign	o_pwm_2 = ctrl_2[4]? pts_2: 16'b0;
 assign	rdata_o = (addr_i == adr_ctrl_1)   ? {8'h0,ctrl}  :
 			  	(addr_i == adr_divisor_1)? divisor	  :
 			  	(addr_i == adr_period_1) ? period		  :
@@ -207,7 +207,7 @@ assign	rdata_o = (addr_i == adr_ctrl_1)   ? {8'h0,ctrl}  :
 				  (addr_i == adr_DC_2)	   ? DC_2		  :
 				  (addr_i == adr_period_2) ? period_2	  :
 				  (addr_i == adr_divisor_2)? divisor_2    :
-				  (addr_i == adr_ctrl_2)   ? {8'h0,ctrl_2}:0;
+				  (addr_i == adr_ctrl_2)   ? {8'h0,ctrl_2}: 32'b0;
 
 
 endmodule
