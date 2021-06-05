@@ -159,7 +159,7 @@ always@(posedge clock_p1 )
 		if(pwm_1) begin
 		    oe_pwm1 <= 1'b1;
 			if(period_counter1	>=	period) period_counter1 <=	16'b0;
-			else period_counter1	<=	period_counter1+1;
+			else period_counter1	<=	period_counter1+ 16'b1;
 
 			if(period_counter1	<	DC_1)	pts	<=	1'b1;
 			else pts	<=	1'b0;
@@ -198,7 +198,7 @@ always@(posedge clock_p2 )
 end
 //////////////////////////////////////////////////////////
 
-assign	o_pwm   = ctrl[4]? pts: 16'b0;
+assign	o_pwm   = ctrl[4]? pts: 1'b0;
 assign	o_pwm_2 = ctrl_2[4]? pts_2: 1'b0;
 assign	rdata_o = (addr_i == adr_ctrl_1)   ? {8'h0,ctrl}  :
 			  	(addr_i == adr_divisor_1)? divisor	  :
