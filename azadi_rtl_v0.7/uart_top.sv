@@ -21,7 +21,7 @@ module uart_top (
 );
     
     logic [31:0] wdata;
-    logic [31:0] addr;
+    logic [3:0] addr;
     logic        we;
     logic        re;
     logic        rdata;

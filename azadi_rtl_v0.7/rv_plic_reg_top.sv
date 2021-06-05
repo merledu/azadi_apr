@@ -441,8 +441,8 @@ module rv_plic_reg_top (
   logic [1:0] threshold0_qs;
   logic [1:0] threshold0_wd;
   logic threshold0_we;
-  logic [7:0] cc0_qs;
-  logic [7:0] cc0_wd;
+  logic [5:0] cc0_qs;
+  logic [5:0] cc0_wd;
   logic cc0_we;
   logic cc0_re;
   logic msip0_qs;
@@ -610,7 +610,7 @@ module rv_plic_reg_top (
     .SWACCESS("RO"),
     .RESVAL  (1'h0)
   ) u_ip_0_p_6 (
-    .clk_i   (clk_i    ),
+    .clk_i   (clk_i    ),DBW
     .rst_ni  (rst_ni  ),
 
     .we     (1'b0),
@@ -4222,7 +4222,7 @@ module rv_plic_reg_top (
 
     // from register interface
     .we     (threshold0_we),
-    .wd     (threshold0_wd),
+    .wd     (threshold0_wd),DBW
 
     // from internal hardware
     .de     (1'b0),
