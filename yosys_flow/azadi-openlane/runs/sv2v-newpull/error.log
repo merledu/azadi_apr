@@ -1,0 +1,24 @@
+during executing: "yosys -c /openLANE_flow/scripts/synth.tcl -l /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/logs/synthesis/1-yosys.log |& tee >&@stdout"
+Last 10 lines:
+child process exited abnormally
+
+during executing: "yosys -c /openLANE_flow/scripts/synth.tcl -l /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/logs/synthesis/2-yosys.log |& tee >&@stdout"
+Last 10 lines:
+child process exited abnormally
+
+during executing: "yosys -c /openLANE_flow/scripts/synth.tcl -l /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/logs/synthesis/3-yosys.log |& tee >&@stdout"
+Last 10 lines:
+child process exited abnormally
+
+during executing: "yosys -c /openLANE_flow/scripts/synth.tcl -l /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/logs/synthesis/6-yosys.log |& tee >&@stdout"
+Last 10 lines:
+child process exited abnormally
+
+during executing: "yosys -c /openLANE_flow/scripts/synth.tcl -l /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/logs/synthesis/7-yosys.log |& tee >&@stdout"
+Last 10 lines:
+child process exited abnormally
+
+during executing: "yosys -c /openLANE_flow/scripts/synth.tcl -l /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/logs/synthesis/8-yosys.log |& tee >&@stdout"
+Last 10 lines:
+child process exited abnormally
+

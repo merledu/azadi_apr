@@ -1,0 +1,81 @@
+[INFO]: Current run directory is /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull
+[INFO]: Preparing LEF Files
+[INFO]: Extracting the number of available metal layers from /home/merl-tools/openlane-v0.15/pdk/sky130A/libs.ref/sky130_fd_sc_hd/techlef/sky130_fd_sc_hd.tlef
+[INFO]: The number of available metal layers is 6
+[INFO]: The available metal layers are li1 met1 met2 met3 met4 met5
+[INFO]: Merging LEF Files...
+[INFO]: Trimming Liberty...
+[INFO]: Generating Exclude List...
+[INFO]: Storing configs into config.tcl ...
+[INFO]: Preparation complete
+[INFO]: current step index: 1
+[ERROR]: during executing: "yosys -c /openLANE_flow/scripts/synth.tcl -l /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/logs/synthesis/1-yosys.log |& tee >&@stdout"
+[ERROR]: Exit code: 1
+[ERROR]: Last 10 lines:
+child process exited abnormally
+
+[ERROR]: Please check yosys  log file
+[ERROR]: Dumping to /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/error.log
+[INFO]: Calculating Runtime From the Start...
+[INFO]: Flow failed for azadi_soc_top/05-06_12-24 in 0h1m25s
+[INFO]: Generating Final Summary Report...
+[INFO]: Design Name: azadi_soc_top
+Run Directory: /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull
+Source not found.
+----------------------------------------
+
+LVS Summary:
+Source: /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/results/lvs/azadi_soc_top.lvs_parsed.gds.log
+Source not found.
+----------------------------------------
+
+Antenna Summary:
+No antenna report found.
+[INFO]: check full report here: /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/reports/final_summary_report.csv
+[ERROR]: Flow Failed.
+[INFO]: current step index: 2
+[ERROR]: during executing: "yosys -c /openLANE_flow/scripts/synth.tcl -l /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/logs/synthesis/2-yosys.log |& tee >&@stdout"
+[ERROR]: Exit code: 1
+[ERROR]: Last 10 lines:
+child process exited abnormally
+
+[ERROR]: Please check yosys  log file
+[ERROR]: Dumping to /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/error.log
+[INFO]: current step index: 3
+[ERROR]: during executing: "yosys -c /openLANE_flow/scripts/synth.tcl -l /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/logs/synthesis/3-yosys.log |& tee >&@stdout"
+[ERROR]: Exit code: 1
+[ERROR]: Last 10 lines:
+child process exited abnormally
+
+[ERROR]: Please check yosys  log file
+[ERROR]: Dumping to /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/error.log
+[INFO]: current step index: 4
+[INFO]: Changing netlist from 0 to /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/results/synthesis/azadi_soc_top.synthesis.v
+[INFO]: current step index: 5
+[INFO]: Changing netlist from /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/results/synthesis/azadi_soc_top.synthesis.v to /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/results/synthesis/azadi_soc_top.synthesis.v
+[INFO]: current step index: 6
+[ERROR]: during executing: "yosys -c /openLANE_flow/scripts/synth.tcl -l /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/logs/synthesis/6-yosys.log |& tee >&@stdout"
+[ERROR]: Exit code: 1
+[ERROR]: Last 10 lines:
+child process exited abnormally
+
+[ERROR]: Please check yosys  log file
+[ERROR]: Dumping to /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/error.log
+[INFO]: current step index: 7
+[ERROR]: during executing: "yosys -c /openLANE_flow/scripts/synth.tcl -l /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/logs/synthesis/7-yosys.log |& tee >&@stdout"
+[ERROR]: Exit code: 1
+[ERROR]: Last 10 lines:
+child process exited abnormally
+
+[ERROR]: Please check yosys  log file
+[ERROR]: Dumping to /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/error.log
+[INFO]: current step index: 8
+[ERROR]: during executing: "yosys -c /openLANE_flow/scripts/synth.tcl -l /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/logs/synthesis/8-yosys.log |& tee >&@stdout"
+[ERROR]: Exit code: 1
+[ERROR]: Last 10 lines:
+child process exited abnormally
+
+[ERROR]: Please check yosys  log file
+[ERROR]: Dumping to /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/error.log
+[INFO]: current step index: 9
+[INFO]: Changing netlist from /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/results/synthesis/azadi_soc_top.synthesis.v to /openLANE_flow/designs/azadi-verilog/runs/sv2v-newpull/results/synthesis/azadi_soc_top.synthesis.v
