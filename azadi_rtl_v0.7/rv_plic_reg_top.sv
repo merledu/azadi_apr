@@ -610,7 +610,7 @@ module rv_plic_reg_top (
     .SWACCESS("RO"),
     .RESVAL  (1'h0)
   ) u_ip_0_p_6 (
-    .clk_i   (clk_i    ),DBW
+    .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     .we     (1'b0),
@@ -4222,7 +4222,7 @@ module rv_plic_reg_top (
 
     // from register interface
     .we     (threshold0_we),
-    .wd     (threshold0_wd),DBW
+    .wd     (threshold0_wd),
 
     // from internal hardware
     .de     (1'b0),
