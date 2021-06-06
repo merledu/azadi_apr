@@ -850,6 +850,10 @@ module brq_cs_registers #(
     .rd_error_o (unused_error1)
   );
 
+    wire [2:0] frmd;
+    wire [2:0] frmq;
+    assign frm_q = roundmode_e'(frmq);
+    assign frmd = frm_d;
   // FRM
   brq_csr #(
     .Width      (3),
@@ -858,9 +862,9 @@ module brq_cs_registers #(
   ) frm_csr (
     .clk_i      (clk_i),
     .rst_ni     (rst_ni),
-    .wr_data_i  (frm_d),
+    .wr_data_i  (frmd),
     .wr_en_i    (frm_en),
-    .rd_data_o  (frm_q),
+    .rd_data_o  (frmq),
     .rd_error_o (unused_error2)
   );
   

@@ -33,8 +33,8 @@ logic [3:0]  mask_sel;
 
 assign mask_sel[0] = (tl_wmask[7:0]   != 8'b0) ? 1'b1: 1'b0;
 assign mask_sel[1] = (tl_wmask[15:8]  != 8'b0) ? 1'b1: 1'b0;
-assign mask_sel[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 2'b0;
-assign mask_sel[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 2'b0;
+assign mask_sel[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 1'b0;
+assign mask_sel[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 1'b0;
 
 assign csb     = ~(tl_req | iccm_ctrl_we);
 

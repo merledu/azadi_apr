@@ -23,8 +23,8 @@ module data_mem_top
 
   assign wmask_o[0] = (tl_wmask[7:0]   != 8'b0) ? 1'b1: 1'b0;
   assign wmask_o[1] = (tl_wmask[15:8]  != 8'b0) ? 1'b1: 1'b0;
-  assign wmask_o[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 2'b0;
-  assign wmask_o[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 2'b0; 
+  assign wmask_o[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 1'b0;
+  assign wmask_o[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 1'b0; 
   
   assign we_o    = ~we_i;
   assign csb     = ~tl_req;

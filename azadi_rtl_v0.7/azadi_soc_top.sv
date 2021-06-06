@@ -1,10 +1,15 @@
 
 module azadi_soc_top (
+`ifdef USE_POWER_PINS
+   inout vccd1,
+   inout vssd1,
+`endif
   input clk_i,
   input rst_ni,
   input prog,
   //output system_rst_ni,
  // output prog_rst_ni,
+  input  logic [15:0] prog_baude, 
   input  logic [31:0] gpio_i,
   output logic [31:0] gpio_o,
   output logic [31:0] gpio_oe,
@@ -44,7 +49,8 @@ localparam logic [31:0] JTAG_ID = {
   1'b1      // (fixed)
 };
 
-
+//  logic clk_ni;
+//  assign clk_ni = ~clk_i;
   logic prog_rst_n;
   logic system_rst_ni;
   logic [31:0] gpio_in;
@@ -385,7 +391,7 @@ logic rx_dv_i;
 logic [7:0] rx_byte_i;
 	
 iccm_controller u_dut(
-    .clk_i      (~clk_i),
+    .clk_i      (clk_i),
 	.rst_ni     (rst_ni),
 	.prog_i     (prog),
 	.rx_dv_i    (rx_dv_i),
@@ -397,10 +403,10 @@ iccm_controller u_dut(
 );
 	
 uart_rx_prog u_uart_rx_prog(
-	.clk_i         (~clk_i),
+	.clk_i         (clk_i),
 	.rst_ni        (rst_ni),
 	.i_Rx_Serial   (uart_rx),
-	.CLKS_PER_BIT  (16'd938),
+	.CLKS_PER_BIT  (prog_baude),
 	.o_Rx_DV       (rx_dv_i),
 	.o_Rx_Byte     (rx_byte_i)
 );
@@ -429,12 +435,15 @@ instr_mem_top iccm_adapter(
   .rdata_i          (instr_rdata)
 );
 
+    logic [31:0] unused_data1;
+    logic [31:0] unused_data2;
 
-  sky130_sram_4kbyte_1rw1r_32x1024_8 u_iccm ( /*`ifdef USE_POWER_PINS
-    inout vdd;
-    inout gnd;
-  `endif*/
-    .clk0      (~clk_i), // clock
+  sky130_sram_4kbyte_1rw1r_32x1024_8 u_iccm (
+  `ifdef USE_POWER_PINS
+    .vccd1(vccd1),
+    .vssd1(vssd1),
+  `endif
+    .clk0      (clk_i), // clock
     .csb0      (instr_csb), // active low chip select
     .web0      (instr_we), // active low write control
     .wmask0    (instr_wmask), // write mask
@@ -444,7 +453,7 @@ instr_mem_top iccm_adapter(
     .clk1     (1'b0),
     .csb1     (1'b1),
     .addr1    (10'b0),
-    .dout1    ()
+    .dout1    (unused_data1)
     );
 // dummy data memory
 
@@ -466,11 +475,12 @@ data_mem_top dccm_adapter(
 );
 
 
-sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm ( /*`ifdef USE_POWER_PINS
-  inout vdd;
-  inout gnd;
-`endif*/
-  .clk0      (~clk_i), // clock
+sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm (
+`ifdef USE_POWER_PINS
+    .vccd1(vccd1),
+    .vssd1(vssd1),
+`endif
+  .clk0      (clk_i), // clock
   .csb0      (data_csb), // active low chip select
   .web0      (data_we), // active low write control
   .wmask0    (data_wmask), // write mask
@@ -480,6 +490,6 @@ sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm ( /*`ifdef USE_POWER_PINS
   .clk1      (1'b0),
   .csb1      (1'b1),
   .addr1     (10'b0),
-  .dout1     ()
+  .dout1     (unused_data2)
   );
 endmodule
