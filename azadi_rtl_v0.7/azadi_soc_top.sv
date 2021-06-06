@@ -1,8 +1,8 @@
 
 module azadi_soc_top (
 `ifdef USE_POWER_PINS
-   inout VPWR,
-   inout VGND,
+   inout vccd1,
+   inout vssd1,
 `endif
   input clk_i,
   input rst_ni,
@@ -440,8 +440,8 @@ instr_mem_top iccm_adapter(
 
   sky130_sram_4kbyte_1rw1r_32x1024_8 u_iccm (
   `ifdef USE_POWER_PINS
-    .vccd1(VPWR),
-    .vssd1(VGND),
+    .vccd1(vccd1),
+    .vssd1(vssd1),
   `endif
     .clk0      (clk_ni), // clock
     .csb0      (instr_csb), // active low chip select
@@ -477,8 +477,8 @@ data_mem_top dccm_adapter(
 
 sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm (
 `ifdef USE_POWER_PINS
-    .vccd1(VPWR),
-    .vssd1(VGND),
+    .vccd1(vccd1),
+    .vssd1(vssd1),
 `endif
   .clk0      (clk_ni), // clock
   .csb0      (data_csb), // active low chip select
