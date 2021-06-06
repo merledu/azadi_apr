@@ -49,8 +49,8 @@ localparam logic [31:0] JTAG_ID = {
   1'b1      // (fixed)
 };
 
-  logic clk_ni;
-  assign clk_ni = ~clk_i;
+//  logic clk_ni;
+//  assign clk_ni = ~clk_i;
   logic prog_rst_n;
   logic system_rst_ni;
   logic [31:0] gpio_in;
@@ -391,7 +391,7 @@ logic rx_dv_i;
 logic [7:0] rx_byte_i;
 	
 iccm_controller u_dut(
-    .clk_i      (clk_ni),
+    .clk_i      (clk_i),
 	.rst_ni     (rst_ni),
 	.prog_i     (prog),
 	.rx_dv_i    (rx_dv_i),
@@ -403,7 +403,7 @@ iccm_controller u_dut(
 );
 	
 uart_rx_prog u_uart_rx_prog(
-	.clk_i         (clk_ni),
+	.clk_i         (clk_i),
 	.rst_ni        (rst_ni),
 	.i_Rx_Serial   (uart_rx),
 	.CLKS_PER_BIT  (prog_baude),
@@ -443,7 +443,7 @@ instr_mem_top iccm_adapter(
     .vccd1(vccd1),
     .vssd1(vssd1),
   `endif
-    .clk0      (clk_ni), // clock
+    .clk0      (clk_i), // clock
     .csb0      (instr_csb), // active low chip select
     .web0      (instr_we), // active low write control
     .wmask0    (instr_wmask), // write mask
@@ -480,7 +480,7 @@ sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm (
     .vccd1(vccd1),
     .vssd1(vssd1),
 `endif
-  .clk0      (clk_ni), // clock
+  .clk0      (clk_i), // clock
   .csb0      (data_csb), // active low chip select
   .web0      (data_we), // active low write control
   .wmask0    (data_wmask), // write mask
