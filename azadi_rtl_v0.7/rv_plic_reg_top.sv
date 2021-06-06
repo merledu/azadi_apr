@@ -441,8 +441,8 @@ module rv_plic_reg_top (
   logic [1:0] threshold0_qs;
   logic [1:0] threshold0_wd;
   logic threshold0_we;
-  logic [7:0] cc0_qs;
-  logic [7:0] cc0_wd;
+  logic [5:0] cc0_qs;
+  logic [5:0] cc0_wd;
   logic cc0_we;
   logic cc0_re;
   logic msip0_qs;
