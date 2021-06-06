@@ -2077,14 +2077,17 @@ endpackage// Copyright 2018 ETH Zurich and University of Bologna.
 // __reset_value: value assigned upon reset
 // __clk: clock input
 // __arst_n: asynchronous reset
-// `define FFLARNC(__q, __d, __load, __clear, __reset_value, __clk, __arst_n)                        \
-//   always_ff @(posedge (__clk) or negedge (__arst_n)) begin                 
-//     if (!__arst_n) begin                                                   
-//       __q <= (__reset_value);                                              
-//     end else begin                                                         
-//       __q <= (__clear) ? (__reset_value) : (__load) ? (__d) : (__q);       
-//     end                                                                    
-//   end
+`define FFLARNC(__q, __d, __load, __clear, __reset_value, __clk, __arst_n) \
+    `ifndef VERILATOR                       \
+  /``* synopsys sync_set_reset `"__clear`" *``/                       \
+    `endif                        \
+  always_ff @(posedge (__clk) or negedge (__arst_n)) begin                 \
+    if (!__arst_n) begin                                                   \
+      __q <= (__reset_value);                                              \
+    end else begin                                                         \
+      __q <= (__clear) ? (__reset_value) : (__load) ? (__d) : (__q);       \
+    end                                                                    \
+  end
 
 // Load-enable Flip-Flop without reset
 // __q: Q output of FF
@@ -3039,11 +3042,16 @@ endpackage
 `endif //__UTILS_VH__
 
 module azadi_soc_top (
+`ifdef USE_POWER_PINS
+   inout vccd1,
+   inout vssd1,
+`endif
   input clk_i,
   input rst_ni,
   input prog,
   //output system_rst_ni,
  // output prog_rst_ni,
+  input  logic [15:0] prog_baude, 
   input  logic [31:0] gpio_i,
   output logic [31:0] gpio_o,
   output logic [31:0] gpio_oe,
@@ -3083,7 +3091,8 @@ localparam logic [31:0] JTAG_ID = {
   1'b1      // (fixed)
 };
 
-
+//  logic clk_ni;
+//  assign clk_ni = ~clk_i;
   logic prog_rst_n;
   logic system_rst_ni;
   logic [31:0] gpio_in;
@@ -3424,7 +3433,7 @@ logic rx_dv_i;
 logic [7:0] rx_byte_i;
 	
 iccm_controller u_dut(
-    .clk_i      (~clk_i),
+    .clk_i      (clk_i),
 	.rst_ni     (rst_ni),
 	.prog_i     (prog),
 	.rx_dv_i    (rx_dv_i),
@@ -3436,10 +3445,10 @@ iccm_controller u_dut(
 );
 	
 uart_rx_prog u_uart_rx_prog(
-	.clk_i         (~clk_i),
+	.clk_i         (clk_i),
 	.rst_ni        (rst_ni),
 	.i_Rx_Serial   (uart_rx),
-	.CLKS_PER_BIT  (16'd938),
+	.CLKS_PER_BIT  (prog_baude),
 	.o_Rx_DV       (rx_dv_i),
 	.o_Rx_Byte     (rx_byte_i)
 );
@@ -3468,12 +3477,15 @@ instr_mem_top iccm_adapter(
   .rdata_i          (instr_rdata)
 );
 
+    logic [31:0] unused_data1;
+    logic [31:0] unused_data2;
 
-  sky130_sram_4kbyte_1rw1r_32x1024_8 u_iccm ( /*`ifdef USE_POWER_PINS
-    inout vdd;
-    inout gnd;
-  `endif*/
-    .clk0      (~clk_i), // clock
+  sky130_sram_4kbyte_1rw1r_32x1024_8 u_iccm (
+  `ifdef USE_POWER_PINS
+    .vccd1(vccd1),
+    .vssd1(vssd1),
+  `endif
+    .clk0      (clk_i), // clock
     .csb0      (instr_csb), // active low chip select
     .web0      (instr_we), // active low write control
     .wmask0    (instr_wmask), // write mask
@@ -3483,7 +3495,7 @@ instr_mem_top iccm_adapter(
     .clk1     (1'b0),
     .csb1     (1'b1),
     .addr1    (10'b0),
-    .dout1    ()
+    .dout1    (unused_data1)
     );
 // dummy data memory
 
@@ -3505,11 +3517,12 @@ data_mem_top dccm_adapter(
 );
 
 
-sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm ( /*`ifdef USE_POWER_PINS
-  inout vdd;
-  inout gnd;
-`endif*/
-  .clk0      (~clk_i), // clock
+sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm (
+`ifdef USE_POWER_PINS
+    .vccd1(vccd1),
+    .vssd1(vssd1),
+`endif
+  .clk0      (clk_i), // clock
   .csb0      (data_csb), // active low chip select
   .web0      (data_we), // active low write control
   .wmask0    (data_wmask), // write mask
@@ -3519,7 +3532,7 @@ sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm ( /*`ifdef USE_POWER_PINS
   .clk1      (1'b0),
   .csb1      (1'b1),
   .addr1     (10'b0),
-  .dout1     ()
+  .dout1     (unused_data2)
   );
 endmodule
 `ifdef RISCV_FORMAL
@@ -6264,6 +6277,10 @@ module brq_cs_registers #(
     .rd_error_o (unused_error1)
   );
 
+    logic [2:0] frmd;
+    logic [2:0] frmq;
+    assign frm_q = roundmode_e'(frmq);
+    assign frmd = frm_d;
   // FRM
   brq_csr #(
     .Width      (3),
@@ -6272,9 +6289,9 @@ module brq_cs_registers #(
   ) frm_csr (
     .clk_i      (clk_i),
     .rst_ni     (rst_ni),
-    .wr_data_i  (frm_d),
+    .wr_data_i  (frmd),
     .wr_en_i    (frm_en),
-    .rd_data_o  (frm_q),
+    .rd_data_o  (frmq),
     .rd_error_o (unused_error2)
   );
   
@@ -18483,8 +18500,8 @@ module data_mem_top
 
   assign wmask_o[0] = (tl_wmask[7:0]   != 8'b0) ? 1'b1: 1'b0;
   assign wmask_o[1] = (tl_wmask[15:8]  != 8'b0) ? 1'b1: 1'b0;
-  assign wmask_o[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 2'b0;
-  assign wmask_o[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 2'b0; 
+  assign wmask_o[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 1'b0;
+  assign wmask_o[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 1'b0; 
   
   assign we_o    = ~we_i;
   assign csb     = ~tl_req;
@@ -18550,7 +18567,8 @@ module debug_rom_one_scratch (
 
   localparam int unsigned RomSize = 13;
 
-  const logic [RomSize-1:0][63:0] mem = {
+  logic [RomSize-1:0][63:0] mem;
+  assign mem = {
     64'h00000000_7b200073,
     64'h7b202473_10802423,
     64'hf1402473_ab1ff06f,
@@ -18609,7 +18627,8 @@ module debug_rom (
 
   localparam int unsigned RomSize = 19;
 
-  const logic [RomSize-1:0][63:0] mem = {
+  logic [RomSize-1:0][63:0] mem; 
+  assign mem = {
     64'h00000000_7b200073,
     64'h7b202473_7b302573,
     64'h10852423_f1402473,
@@ -21338,18 +21357,14 @@ module fpnew_cast_multi #(
   // Indication of valid data in flight
   output logic                   busy_o
 );
-
-  `define FFLARNC(__q, __d, __load, __clear, __reset_value, __clk, __arst_n) 
-  //   `ifndef VERILATOR                       
-  // ``* synopsys sync_set_reset `"__clear`" *``                       
-  //   `endif                        
-  always_ff @(posedge (__clk) or negedge (__arst_n)) begin                 
-    if (!__arst_n) begin                                                   
-      __q <= (__reset_value);                                              
-    end else begin                                                         
-      __q <= (__clear) ? (__reset_value) : (__load) ? (__d) : (__q);       
-    end                                                                    
-  end
+  `define FFLARNC(__q, __d, __load, __clear, __reset_value, __clk, __arst_n)              
+    always_ff @(posedge (__clk) or negedge (__arst_n)) begin                 
+      if (!__arst_n) begin                                                   
+        __q <= (__reset_value);                                              
+      end else begin                                                         
+        __q <= (__clear) ? (__reset_value) : (__load) ? (__d) : (__q);       
+      end                                                                    
+    end
 
   `define FFL(__q, __d, __load, __reset_value)         
   always_ff @(posedge clk_i or negedge rst_ni) begin 
@@ -26569,8 +26584,8 @@ logic [3:0]  mask_sel;
 
 assign mask_sel[0] = (tl_wmask[7:0]   != 8'b0) ? 1'b1: 1'b0;
 assign mask_sel[1] = (tl_wmask[15:8]  != 8'b0) ? 1'b1: 1'b0;
-assign mask_sel[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 2'b0;
-assign mask_sel[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 2'b0;
+assign mask_sel[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 1'b0;
+assign mask_sel[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 1'b0;
 
 assign csb     = ~(tl_req | iccm_ctrl_we);
 
@@ -26615,7 +26630,8 @@ assign wmask_o = (prog_rst_ni) ? mask_sel : 4'b1111;
  end
 
 
-endmodule// Copyright 2018 ETH Zurich and University of Bologna.
+endmodule
+// Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
 // License, Version 0.51 (the “License”); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
@@ -29811,8 +29827,8 @@ module rv_plic_reg_top (
   logic [1:0] threshold0_qs;
   logic [1:0] threshold0_wd;
   logic threshold0_we;
-  logic [7:0] cc0_qs;
-  logic [7:0] cc0_wd;
+  logic [5:0] cc0_qs;
+  logic [5:0] cc0_wd;
   logic cc0_we;
   logic cc0_re;
   logic msip0_qs;
@@ -37853,7 +37869,7 @@ module uart_rx_prog (
   assign o_Rx_DV   = r_Rx_DV;
   assign o_Rx_Byte = r_Rx_Byte;
    
-endmodule // uart_rxmodule 
+endmodule // uart_rx
 module uart_rx (
    input        clk_i,
    input        rst_ni,
@@ -38015,10 +38031,10 @@ module uart_top (
 );
     
     logic [31:0] wdata;
-    logic [31:0] addr;
+    logic [3:0] addr;
     logic        we;
     logic        re;
-    logic        rdata;
+    logic [31:0] rdata;
     logic [3:0]  be;
     
 uart_core u_uart_core(

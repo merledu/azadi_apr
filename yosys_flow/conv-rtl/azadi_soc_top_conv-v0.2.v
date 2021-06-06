@@ -2,7 +2,7 @@ module azadi_soc_top (
 	clk_i,
 	rst_ni,
 	prog,
-	clk_per_bits,
+	prog_baude,
 	gpio_i,
 	gpio_o,
 	gpio_oe,
@@ -27,7 +27,7 @@ module azadi_soc_top (
 	input clk_i;
 	input rst_ni;
 	input prog;
-	input wire [15:0] clk_per_bits;
+	input wire [15:0] prog_baude;
 	input wire [31:0] gpio_i;
 	output wire [31:0] gpio_o;
 	output wire [31:0] gpio_oe;
@@ -305,7 +305,7 @@ module azadi_soc_top (
 		.clk_i(clk_i),
 		.rst_ni(rst_ni),
 		.i_Rx_Serial(uart_rx),
-		.CLKS_PER_BIT(clk_per_bits),
+		.CLKS_PER_BIT(prog_baude),
 		.o_Rx_DV(rx_dv_i),
 		.o_Rx_Byte(rx_byte_i)
 	);
@@ -13079,7 +13079,7 @@ module fpnew_cast_multi_8A35C_87530 (
 	output wire out_valid_o;
 	input wire out_ready_i;
 	output wire busy_o;
-	/*always @(posedge __clk or negedge __arst_n)
+	always @(posedge __clk or negedge __arst_n)
 		if (!__arst_n)
 			__q <= __reset_value;
 		else
@@ -13089,7 +13089,6 @@ module fpnew_cast_multi_8A35C_87530 (
 			__q <= __reset_value;
 		else
 			__q <= (__load ? __d : __q);
-	*/
 	localparam [31:0] NUM_INT_FORMATS = fpnew_pkg_NUM_INT_FORMATS;
 	localparam [31:0] MAX_INT_WIDTH = fpnew_pkg_max_int_width(IntFmtConfig);
 	function automatic [31:0] fpnew_pkg_exp_bits;
@@ -15657,15 +15656,13 @@ module fpnew_opgroup_block_BE2AB (
 			fpnew_pkg_get_num_regs_multi = res;
 		end
 	endfunction
-	localparam FMT = fpnew_pkg_get_first_enabled_multi(FmtUnitTypes, FpFmtMask);
-        localparam REG = fpnew_pkg_get_num_regs_multi(FmtPipeRegs, FmtUnitTypes, FpFmtMask);
 	generate
 		if (fpnew_pkg_any_enabled_multi(FmtUnitTypes, FpFmtMask)) begin : gen_merged_slice
-			//localparam FMT = fpnew_pkg_get_first_enabled_multi(FmtUnitTypes, FpFmtMask);
-			//localparam REG = fpnew_pkg_get_num_regs_multi(FmtPipeRegs, FmtUnitTypes, FpFmtMask);
+			localparam FMT = fpnew_pkg_get_first_enabled_multi(FmtUnitTypes, FpFmtMask);
+			localparam REG = fpnew_pkg_get_num_regs_multi(FmtPipeRegs, FmtUnitTypes, FpFmtMask);
 			wire in_valid;
 			assign in_valid = in_valid_i & (FmtUnitTypes[(4 - dst_fmt_i) * 2+:2] == fpnew_pkg_MERGED);
-			/*fpnew_opgroup_multifmt_slice_7C482 #(
+			fpnew_opgroup_multifmt_slice_7C482 #(
 				.OpGroup(OpGroup),
 				.Width(Width),
 				.FpFmtConfig(FpFmtMask),
@@ -15692,13 +15689,11 @@ module fpnew_opgroup_block_BE2AB (
 				.result_o(fmt_outputs[((Width + 6) >= 0 ? (FMT * ((Width + 6) >= 0 ? Width + 7 : 1 - (Width + 6))) + ((Width + 6) >= 0 ? Width + 6 : (Width + 6) - (Width + 6)) : (((FMT * ((Width + 6) >= 0 ? Width + 7 : 1 - (Width + 6))) + ((Width + 6) >= 0 ? Width + 6 : (Width + 6) - (Width + 6))) + ((Width + 6) >= 7 ? Width : 8 - (Width + 6))) - 1)-:((Width + 6) >= 7 ? Width : 8 - (Width + 6))]),
 				.status_o(fmt_outputs[((Width + 6) >= 0 ? (FMT * ((Width + 6) >= 0 ? Width + 7 : 1 - (Width + 6))) + ((Width + 6) >= 0 ? 6 : Width) : ((FMT * ((Width + 6) >= 0 ? Width + 7 : 1 - (Width + 6))) + ((Width + 6) >= 0 ? 6 : Width)) + 4)-:5]),
 				.extension_bit_o(fmt_outputs[(FMT * ((Width + 6) >= 0 ? Width + 7 : 1 - (Width + 6))) + ((Width + 6) >= 0 ? 1 : Width + 5)]),
-				//.tag_o(fmt_outputs[(FMT * ((Width + 6) >= 0 ? Width + 7 : 1 - (Width + 6))) + ((Width + 6) >= 0 ? 0 : Width + 6)]),
-				.tag_o(),
-				.out_valid_o(),
+				.tag_o(fmt_outputs[(FMT * ((Width + 6) >= 0 ? Width + 7 : 1 - (Width + 6))) + ((Width + 6) >= 0 ? 0 : Width + 6)]),
+				.out_valid_o(fmt_out_valid[FMT]),
 				.out_ready_i(fmt_out_ready[FMT]),
-				//.busy_o(fmt_busy[FMT])
-				.busy_o(busy_o)
-			);*/
+				.busy_o(fmt_busy[FMT])
+			);
 		end
 	endgenerate
 	wire [Width + 6:0] arbiter_output;
@@ -16337,8 +16332,7 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 						.flush_i(flush_i),
 						.result_o(op_result),
 						.status_o(op_status),
-						//.extension_bit_o(lane_ext_bit[lane]),
-						.extension_bit_o(extension_bit_o), 
+						.extension_bit_o(lane_ext_bit[lane]),
 						.tag_o(lane_tags[lane]),
 						.aux_o(lane_aux[lane * AUX_BITS+:AUX_BITS]),
 						.out_valid_o(out_valid),
@@ -16375,8 +16369,7 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 						.flush_i(flush_i),
 						.result_o(op_result),
 						.status_o(op_status),
-						//.extension_bit_o(lane_ext_bit[lane]),
-						.extension_bit_o(extension_bit_o),
+						.extension_bit_o(lane_ext_bit[lane]),
 						.tag_o(lane_tags[lane]),
 						.aux_o(lane_aux[lane * AUX_BITS+:AUX_BITS]),
 						.out_valid_o(out_valid),
@@ -16418,8 +16411,7 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 						.flush_i(flush_i),
 						.result_o(op_result),
 						.status_o(op_status),
-						//.extension_bit_o(lane_ext_bit[lane]),
-						.extension_bit_o(extension_bit_o),
+						.extension_bit_o(lane_ext_bit[lane]),
 						.tag_o(lane_tags[lane]),
 						.aux_o(lane_aux[lane * AUX_BITS+:AUX_BITS]),
 						.out_valid_o(out_valid),
@@ -16436,7 +16428,7 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 				assign local_result = (lane_out_valid[lane] ? op_result : {(OpGroup == fpnew_pkg_CONV ? fpnew_pkg_max_fp_width(sv2v_cast_18C91(fpnew_pkg_get_conv_lane_formats(Width, FpFmtConfig, sv2v_cast_32($unsigned(lane))))) : fpnew_pkg_max_fp_width(sv2v_cast_18C91(fpnew_pkg_get_lane_formats(Width, FpFmtConfig, sv2v_cast_32($unsigned(lane)))))) {lane_ext_bit[0]}});
 				assign lane_status[lane * 5+:5] = (lane_out_valid[lane] ? op_status : {5 {1'sb0}});
 			end
-			else begin /* : inactive_lane
+			else begin : inactive_lane
 				assign lane_out_valid[lane] = 1'b0;
 				assign lane_in_ready[lane] = 1'b0;
 				function automatic [4:0] sv2v_cast_18C91;
@@ -16465,7 +16457,7 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 					assign fmt_slice_result[(fmt * Width) + ((((LANE + 1) * FP_WIDTH) - 1) >= (LANE * FP_WIDTH) ? ((LANE + 1) * FP_WIDTH) - 1 : ((((LANE + 1) * FP_WIDTH) - 1) + ((((LANE + 1) * FP_WIDTH) - 1) >= (LANE * FP_WIDTH) ? ((((LANE + 1) * FP_WIDTH) - 1) - (LANE * FP_WIDTH)) + 1 : ((LANE * FP_WIDTH) - (((LANE + 1) * FP_WIDTH) - 1)) + 1)) - 1)-:((((LANE + 1) * FP_WIDTH) - 1) >= (LANE * FP_WIDTH) ? ((((LANE + 1) * FP_WIDTH) - 1) - (LANE * FP_WIDTH)) + 1 : ((LANE * FP_WIDTH) - (((LANE + 1) * FP_WIDTH) - 1)) + 1)] = {((((LANE + 1) * FP_WIDTH) - 1) >= (LANE * FP_WIDTH) ? ((((LANE + 1) * FP_WIDTH) - 1) - (LANE * FP_WIDTH)) + 1 : ((LANE * FP_WIDTH) - (((LANE + 1) * FP_WIDTH) - 1)) + 1) {lane_ext_bit[LANE]}};
 				end
 				else if ((LANE * FP_WIDTH) < Width) assign fmt_slice_result[(fmt * Width) + ((Width - 1) >= (LANE * FP_WIDTH) ? Width - 1 : ((Width - 1) + ((Width - 1) >= (LANE * FP_WIDTH) ? ((Width - 1) - (LANE * FP_WIDTH)) + 1 : ((LANE * FP_WIDTH) - (Width - 1)) + 1)) - 1)-:((Width - 1) >= (LANE * FP_WIDTH) ? ((Width - 1) - (LANE * FP_WIDTH)) + 1 : ((LANE * FP_WIDTH) - (Width - 1)) + 1)] = {((Width - 1) >= (LANE * FP_WIDTH) ? ((Width - 1) - (LANE * FP_WIDTH)) + 1 : ((LANE * FP_WIDTH) - (Width - 1)) + 1) {lane_ext_bit[LANE]}};
-			*/end
+			end
 			if (OpGroup == fpnew_pkg_CONV) begin : int_results_enabled
 				genvar ifmt;
 				for (ifmt = 0; ifmt < NUM_INT_FORMATS; ifmt = ifmt + 1) begin : pack_int_result
@@ -16529,7 +16521,7 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 	endgenerate
 	assign {result_fmt_is_int, result_is_vector, result_fmt} = lane_aux[0+:AUX_BITS];
 	assign result_o = (result_fmt_is_int ? ifmt_slice_result[result_fmt * Width+:Width] : fmt_slice_result[result_fmt * Width+:Width]);
-	//assign extension_bit_o = lane_ext_bit[0];
+	assign extension_bit_o = lane_ext_bit[0];
 	assign tag_o = lane_tags[0];
 	assign busy_o = |lane_busy;
 	assign out_valid_o = lane_out_valid[0];
@@ -19024,13 +19016,13 @@ module pwm (
 			ctrl[4:2] <= 0;
 			ctrl[0] <= 0;
 			ctrl[1] <= 1'b0;
-			ctrl[7:5] <= 0;
+			ctrl[7:6] <= 0;
 			DC_1 <= 0;
 			period <= 0;
 			divisor <= 0;
 			ctrl_2[4:2] <= 0;
 			ctrl_2[0] <= 1'b0;
-			ctrl_2[7:5] <= 0;
+			ctrl_2[7:6] <= 0;
 			ctrl_2[1] <= 1'b0;
 			DC_2 <= 0;
 			period_2 <= 0;
@@ -19042,13 +19034,13 @@ module pwm (
 					ctrl[0] <= wdata_i[0];
 					ctrl[1] <= 1'b1;
 					ctrl[4:2] <= wdata_i[4:2];
-					ctrl[7:5] <= wdata_i[7:5];
+					ctrl[7:6] <= wdata_i[7:6];
 				end
 				adr_ctrl_2: begin
 					ctrl_2[0] <= wdata_i[0];
 					ctrl_2[1] <= 1'b1;
 					ctrl_2[4:2] <= wdata_i[4:2];
-					ctrl_2[7:5] <= wdata_i[7:5];
+					ctrl_2[7:6] <= wdata_i[7:6];
 				end
 				adr_divisor_1: divisor <= wdata_i[15:0];
 				adr_period_1: period <= wdata_i[15:0];
@@ -24590,10 +24582,6 @@ module tlul_host_adapter (
 	localparam signed [31:0] WordSize = 2;
 	wire [7:0] tl_source;
 	wire [3:0] tl_be;
-	function automatic [7:0] sv2v_cast_8;
-                input reg [7:0] inp;
-                sv2v_cast_8 = inp;
-        endfunction
 	generate
 		if (MAX_REQS == 1) begin
 			assign tl_source = {8 {1'sb0}};
@@ -24615,6 +24603,10 @@ module tlul_host_adapter (
 					else
 						source_d = source_q + 1;
 			end
+			function automatic [7:0] sv2v_cast_8;
+				input reg [7:0] inp;
+				sv2v_cast_8 = inp;
+			endfunction
 			assign tl_source = sv2v_cast_8(source_q);
 		end
 	endgenerate
@@ -25687,7 +25679,7 @@ module uart_core (
 	input we;
 	input [31:0] wdata;
 	output [31:0] rdata;
-	input [3:0] addr;
+	input [7:0] addr;
 	output tx_o;
 	input rx_i;
 	output intr_tx;
