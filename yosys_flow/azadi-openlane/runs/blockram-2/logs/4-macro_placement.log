@@ -1,0 +1,18 @@
+Notice 0: Reading LEF file:  /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/merged.lef
+Notice 0:     Created 13 technology layers
+Notice 0:     Created 25 technology vias
+Notice 0:     Created 442 library cells
+Notice 0: Finished LEF file:  /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/merged.lef
+Notice 0: 
+Reading DEF file: /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/floorplan/3-verilog2def_openroad.def
+Notice 0: Design: azadi_soc_top
+Notice 0:     Created 135 pins.
+Notice 0:     Created 47550 components and 366385 component-terminals.
+Notice 0:     Created 47733 nets and 176137 connections.
+Notice 0: Finished DEF file: /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/floorplan/3-verilog2def_openroad.def
+Placing the following macros:
+{'u_iccm': ['206730', '1286600', 'N'], 'u_dccm': ['1103360', '1286600', 'N']}
+Design name: azadi_soc_top
+Placing u_dccm
+Placing u_iccm
+Successfully placed 2 instances

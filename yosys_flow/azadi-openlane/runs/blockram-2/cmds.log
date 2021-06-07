@@ -1,0 +1,50 @@
+Mon Jun 07 18:24:54 UTC 2021 - Executing "python3 /openLANE_flow/scripts/extract_metal_layers.py -t /home/merl-tools/openlane-v0.15/pdk/sky130A/libs.ref/sky130_fd_sc_hd/techlef/sky130_fd_sc_hd.tlef -o /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/met_layers_list.txt"
+
+Mon Jun 07 18:24:54 UTC 2021 - Executing "/openLANE_flow/scripts/mergeLef.py -i /home/merl-tools/openlane-v0.15/pdk/sky130A/libs.ref/sky130_fd_sc_hd/techlef/sky130_fd_sc_hd.tlef {/home/merl-tools/openlane-v0.15/pdk/sky130A/libs.ref/sky130_fd_sc_hd/lef/sky130_fd_sc_hd.lef /home/merl-tools/openlane-v0.15/pdk/sky130A/libs.ref/sky130_fd_sc_hd/lef/sky130_ef_sc_hd__decap_12.lef /home/merl-tools/openlane-v0.15/pdk/sky130A/libs.ref/sky130_fd_sc_hd/lef/sky130_ef_sc_hd__fakediode_2.lef /home/merl-tools/openlane-v0.15/pdk/sky130A/libs.ref/sky130_fd_sc_hd/lef/sky130_ef_sc_hd__fill_12.lef} -o /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/merged_unpadded.lef |& tee >&@stdout"
+
+Mon Jun 07 18:24:54 UTC 2021 - Executing "/openLANE_flow/scripts/mergeLef.py -i /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/merged_unpadded.lef /openLANE_flow/designs/azadi-openlane/macros/lef/sky130_sram_4kbyte_1rw1r_32x1024_8.lef /openLANE_flow/designs/azadi-openlane/macros/lef/sky130_sram_8kbyte_1rw1r_32x2048_8.lef -o /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/merged_unpadded.lef |& tee >&@stdout"
+
+Mon Jun 07 18:24:54 UTC 2021 - Executing "/openLANE_flow/scripts/libtrim.pl /home/merl-tools/openlane-v0.15/pdk/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/trimmed.lib.exclude.list > /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/trimmed.lib"
+
+Mon Jun 07 18:24:55 UTC 2021 - Executing "echo {openlane v0.15} > /openLANE_flow/designs/azadi-openlane/runs/blockram-2/OPENLANE_VERSION"
+
+Mon Jun 07 18:25:01 UTC 2021 - Executing "sed -E {s/^([[:space:]]+)pg_pin(.*)/\1pin\2\n\1    direction : "inout";/g} /home/merl-tools/openlane-v0.15/pdk/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib > /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/sky130_fd_sc_hd__tt_025C_1v80.no_pg.lib"
+
+Mon Jun 07 18:25:01 UTC 2021 - Executing "yosys -c /openLANE_flow/scripts/synth.tcl -l /openLANE_flow/designs/azadi-openlane/runs/blockram-2/logs/synthesis/1-yosys.log |& tee >&@stdout"
+
+Mon Jun 07 18:31:17 UTC 2021 - Executing "sed -i -e {s/\(set ::env(CURRENT_NETLIST)\).*/\1 \/openLANE_flow\/designs\/azadi-openlane\/runs\/blockram-2\/results\/synthesis\/azadi_soc_top.synthesis.v/} /openLANE_flow/designs/azadi-openlane/runs/blockram-2/config.tcl"
+
+Mon Jun 07 18:31:17 UTC 2021 - Executing "sed -i -e {s/\(set ::env(PREV_NETLIST)\).*/\1 0/} /openLANE_flow/designs/azadi-openlane/runs/blockram-2/config.tcl"
+
+Mon Jun 07 18:31:17 UTC 2021 - Executing "sed -i /defparam/d /openLANE_flow/designs/azadi-openlane/runs/blockram-2/results/synthesis/azadi_soc_top.synthesis.v"
+
+Mon Jun 07 18:31:18 UTC 2021 - Executing "sta /openLANE_flow/scripts/sta.tcl |& tee >&@stdout /openLANE_flow/designs/azadi-openlane/runs/blockram-2/logs/synthesis/2-opensta"
+
+Mon Jun 07 18:36:09 UTC 2021 - Executing "openroad -exit /openLANE_flow/scripts/openroad/or_floorplan.tcl |& tee >&@stdout /openLANE_flow/designs/azadi-openlane/runs/blockram-2/logs/floorplan/3-verilog2def.openroad.log"
+
+Mon Jun 07 18:36:43 UTC 2021 - Executing "echo u_iccm 206.73 1286.6 N >> /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/macro_placement.cfg"
+
+Mon Jun 07 18:36:54 UTC 2021 - Executing "echo u_dccm 1103.36 1286.6 N >> /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/macro_placement.cfg"
+
+Mon Jun 07 18:37:21 UTC 2021 - Executing "python3 /openLANE_flow/scripts/manual_macro_place.py -l /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/merged.lef -id /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/floorplan/3-verilog2def_openroad.def -o /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/floorplan/3-verilog2def_openroad.macro_placement.def -c /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/macro_placement.cfg -f |& tee >&@stdout /openLANE_flow/designs/azadi-openlane/runs/blockram-2/logs/4-macro_placement.log"
+
+Mon Jun 07 18:37:32 UTC 2021 - Executing "openroad -exit /openLANE_flow/scripts/openroad/or_ioplacer.tcl |& tee >&@stdout /openLANE_flow/designs/azadi-openlane/runs/blockram-2/logs/floorplan/5-ioPlacer.log"
+
+Mon Jun 07 18:37:49 UTC 2021 - Executing "openroad -exit /openLANE_flow/scripts/openroad/or_tapcell.tcl |& tee >&@stdout /openLANE_flow/designs/azadi-openlane/runs/blockram-2/logs/floorplan/6-tapcell.log"
+
+Mon Jun 07 18:38:11 UTC 2021 - Executing "openroad -exit /openLANE_flow/scripts/openroad/or_pdn.tcl |& tee >&@stdout /openLANE_flow/designs/azadi-openlane/runs/blockram-2/logs/floorplan/7-pdn.log"
+
+Mon Jun 07 18:39:48 UTC 2021 - Executing "python3 /openLANE_flow/scripts/write_powered_def.py -d /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/floorplan/7-pdn.def -l /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/merged.lef --power-port VPWR --ground-port VGND --powered-netlist {} -o /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/routing/8-azadi_soc_top.powered.def |& tee >&@stdout /openLANE_flow/designs/azadi-openlane/runs/blockram-2/logs/lvs/8-write_powered_verilog.log"
+
+Mon Jun 07 18:40:01 UTC 2021 - Executing "openroad -exit /openLANE_flow/scripts/openroad/or_write_verilog.tcl |& tee >&@stdout /openLANE_flow/designs/azadi-openlane/runs/blockram-2/logs/9-write_verilog.log"
+
+Mon Jun 07 18:40:06 UTC 2021 - Executing "yosys -c /openLANE_flow/scripts/yosys_rewrite_verilog.tcl -l /openLANE_flow/designs/azadi-openlane/runs/blockram-2/logs/synthesis/10-yosys_rewrite_verilog.log"
+
+Mon Jun 07 18:47:10 UTC 2021 - Executing "sed -i -e {s/\(set ::env(CURRENT_NETLIST)\).*/\1 \/openLANE_flow\/designs\/azadi-openlane\/runs\/blockram-2\/results\/lvs\/azadi_soc_top.lvs.powered.v/} /openLANE_flow/designs/azadi-openlane/runs/blockram-2/config.tcl"
+
+Mon Jun 07 18:47:10 UTC 2021 - Executing "sed -i -e {s/\(set ::env(PREV_NETLIST)\).*/\1 \/openLANE_flow\/designs\/azadi-openlane\/runs\/blockram-2\/results\/synthesis\/azadi_soc_top.synthesis.v/} /openLANE_flow/designs/azadi-openlane/runs/blockram-2/config.tcl"
+
+Mon Jun 07 18:52:25 UTC 2021 - Executing "openroad -exit /openLANE_flow/scripts/openroad/or_replace.tcl |& tee >&@stdout /openLANE_flow/designs/azadi-openlane/runs/blockram-2/logs/placement/11-replace.log"
+
+Mon Jun 07 18:53:29 UTC 2021 - Executing "openroad -exit /openLANE_flow/scripts/openroad/or_opendp.tcl |& tee >&@stdout /openLANE_flow/designs/azadi-openlane/runs/blockram-2/logs/placement/12-opendp.log"
+

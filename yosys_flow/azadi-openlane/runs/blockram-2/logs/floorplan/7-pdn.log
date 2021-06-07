@@ -1,0 +1,443 @@
+OpenROAD 0.9.0 1415572a73
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+Warning: /home/merl-tools/openlane-v0.15/pdk/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib line 31, default_operating_condition tt_025C_1v80 not found.
+Notice 0: Reading LEF file:  /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/merged_unpadded.lef
+Notice 0:     Created 13 technology layers
+Notice 0:     Created 25 technology vias
+Notice 0:     Created 442 library cells
+Notice 0: Finished LEF file:  /openLANE_flow/designs/azadi-openlane/runs/blockram-2/tmp/merged_unpadded.lef
+Notice 0: 
+Reading DEF file: /openLANE_flow/designs/azadi-openlane/runs/blockram-2/results/floorplan/azadi_soc_top.floorplan.def
+Notice 0: Design: azadi_soc_top
+Notice 0:     Created 135 pins.
+Notice 0:     Created 93924 components and 464137 component-terminals.
+Notice 0:     Created 47733 nets and 176137 connections.
+Notice 0: Finished DEF file: /openLANE_flow/designs/azadi-openlane/runs/blockram-2/results/floorplan/azadi_soc_top.floorplan.def
+[INFO] [PDNG-0016] Power Delivery Network Generator: Generating PDN
+[INFO] [PDNG-0016]   config: /home/merl-tools/openlane-v0.15/pdk/sky130A/libs.tech/openlane/common_pdn.tcl
+[INFO] [PDNG-0008] Design Name is azadi_soc_top
+[INFO] [PDNG-0009] Reading technology data
+[ERROR] [PDNG-0037] Cannot find pin VPWR on instance u_dccm (sky130_sram_4kbyte_1rw1r_32x1024_8)
+[ERROR] [PDNG-0037] Cannot find pin VGND on instance u_dccm (sky130_sram_4kbyte_1rw1r_32x1024_8)
+[ERROR] [PDNG-0037] Cannot find pin VPWR on instance u_iccm (sky130_sram_4kbyte_1rw1r_32x1024_8)
+[ERROR] [PDNG-0037] Cannot find pin VGND on instance u_iccm (sky130_sram_4kbyte_1rw1r_32x1024_8)
+[INFO] [PDNG-0011] ****** INFO ******
+Type: stdcell, grid
+    Stdcell Rails
+      Layer: met1 -  width: 0.480  pitch: 2.720  offset: 0.000 
+    Straps
+      Layer: met4 -  width: 1.600  pitch: 30.000  offset: 0.000 
+      Layer: met5 -  width: 1.600  pitch: 153.180  offset: 16.650 
+    Connect: {met4 met5} {met1 met4}
+Type: macro, macro_1
+    Macro orientation: R0 R180 MX MY R90 R270 MXR90 MYR90
+    Straps
+    Connect: {met4_PIN_ver met5}
+[INFO] [PDNG-0012] **** END INFO ****
+[INFO] [PDNG-0013] Inserting stdcell grid - grid
+[INFO] [PDNG-0010] Inserting macro grid for 2 macros
+[INFO] [PDNG-0034]   - grid for instance u_dccm
+[WARN] [PDNG-0002] No shapes on layer met4_PIN_ver for POWER
+[WARN] [PDNG-0002] No shapes on layer met4_PIN_ver for GROUND
+[INFO] [PDNG-0034]   - grid for instance u_iccm
+[WARN] [PDNG-0002] No shapes on layer met4_PIN_ver for POWER
+[WARN] [PDNG-0002] No shapes on layer met4_PIN_ver for GROUND
+[INFO] [PDNG-0015] Writing to database
+[WARNING PSM-0016] Voltage pad location (vsrc) file not specified, defaulting pad location to checkerboard pattern on core area.
+[WARNING PSM-0017] X direction bump pitch is not specified, defaulting to 140um.
+[WARNING PSM-0018] Y direction bump pitch is not specified, defaulting to 140um.
+[WARNING PSM-0019] Voltage on net VPWR is not explicitly set.
+[WARNING PSM-0022] Using voltage 0.000V for VDD network.
+[INFO PSM-0026] Creating G matrix.
+[INFO PSM-0028] Extracting power stripes on net VPWR.
+[WARNING PSM-0030] Vsrc location at (5.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (5.400um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (145.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (145.800um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 27.290um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 180.470um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 180.470um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 180.470um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 180.470um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 180.470um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 180.470um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 180.470um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 180.470um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 180.470um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 180.470um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 180.470um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 180.470um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 180.470um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 333.650um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 333.650um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 333.650um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 333.650um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 333.650um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 333.650um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 333.650um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 333.650um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 333.650um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 333.650um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 333.650um).
+[WARNING PSM-0030] Vsrc location at (5.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (5.400um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (145.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (145.800um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 486.830um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 640.010um).
+[WARNING PSM-0030] Vsrc location at (5.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (5.400um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (145.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (145.800um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 793.190um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 946.370um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 946.370um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 946.370um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 946.370um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 946.370um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 946.370um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 946.370um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 946.370um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 946.370um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 946.370um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 946.370um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 946.370um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 946.370um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 1099.550um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 1099.550um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 1099.550um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 1099.550um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 1099.550um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 1099.550um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 1099.550um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 1099.550um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 1099.550um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 1099.550um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 1099.550um).
+[WARNING PSM-0030] Vsrc location at (5.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (5.400um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (145.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (145.800um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 1252.730um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 1559.090um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 1559.090um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 1559.090um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 1559.090um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 1559.090um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 1559.090um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 1559.090um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 1559.090um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 1559.090um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 1559.090um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 1559.090um).
+[WARNING PSM-0030] Vsrc location at (5.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (5.400um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (145.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (145.800um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 1712.270um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 1865.450um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 1865.450um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 1865.450um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 1865.450um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 1865.450um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 1865.450um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 1865.450um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 1865.450um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 1865.450um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 1865.450um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 1865.450um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 1865.450um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 1865.450um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 2018.630um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 2018.630um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 2018.630um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 2018.630um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 2018.630um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 2018.630um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 2018.630um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 2018.630um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 2018.630um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 2018.630um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 2018.630um).
+[INFO PSM-0031] Number of nodes on net VPWR = 286658.
+[INFO PSM-0037] G matrix created sucessfully.
+[INFO PSM-0040] Connection between all PDN nodes established in net VPWR.
+[WARNING PSM-0016] Voltage pad location (vsrc) file not specified, defaulting pad location to checkerboard pattern on core area.
+[WARNING PSM-0017] X direction bump pitch is not specified, defaulting to 140um.
+[WARNING PSM-0018] Y direction bump pitch is not specified, defaulting to 140um.
+[WARNING PSM-0019] Voltage on net VGND is not explicitly set.
+[WARNING PSM-0021] Using voltage 0.000V for ground network.
+[INFO PSM-0026] Creating G matrix.
+[INFO PSM-0028] Extracting power stripes on net VGND.
+[WARNING PSM-0030] Vsrc location at (5.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (5.400um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (145.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (145.800um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 10.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 150.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 103.880um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 257.060um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 257.060um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 257.060um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 257.060um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 257.060um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 257.060um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 257.060um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 257.060um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 257.060um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 257.060um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 290.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 257.060um).
+[WARNING PSM-0030] Vsrc location at (5.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (5.400um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (145.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (145.800um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 430.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 410.240um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 563.420um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 563.420um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 563.420um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 563.420um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 563.420um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 563.420um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 563.420um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 563.420um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 563.420um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 563.420um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 563.420um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 563.420um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 570.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 563.420um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 716.600um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 716.600um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 716.600um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 716.600um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 716.600um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 716.600um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 716.600um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 716.600um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 716.600um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 716.600um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 710.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 716.600um).
+[WARNING PSM-0030] Vsrc location at (5.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (5.400um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (145.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (145.800um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 850.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 869.780um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 1022.960um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 1022.960um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 1022.960um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 1022.960um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 1022.960um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 1022.960um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 1022.960um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 1022.960um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 1022.960um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 1022.960um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 1022.960um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 1022.960um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 990.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 1022.960um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 1176.140um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 1176.140um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 1176.140um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 1176.140um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 1176.140um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 1176.140um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 1176.140um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 1176.140um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 1176.140um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 1176.140um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 1130.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 1176.140um).
+[WARNING PSM-0030] Vsrc location at (5.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (5.400um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (145.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (145.800um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 1270.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 1329.320um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 1410.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 1410.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 1410.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 1410.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 1410.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 1410.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 1410.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 1410.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 1410.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 1410.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 1410.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 1410.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 1410.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 1550.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 1482.500um).
+[WARNING PSM-0030] Vsrc location at (5.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (5.400um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (145.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (145.800um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 1690.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 1635.680um).
+[WARNING PSM-0030] Vsrc location at (285.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (286.200um, 1788.860um).
+[WARNING PSM-0030] Vsrc location at (425.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (426.600um, 1788.860um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 1788.860um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 1788.860um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 1788.860um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 1788.860um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 1788.860um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 1788.860um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 1788.860um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 1788.860um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 1788.860um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 1788.860um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 1830.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 1788.860um).
+[WARNING PSM-0030] Vsrc location at (565.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (567.000um, 1942.040um).
+[WARNING PSM-0030] Vsrc location at (705.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (707.400um, 1942.040um).
+[WARNING PSM-0030] Vsrc location at (845.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (847.800um, 1942.040um).
+[WARNING PSM-0030] Vsrc location at (985.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (988.200um, 1942.040um).
+[WARNING PSM-0030] Vsrc location at (1125.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1123.200um, 1942.040um).
+[WARNING PSM-0030] Vsrc location at (1265.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1263.600um, 1942.040um).
+[WARNING PSM-0030] Vsrc location at (1405.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1404.000um, 1942.040um).
+[WARNING PSM-0030] Vsrc location at (1545.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1544.400um, 1942.040um).
+[WARNING PSM-0030] Vsrc location at (1685.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1684.800um, 1942.040um).
+[WARNING PSM-0030] Vsrc location at (1825.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1825.200um, 1942.040um).
+[WARNING PSM-0030] Vsrc location at (1965.520um, 1970.880um) and size =10.000um, is not located on a power stripe. Moving to closest stripe at (1965.600um, 1942.040um).
+[INFO PSM-0031] Number of nodes on net VGND = 288190.
+[INFO PSM-0037] G matrix created sucessfully.
+[INFO PSM-0040] Connection between all PDN nodes established in net VGND.
