@@ -3,14 +3,14 @@
 
 
 module gpio (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   // Below Regster interface can be changed
   input  tlul_pkg::tl_h2d_t tl_i,
   output tlul_pkg::tl_d2h_t tl_o,
 
-  input        [31:0] cio_gpio_i,
+  input  logic [31:0] cio_gpio_i,
   output logic [31:0] cio_gpio_o,
   output logic [31:0] cio_gpio_en_o,
 

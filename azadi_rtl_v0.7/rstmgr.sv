@@ -3,9 +3,9 @@
 
 module rstmgr(
 
-    input clk_i, //system clock
-    input rst_ni, // system reset
-    input prog_rst_ni,
+    input logic clk_i, //system clock
+    input logic rst_ni, // system reset
+    input logic prog_rst_ni,
   
     input  logic  ndmreset, // non-debug module reset
     output logic  sys_rst_ni // reset for system except debug module

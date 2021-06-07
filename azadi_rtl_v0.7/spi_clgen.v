@@ -2,12 +2,12 @@
 `include "spi_defines.v"
 
 module spi_clgen (
-  input                            clk_i,   // input clock (system clock)
-  input                            rst_ni,      // reset
-  input                            enable,   // clock enable
-  input                            go,       // start transfer
-  input                            last_clk, // last clock
-  input     [`SPI_DIVIDER_LEN-1:0] divider,  // clock divider (output clock is divided by this value)
+  input    wire                        clk_i,   // input clock (system clock)
+  input    wire                        rst_ni,      // reset
+  input    wire                        enable,   // clock enable
+  input    wire                        go,       // start transfer
+  input    wire                        last_clk, // last clock
+  input    wire [`SPI_DIVIDER_LEN-1:0] divider,  // clock divider (output clock is divided by this value)
   output    reg                    clk_out,  // output clock
   output    reg                    pos_edge, // pulse marking positive edge of clk_out
   output    reg                    neg_edge // pulse marking negative edge of clk_out

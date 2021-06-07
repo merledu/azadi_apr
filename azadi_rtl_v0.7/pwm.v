@@ -11,17 +11,17 @@ bit 7:	When set, counter reset for PWM/timer, it's output and bit 5 will also be
 */
 module	pwm(
 //tlul interface
-	input 			clk_i,												
-	input 			rst_ni,												
+	input wire			clk_i,												
+	input wire			rst_ni,												
 
-	input 			re_i,											
-	input 			we_i,											
-	input  [7:0]    addr_i,											
-	input  [31:0]   wdata_i,											
-	input  [3:0]	be_i,										
-	output [31:0]   rdata_o,																								
-    output          o_pwm,
-	output          o_pwm_2,
+	input wire			re_i,											
+	input wire			we_i,											
+	input wire  [7:0]    addr_i,											
+	input wire [31:0]   wdata_i,											
+	input wire [3:0]	be_i,										
+	output wire [31:0]   rdata_o,																								
+  output wire         o_pwm,
+	output wire         o_pwm_2,
 	output  reg     oe_pwm1,
 	output  reg     oe_pwm2
 

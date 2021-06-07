@@ -8,12 +8,12 @@
 // (10000000)/(115200) = 87
   
 module uart_rx_prog (
-   input         clk_i,
-   input         rst_ni,
-   input         i_Rx_Serial,
-   input  [15:0] CLKS_PER_BIT,
-   output        o_Rx_DV,
-   output  [7:0] o_Rx_Byte
+   input  wire       clk_i,
+   input  wire       rst_ni,
+   input  wire       i_Rx_Serial,
+   input  wire [15:0] CLKS_PER_BIT,
+   output wire        o_Rx_DV,
+   output wire  [7:0] o_Rx_Byte
    );
     
   parameter s_IDLE         = 3'b000;

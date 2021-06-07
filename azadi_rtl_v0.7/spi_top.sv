@@ -3,20 +3,20 @@
 `include "spi_defines.v"
 module spi_top(
 
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   input  tlul_pkg::tl_h2d_t tl_i,
   output tlul_pkg::tl_d2h_t tl_o,
 
   // SPI signals                  
-  output     intr_rx_o,
-  output     intr_tx_o,                   
-  output     [`SPI_SS_NB-1:0] ss_o,        
-  output                      sclk_o,      
-  output                      sd_o,
-  output                      sd_oe,       
-  input                       sd_i      
+  output logic    intr_rx_o,
+  output logic    intr_tx_o,                   
+  output logic    [`SPI_SS_NB-1:0] ss_o,        
+  output logic                     sclk_o,      
+  output logic                     sd_o,
+  output logic                     sd_oe,       
+  input  logic                     sd_i      
 
 );
 

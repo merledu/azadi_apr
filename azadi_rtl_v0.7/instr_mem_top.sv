@@ -1,15 +1,15 @@
 module instr_mem_top
 (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
   
   input  tlul_pkg::tl_h2d_t tl_i,
   output tlul_pkg::tl_d2h_t tl_o,
 // iccm controller interface 
   input  [11:0] iccm_ctrl_addr,
   input  [31:0] iccm_ctrl_wdata,
-  input         iccm_ctrl_we,
-  input         prog_rst_ni,
+  input  logic  iccm_ctrl_we,
+  input  logic  prog_rst_ni,
     
 
 // sram interface 

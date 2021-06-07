@@ -7,8 +7,8 @@
 
 
 module rv_timer_reg_top (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   // Below Regster interface can be changed
   input  tlul_pkg::tl_h2d_t tl_i,

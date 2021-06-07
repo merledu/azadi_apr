@@ -3,8 +3,8 @@ module tlul_adapter_reg import tlul_pkg::*; #(
   parameter  int RegDw = 32, // Shall be matched with TL_DW
   localparam int RegBw = RegDw/8
 ) (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   // TL-UL interface
   input  tl_h2d_t tl_i,
@@ -16,8 +16,8 @@ module tlul_adapter_reg import tlul_pkg::*; #(
   output logic [RegAw-1:0] addr_o,
   output logic [RegDw-1:0] wdata_o,
   output logic [RegBw-1:0] be_o,
-  input        [RegDw-1:0] rdata_i,
-  input                    error_i
+  input  logic      [RegDw-1:0] rdata_i,
+  input  logic                  error_i
 );
 
   localparam int IW  = $bits(tl_i.a_source);

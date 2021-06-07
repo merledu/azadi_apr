@@ -10,20 +10,20 @@ module fifo_sync #(
   // derived parameter
   localparam int          DepthW     = tlul_pkg::vbits(Depth+1)
 ) (
-  input                   clk_i,
-  input                   rst_ni,
+  input  logic                 clk_i,
+  input  logic                 rst_ni,
   // synchronous clear / flush port
-  input                   clr_i,
+  input  logic                 clr_i,
   // write port
-  input                   wvalid_i,
-  output                  wready_o,
-  input   [Width-1:0]     wdata_i,
+  input  logic                 wvalid_i,
+  output logic                 wready_o,
+  input  logic [Width-1:0]     wdata_i,
   // read port
-  output                  rvalid_o,
-  input                   rready_i,
-  output  [Width-1:0]     rdata_o,
+  output logic                 rvalid_o,
+  input  logic                 rready_i,
+  output logic [Width-1:0]     rdata_o,
   // occupancy
-  output  [DepthW-1:0]    depth_o
+  output logic [DepthW-1:0]    depth_o
 );
 
   // FIFO is in complete passthrough mode

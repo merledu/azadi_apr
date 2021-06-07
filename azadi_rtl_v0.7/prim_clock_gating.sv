@@ -1,9 +1,9 @@
 
 
 module prim_clock_gating (
-  input        clk_i,
-  input        en_i,
-  input        test_en_i,
+  input  logic clk_i,
+  input  logic en_i,
+  input  logic test_en_i,
   output logic clk_o
 );
 
