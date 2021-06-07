@@ -54,6 +54,7 @@ module uart_rx_prog (
         r_Rx_DV       <= 1'b0;
         r_Clock_Count <= 16'b0;
         r_Bit_Index   <= 3'b0;
+	r_Rx_Byte     <= 8'b0;
       end else begin       
       case (r_SM_Main)
         s_IDLE :
@@ -61,7 +62,7 @@ module uart_rx_prog (
             r_Rx_DV       <= 1'b0;
             r_Clock_Count <= 16'b0;
             r_Bit_Index   <= 3'b0;
-             
+            r_Rx_Byte     <= 8'b0; 
             if (r_Rx_Data == 1'b0)          // Start bit detected
               r_SM_Main <= s_RX_START_BIT;
             else

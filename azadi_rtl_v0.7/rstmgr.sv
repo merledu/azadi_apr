@@ -29,12 +29,21 @@ module rstmgr(
   end
   
   always_ff @(posedge clk_i ) begin
-    rst_q <= rst_d;
+   if(~rst_ni) begin
+      rst_q <= 1'b0;
+   end else begin
+      rst_q <= rst_d;
+   end
+    
   end
 
   assign rst_fd = rst_q;
   always_ff @(posedge clk_i ) begin
-    rst_fq <= rst_fd;
+    if(~rst_ni) begin
+      rst_fq <= 1'b0;
+    end else begin
+      rst_fq <= rst_fd;
+    end 
   end
 
   assign sys_rst_ni = rst_fq;
