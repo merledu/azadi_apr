@@ -4,24 +4,24 @@
 module spi_core
 (
   // tlul signals
-  input         clk_i,        
-  input         rst_ni,        
-  input  [7:0]  addr_i,            
-  input  [31:0] wdata_i,              
-  output reg [31:0] rdata_o,             
-  input  [3:0]  be_i,           
-  input         we_i,       
-  input         re_i,        
+  input  logic        clk_i,        
+  input  logic        rst_ni,        
+  input  logic [7:0]  addr_i,            
+  input  logic [31:0] wdata_i,              
+  output reg   [31:0] rdata_o,             
+  input  logic [3:0]  be_i,           
+  input  logic        we_i,       
+  input  logic        re_i,        
   output reg    error_o,       
   output reg    intr_rx_o,
   output reg    intr_tx_o,         
                                                      
   // SPI signals                                     
-  output     [`SPI_SS_NB-1:0] ss_o,         // slave select
-  output                      sclk_o,       // serial clock
-  output                      sd_o,
-  output     reg              sd_oe,       // master out slave in
-  input                       sd_i       // master in slave out
+  output logic    [`SPI_SS_NB-1:0] ss_o,         // slave select
+  output logic                     sclk_o,       // serial clock
+  output logic                     sd_o,
+  output reg                       sd_oe,       // master out slave in
+  input  logic                     sd_i       // master in slave out
 );
 
                                                

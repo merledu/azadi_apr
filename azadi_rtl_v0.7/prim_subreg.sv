@@ -5,17 +5,17 @@ module prim_subreg #(
   parameter                SWACCESS = "RW",  // {RW, RO, WO, W1C, W1S, W0C, RC}
   parameter logic [DW-1:0] RESVAL   = '0     // Reset value
 ) (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   // From SW: valid for RW, WO, W1C, W1S, W0C, RC
   // In case of RC, Top connects Read Pulse to we
-  input          we,
-  input [DW-1:0] wd,
+  input logic         we,
+  input logic [DW-1:0] wd,
 
   // From HW: valid for HRW, HWO
-  input          de,
-  input [DW-1:0] d,
+  input logic         de,
+  input logic [DW-1:0] d,
 
   // output to HW and Reg Read
   output logic          qe,

@@ -1,12 +1,12 @@
 module uart_tx (
-   input       clk_i,
-   input       rst_ni,
-   input       tx_en,
-   input [7:0] i_TX_Byte, 
-   input [15:0]CLKS_PER_BIT,
+   input wire      clk_i,
+   input wire      rst_ni,
+   input wire      tx_en,
+   input wire [7:0] i_TX_Byte, 
+   input wire [15:0]CLKS_PER_BIT,
    //output      o_TX_Active,
    output reg  o_TX_Serial,
-   output      o_TX_Done
+   output wire     o_TX_Done
    );
  
   localparam IDLE         = 3'b000;

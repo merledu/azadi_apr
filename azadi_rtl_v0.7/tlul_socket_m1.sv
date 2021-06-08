@@ -28,8 +28,8 @@ module tlul_socket_m1 #(
   parameter bit [3:0]     DReqDepth = 4'h2,
   parameter bit [3:0]     DRspDepth = 4'h2
 ) (
-  input                     clk_i,
-  input                     rst_ni,
+  input  logic                   clk_i,
+  input  logic                   rst_ni,
 
   input  tlul_pkg::tl_h2d_t tl_h_i [M],
   output tlul_pkg::tl_d2h_t tl_h_o [M],

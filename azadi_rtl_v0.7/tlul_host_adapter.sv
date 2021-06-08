@@ -18,8 +18,8 @@
 module tlul_host_adapter #(
     parameter int unsigned MAX_REQS = 1
 ) (
-    input clk_i,
-    input rst_ni,
+    input logic clk_i,
+    input logic rst_ni,
 // interface with host agent 
     input                               req_i,
     output logic                        gnt_o,

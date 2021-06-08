@@ -13,11 +13,11 @@
 //   #Cycles before switching to new value.
 
 module prim_filter_ctr #(parameter int unsigned Cycles = 4) (
-  input  clk_i,
-  input  rst_ni,
-  input  enable_i,
-  input  filter_i,
-  output filter_o
+  input logic clk_i,
+  input logic rst_ni,
+  input logic enable_i,
+  input logic filter_i,
+  output logic filter_o
 );
 
   localparam int unsigned CTR_WIDTH = $clog2(Cycles);

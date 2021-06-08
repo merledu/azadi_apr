@@ -3,8 +3,8 @@
 
 module tl_xbar_main (
 
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
 
   // Host interfaces

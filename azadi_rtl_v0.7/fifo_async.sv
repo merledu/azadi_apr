@@ -8,20 +8,20 @@ module fifo_async #(
   localparam int unsigned DepthW = $clog2(Depth+1) // derived parameter representing [0..Depth]
 ) (
   // write port
-  input                  clk_wr_i,
-  input                  rst_wr_ni,
-  input                  wvalid_i,
-  output                 wready_o,
-  input [Width-1:0]      wdata_i,
-  output [DepthW-1:0]    wdepth_o,
+  input    logic              clk_wr_i,
+  input    logic              rst_wr_ni,
+  input    logic              wvalid_i,
+  output   logic              wready_o,
+  input    logic [Width-1:0]  wdata_i,
+  output   logic [DepthW-1:0] wdepth_o,
 
   // read port
-  input                  clk_rd_i,
-  input                  rst_rd_ni,
-  output                 rvalid_o,
-  input                  rready_i,
-  output [Width-1:0]     rdata_o,
-  output [DepthW-1:0]    rdepth_o
+  input    logic              clk_rd_i,
+  input    logic              rst_rd_ni,
+  output   logic              rvalid_o,
+  input    logic              rready_i,
+  output   logic [Width-1:0]  rdata_o,
+  output   logic [DepthW-1:0] rdepth_o
 );
 
 

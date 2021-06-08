@@ -44,13 +44,13 @@ module tlul_socket_1n #(
   parameter bit [N*4-1:0] DRspDepth = {N{4'h2}},
   localparam int unsigned NWD       = $clog2(N+1) // derived parameter
 ) (
-  input                     clk_i,
-  input                     rst_ni,
+  input  logic                   clk_i,
+  input  logic                   rst_ni,
   input  tlul_pkg::tl_h2d_t tl_h_i,
   output tlul_pkg::tl_d2h_t tl_h_o,
   output tlul_pkg::tl_h2d_t tl_d_o    [N],
   input  tlul_pkg::tl_d2h_t tl_d_i    [N],
-  input  [NWD-1:0]          dev_select_i
+  input  logic [NWD-1:0]          dev_select_i
 );
 
   // Since our steering is done after potential FIFOing, we need to

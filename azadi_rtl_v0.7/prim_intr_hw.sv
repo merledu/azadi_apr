@@ -5,17 +5,17 @@ module prim_intr_hw # (
   parameter bit FlopOutput = 1
 ) (
   // event
-  input  clk_i,
-  input  rst_ni,
-  input  [Width-1:0]  event_intr_i,
+  input logic clk_i,
+  input logic rst_ni,
+  input logic [Width-1:0]  event_intr_i,
 
   // register interface
-  input  [Width-1:0]  reg2hw_intr_enable_q_i,
-  input  [Width-1:0]  reg2hw_intr_test_q_i,
-  input               reg2hw_intr_test_qe_i,
-  input  [Width-1:0]  reg2hw_intr_state_q_i,
-  output              hw2reg_intr_state_de_o,
-  output [Width-1:0]  hw2reg_intr_state_d_o,
+  input logic [Width-1:0]  reg2hw_intr_enable_q_i,
+  input logic [Width-1:0]  reg2hw_intr_test_q_i,
+  input logic              reg2hw_intr_test_qe_i,
+  input logic [Width-1:0]  reg2hw_intr_state_q_i,
+  output logic             hw2reg_intr_state_de_o,
+  output logic [Width-1:0]  hw2reg_intr_state_d_o,
 
   // outgoing interrupt
   output logic [Width-1:0]  intr_o

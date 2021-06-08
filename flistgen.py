@@ -1,6 +1,6 @@
 import os
 
-path ="/home/merl/Desktop/azadi_apr/azadi_rtl_v0.6"
+path ="/home/sahmad/xcelium_runs/sky130_verilog"
 #we shall store all the file names in this list
 flist = []
 

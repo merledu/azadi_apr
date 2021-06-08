@@ -8,8 +8,8 @@
 module prim_generic_clock_inv #(
   parameter bit HasScanMode = 1'b1
 ) (
-  input        clk_i,
-  input        scanmode_i,
+  input logic       clk_i,
+  input logic       scanmode_i,
   output logic clk_no      // Inverted
 );
 

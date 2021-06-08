@@ -1,25 +1,25 @@
 `include "spi_defines.v"
 
 module spi_shift (
-  input                          clk_i,          // system clock
-  input                          rst_ni,          // reset
-  input                          latch,        // latch signal for storing the data in shift register
-  input                    [3:0] byte_sel,     // byte select signals for storing the data in shift register
-  input [`SPI_CHAR_LEN_BITS-1:0] len,          // data len in bits (minus one)
-  input                          lsb,          // lbs first_ni on the line
-  input                          go,           // start stansfer
-  input                          pos_edge,     // recognize posedge of sclk_i
-  input                          neg_edge,     // recognize negedge of sclk_i
-  input                          rx_negedge,   // s_in is sampled on negative edge 
-  input                          tx_negedge,   // s_out is driven on negative edge
+  input  wire                        clk_i,          // system clock
+  input  wire                        rst_ni,          // reset
+  input  wire                        latch,        // latch signal for storing the data in shift register
+  input  wire                  [3:0] byte_sel,     // byte select signals for storing the data in shift register
+  input  wire [`SPI_CHAR_LEN_BITS-1:0] len,          // data len in bits (minus one)
+  input  wire                        lsb,          // lbs first_ni on the line
+  input  wire                        go,           // start stansfer
+  input  wire                        pos_edge,     // recognize posedge of sclk_i
+  input  wire                        neg_edge,     // recognize negedge of sclk_i
+  input  wire                        rx_negedge,   // s_in is sampled on negative edge 
+  input  wire                        tx_negedge,   // s_out is driven on negative edge
   output   reg                   tip,          // transfer in progress
-  output                         last,         // last bit
-  input                   [31:0] p_in,         // parallel in
-  output     [`SPI_MAX_CHAR-1:0] p_out,        // parallel out
-  input                          s_clk,        // serial clock
-  input                          s_in,         // serial in
+  output wire                        last,         // last bit
+  input  wire                 [31:0] p_in,         // parallel in
+  output wire    [`SPI_MAX_CHAR-1:0] p_out,        // parallel out
+  input  wire                        s_clk,        // serial clock
+  input  wire                        s_in,         // serial in
   output   reg                   s_out,        // serial out
-  input                          rx_en         // serial rx enable  
+  input  wire                        rx_en         // serial rx enable  
 );
                                    
  // reg                            s_out;        

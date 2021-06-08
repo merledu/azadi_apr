@@ -4,8 +4,8 @@
 // after request with no stalling unless response is stuck on the way out.
 //`include "/home/sajjad/Shaheen-sv/src/buraq_core_top/ibex_core/tlul_pkg.sv"
 module tlul_err_resp (
-  input                     clk_i,
-  input                     rst_ni,
+  input  logic              clk_i,
+  input  logic              rst_ni,
   input  tlul_pkg::tl_h2d_t tl_h_i,
   output tlul_pkg::tl_d2h_t tl_h_o
 );
