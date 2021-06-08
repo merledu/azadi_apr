@@ -17,14 +17,14 @@ module rstmgr(
   always_comb begin
     if(!rst_ni) begin
       rst_d = 1'b0;
-    end else 
-    if(ndmreset) begin
-      rst_d = 1'b0;
-    end else 
-    if(!prog_rst_ni)begin
-      rst_d = 1'b0;
-    end else begin
-      rst_d = 1'b1;
+    end else begin 
+    	if(ndmreset) begin
+      	   rst_d = 1'b0;
+    	end else if(!prog_rst_ni)begin
+      	   rst_d = 1'b0;
+    	end else begin
+      	   rst_d = prog_rst_ni;
+    	end
     end
   end
   
