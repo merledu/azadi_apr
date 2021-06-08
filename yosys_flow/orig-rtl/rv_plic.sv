@@ -18,18 +18,18 @@ module rv_plic import rv_plic_reg_pkg::*; #(
   // derived parameter
   localparam int SRCW    = $clog2(NumSrc)
 ) (
-  input     clk_i,
-  input     rst_ni,
+  input logic     clk_i,
+  input logic     rst_ni,
 
   // Bus Interface (device)
   input  tlul_pkg::tl_h2d_t tl_i,
   output tlul_pkg::tl_d2h_t tl_o,
 
   // Interrupt Sources
-  input  [NumSrc-1:0] intr_src_i,
+  input  logic [NumSrc-1:0] intr_src_i,
 
   // Interrupt notification to targets
-  output [NumTarget-1:0] irq_o,
+  output logic [NumTarget-1:0] irq_o,
 
   output logic [NumTarget-1:0] msip_o
 );

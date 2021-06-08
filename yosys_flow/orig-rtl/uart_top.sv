@@ -7,17 +7,17 @@
 // `include "prim_assert.sv"
 
 module uart_top (
-    input  clk_i,
-    input  rst_ni,
+    input logic clk_i,
+    input logic rst_ni,
 
   // Bus Interface
     input  tlul_pkg::tl_h2d_t tl_i,
     output tlul_pkg::tl_d2h_t tl_o,
    
-    output tx_o,
-    input  rx_i,
+    output logic tx_o,
+    input  logic rx_i,
     
-    output intr_tx
+    output logic intr_tx
 );
     
     logic [31:0] wdata;

@@ -13,8 +13,8 @@ module tlul_sram_adapter #(
   parameter bit ErrOnWrite  = 0,  // 1: Writes not allowed, automatically error
   parameter bit ErrOnRead   = 0   // 1: Reads not allowed, automatically error
 ) (
-  input   clk_i,
-  input   rst_ni,
+  input   logic clk_i,
+  input   logic rst_ni,
 
   // TL-UL interface
   input   tlul_pkg::tl_h2d_t  tl_i,
@@ -22,14 +22,14 @@ module tlul_sram_adapter #(
 
   // SRAM interface
   output logic              req_o,
-  input                     gnt_i,
+  input  logic              gnt_i,
   output logic              we_o,
   output logic [SramAw-1:0] addr_o,
   output logic [SramDw-1:0] wdata_o,
   output logic [SramDw-1:0] wmask_o,
-  input        [SramDw-1:0] rdata_i,
-  input                     rvalid_i,
-  input        [1:0]        rerror_i // 2 bit error [1]: Uncorrectable, [0]: Correctable
+  input  logic [SramDw-1:0] rdata_i,
+  input  logic              rvalid_i,
+  input  logic [1:0]        rerror_i // 2 bit error [1]: Uncorrectable, [0]: Correctable
 );
 
   import tlul_pkg::*;

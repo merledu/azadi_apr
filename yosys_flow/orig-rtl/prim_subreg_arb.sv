@@ -6,15 +6,15 @@ module prim_subreg_arb #(
 ) (
   // From SW: valid for RW, WO, W1C, W1S, W0C, RC.
   // In case of RC, top connects read pulse to we.
-  input          we,
-  input [DW-1:0] wd,
+  input logic         we,
+  input logic [DW-1:0] wd,
 
   // From HW: valid for HRW, HWO.
-  input          de,
-  input [DW-1:0] d,
+  input logic         de,
+  input logic [DW-1:0] d,
 
   // From register: actual reg value.
-  input [DW-1:0] q,
+  input logic [DW-1:0] q,
 
   // To register: actual write enable and write data.
   output logic          wr_en,

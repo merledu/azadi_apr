@@ -4,12 +4,12 @@ module azadi_soc_top (
    inout vccd1,
    inout vssd1,
 `endif
-  input clk_i,
-  input rst_ni,
-  input prog,
+  input logic clk_i,
+  input logic rst_ni,
+  input logic prog,
   //output system_rst_ni,
  // output prog_rst_ni,
-  input  logic [15:0] prog_baude, 
+  input  logic [15:0] clks_per_bit, 
   input  logic [31:0] gpio_i,
   output logic [31:0] gpio_o,
   output logic [31:0] gpio_oe,
@@ -406,7 +406,7 @@ uart_rx_prog u_uart_rx_prog(
 	.clk_i         (clk_i),
 	.rst_ni        (rst_ni),
 	.i_Rx_Serial   (uart_rx),
-	.CLKS_PER_BIT  (prog_baude),
+	.CLKS_PER_BIT  (clks_per_bit),
 	.o_Rx_DV       (rx_dv_i),
 	.o_Rx_Byte     (rx_byte_i)
 );

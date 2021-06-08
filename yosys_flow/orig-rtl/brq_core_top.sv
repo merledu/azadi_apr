@@ -23,8 +23,8 @@ module brq_core_top #(
     parameter int unsigned        DmExceptionAddr  = 0
 )
 (
-  input clk_i,
-  input rst_ni,
+    input logic clk_i,
+    input logic rst_ni,
 
   // instruction memory interface 
     input tlul_pkg::tl_d2h_t tl_i_i,

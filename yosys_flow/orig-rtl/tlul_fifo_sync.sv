@@ -11,8 +11,8 @@ module tlul_fifo_sync #(
   parameter int unsigned SpareReqW = 1,
   parameter int unsigned SpareRspW = 1
 ) (
-  input                     clk_i,
-  input                     rst_ni,
+  input  logic              clk_i,
+  input  logic              rst_ni,
   input  tlul_pkg::tl_h2d_t tl_h_i,
   output tlul_pkg::tl_d2h_t tl_h_o,
   output tlul_pkg::tl_h2d_t tl_d_o,

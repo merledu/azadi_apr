@@ -45,7 +45,7 @@ module brq_cs_registers #(
     input  brq_pkg::csr_num_e   csr_addr_i,
     input  logic [31:0]         csr_wdata_i,
     input  brq_pkg::csr_op_e    csr_op_i,
-    input                       csr_op_en_i,
+    input  logic                csr_op_en_i,
     output logic [31:0]         csr_rdata_o,
 
     // interrupts

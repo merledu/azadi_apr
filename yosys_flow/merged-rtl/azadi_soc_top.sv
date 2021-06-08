@@ -1876,231 +1876,7 @@ package prim_util_pkg;
 `endif
   endfunction
 
-endpackage// Copyright 2018 ETH Zurich and University of Bologna.
-//
-// Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License"); you may not use this file except in
-// compliance with the License. You may obtain a copy of the License at
-// http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
-// or agreed to in writing, software, hardware and materials distributed under
-// this License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the
-// specific language governing permissions and limitations under the License.
-
-// Common register defines for RTL designs
-`ifndef COMMON_CELLS_REGISTERS_SVH_
-`define COMMON_CELLS_REGISTERS_SVH_
-
-// Abridged Summary of available FF macros:
-// `FF:      asynchronous active-low reset (implicit clock and reset)
-// `FFAR:    asynchronous active-high reset
-// `FFARN:   asynchronous active-low reset
-// `FFSR:    synchronous active-high reset
-// `FFSRN:   synchronous active-low reset
-// `FFNR:    without reset
-// `FFL:     load-enable and asynchronous active-low reset (implicit clock and reset)
-// `FFLAR:   load-enable and asynchronous active-high reset
-// `FFLARN:  load-enable and asynchronous active-low reset
-// `FFLARNC: load-enable and asynchronous active-low reset and synchronous active-high clear
-// `FFLSR:   load-enable and synchronous active-high reset
-// `FFLSRN:  load-enable and synchronous active-low reset
-// `FFLNR:   load-enable without reset
-
-
-// Flip-Flop with asynchronous active-low reset (implicit clock and reset)
-// __q: Q output of FF
-// __d: D input of FF
-// __reset_value: value assigned upon reset
-// Implicit:
-// clk_i: clock input
-// rst_ni: reset input (asynchronous, active low)
-`define FF(__q, __d, __reset_value)                  \
-  always_ff @(posedge clk_i or negedge rst_ni) begin \
-    if (!rst_ni) begin                               \
-      __q <= (__reset_value);                        \
-    end else begin                                   \
-      __q <= (__d);                                  \
-    end                                              \
-  end
-
-// Flip-Flop with asynchronous active-high reset
-// __q: Q output of FF
-// __d: D input of FF
-// __reset_value: value assigned upon reset
-// __clk: clock input
-// __arst: asynchronous reset
-`define FFAR(__q, __d, __reset_value, __clk, __arst)     \
-  always_ff @(posedge (__clk) or posedge (__arst)) begin \
-    if (__arst) begin                                    \
-      __q <= (__reset_value);                            \
-    end else begin                                       \
-      __q <= (__d);                                      \
-    end                                                  \
-  end
-
-// Flip-Flop with asynchronous active-low reset
-// __q: Q output of FF
-// __d: D input of FF
-// __reset_value: value assigned upon reset
-// __clk: clock input
-// __arst_n: asynchronous reset
-`define FFARN(__q, __d, __reset_value, __clk, __arst_n)    \
-  always_ff @(posedge (__clk) or negedge (__arst_n)) begin \
-    if (!__arst_n) begin                                   \
-      __q <= (__reset_value);                              \
-    end else begin                                         \
-      __q <= (__d);                                        \
-    end                                                    \
-  end
-
-// Flip-Flop with synchronous active-high reset
-// __q: Q output of FF
-// __d: D input of FF
-// __reset_value: value assigned upon reset
-// __clk: clock input
-// __reset_clk: reset input
-`define FFSR(__q, __d, __reset_value, __clk, __reset_clk) \
-  `ifndef VERILATOR                       \
-  /``* synopsys sync_set_reset `"__reset_clk`" *``/       \
-    `endif                        \
-  always_ff @(posedge (__clk)) begin                      \
-    __q <= (__reset_clk) ? (__reset_value) : (__d);       \
-  end
-
-// Flip-Flop with synchronous active-low reset
-// __q: Q output of FF
-// __d: D input of FF
-// __reset_value: value assigned upon reset
-// __clk: clock input
-// __reset_n_clk: reset input
-`define FFSRN(__q, __d, __reset_value, __clk, __reset_n_clk) \
-    `ifndef VERILATOR                       \
-  /``* synopsys sync_set_reset `"__reset_n_clk`" *``/        \
-    `endif                        \
-  always_ff @(posedge (__clk)) begin                         \
-    __q <= (!__reset_n_clk) ? (__reset_value) : (__d);       \
-  end
-
-// Always-enable Flip-Flop without reset
-// __q: Q output of FF
-// __d: D input of FF
-// __clk: clock input
-`define FFNR(__q, __d, __clk)        \
-  always_ff @(posedge (__clk)) begin \
-    __q <= (__d);                    \
-  end
-
-// Flip-Flop with load-enable and asynchronous active-low reset (implicit clock and reset)
-// __q: Q output of FF
-// __d: D input of FF
-// __load: load d value into FF
-// __reset_value: value assigned upon reset
-// Implicit:
-// clk_i: clock input
-// rst_ni: reset input (asynchronous, active low)
-`define FFL(__q, __d, __load, __reset_value)         \
-  always_ff @(posedge clk_i or negedge rst_ni) begin \
-    if (!rst_ni) begin                               \
-      __q <= (__reset_value);                        \
-    end else begin                                   \
-      __q <= (__load) ? (__d) : (__q);               \
-    end                                              \
-  end
-
-// Flip-Flop with load-enable and asynchronous active-high reset
-// __q: Q output of FF
-// __d: D input of FF
-// __load: load d value into FF
-// __reset_value: value assigned upon reset
-// __clk: clock input
-// __arst: asynchronous reset
-`define FFLAR(__q, __d, __load, __reset_value, __clk, __arst) \
-  always_ff @(posedge (__clk) or posedge (__arst)) begin      \
-    if (__arst) begin                                         \
-      __q <= (__reset_value);                                 \
-    end else begin                                            \
-      __q <= (__load) ? (__d) : (__q);                        \
-    end                                                       \
-  end
-
-// Flip-Flop with load-enable and asynchronous active-low reset
-// __q: Q output of FF
-// __d: D input of FF
-// __load: load d value into FF
-// __reset_value: value assigned upon reset
-// __clk: clock input
-// __arst_n: asynchronous reset
-`define FFLARN(__q, __d, __load, __reset_value, __clk, __arst_n) \
-  always_ff @(posedge (__clk) or negedge (__arst_n)) begin       \
-    if (!__arst_n) begin                                         \
-      __q <= (__reset_value);                                    \
-    end else begin                                               \
-      __q <= (__load) ? (__d) : (__q);                           \
-    end                                                          \
-  end
-
-// Flip-Flop with load-enable and synchronous active-high reset
-// __q: Q output of FF
-// __d: D input of FF
-// __load: load d value into FF
-// __reset_value: value assigned upon reset
-// __clk: clock input
-// __reset_clk: reset input
-`define FFLSR(__q, __d, __load, __reset_value, __clk, __reset_clk)       \
-    `ifndef VERILATOR                       \
-  /``* synopsys sync_set_reset `"__reset_clk`" *``/                      \
-    `endif                        \
-  always_ff @(posedge (__clk)) begin                                     \
-    __q <= (__reset_clk) ? (__reset_value) : ((__load) ? (__d) : (__q)); \
-  end
-
-// Flip-Flop with load-enable and synchronous active-low reset
-// __q: Q output of FF
-// __d: D input of FF
-// __load: load d value into FF
-// __reset_value: value assigned upon reset
-// __clk: clock input
-// __reset_n_clk: reset input
-`define FFLSRN(__q, __d, __load, __reset_value, __clk, __reset_n_clk)       \
-    `ifndef VERILATOR                       \
-  /``* synopsys sync_set_reset `"__reset_n_clk`" *``/                       \
-    `endif                        \
-  always_ff @(posedge (__clk)) begin                                        \
-    __q <= (!__reset_n_clk) ? (__reset_value) : ((__load) ? (__d) : (__q)); \
-  end
-
-// Flip-Flop with load-enable and asynchronous active-low reset and synchronous clear
-// __q: Q output of FF
-// __d: D input of FF
-// __load: load d value into FF
-// __clear: assign reset value into FF
-// __reset_value: value assigned upon reset
-// __clk: clock input
-// __arst_n: asynchronous reset
-`define FFLARNC(__q, __d, __load, __clear, __reset_value, __clk, __arst_n) \
-    `ifndef VERILATOR                       \
-  /``* synopsys sync_set_reset `"__clear`" *``/                       \
-    `endif                        \
-  always_ff @(posedge (__clk) or negedge (__arst_n)) begin                 \
-    if (!__arst_n) begin                                                   \
-      __q <= (__reset_value);                                              \
-    end else begin                                                         \
-      __q <= (__clear) ? (__reset_value) : (__load) ? (__d) : (__q);       \
-    end                                                                    \
-  end
-
-// Load-enable Flip-Flop without reset
-// __q: Q output of FF
-// __d: D input of FF
-// __load: load d value into FF
-// __clk: clock input
-`define FFLNR(__q, __d, __load, __clk) \
-  always_ff @(posedge (__clk)) begin   \
-    __q <= (__load) ? (__d) : (__q);   \
-  end
-
-`endif
-// Copyright lowRISC contributors.
+endpackage// Copyright lowRISC contributors.
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -2927,131 +2703,18 @@ function automatic integer _clog2(integer value);
 
 
 endpackage
-////////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2013, University of British Columbia (UBC); All rights reserved. //
-//                                                                                //
-// Redistribution  and  use  in  source   and  binary  forms,   with  or  without //
-// modification,  are permitted  provided that  the following conditions are met: //
-//   * Redistributions   of  source   code  must  retain   the   above  copyright //
-//     notice,  this   list   of   conditions   and   the  following  disclaimer. //
-//   * Redistributions  in  binary  form  must  reproduce  the  above   copyright //
-//     notice, this  list  of  conditions  and the  following  disclaimer in  the //
-//     documentation and/or  other  materials  provided  with  the  distribution. //
-//   * Neither the name of the University of British Columbia (UBC) nor the names //
-//     of   its   contributors  may  be  used  to  endorse  or   promote products //
-//     derived from  this  software without  specific  prior  written permission. //
-//                                                                                //
-// THIS  SOFTWARE IS  PROVIDED  BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" //
-// AND  ANY EXPRESS  OR IMPLIED WARRANTIES,  INCLUDING,  BUT NOT LIMITED TO,  THE //
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE //
-// DISCLAIMED.  IN NO  EVENT SHALL University of British Columbia (UBC) BE LIABLE //
-// FOR ANY DIRECT,  INDIRECT,  INCIDENTAL,  SPECIAL,  EXEMPLARY, OR CONSEQUENTIAL //
-// DAMAGES  (INCLUDING,  BUT NOT LIMITED TO,  PROCUREMENT OF  SUBSTITUTE GOODS OR //
-// SERVICES;  LOSS OF USE,  DATA,  OR PROFITS;  OR BUSINESS INTERRUPTION) HOWEVER //
-// CAUSED AND ON ANY THEORY OF LIABILITY,  WHETHER IN CONTRACT, STRICT LIABILITY, //
-// OR TORT  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE //
-// OF  THIS SOFTWARE,  EVEN  IF  ADVISED  OF  THE  POSSIBILITY  OF  SUCH  DAMAGE. //
-////////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////////
-//                    utils.vh: Design utilities (pre-compile)                    //
-//                                                                                //
-//    Author: Ameer M. Abdelhadi (ameer@ece.ubc.ca, ameer.abdelhadi@gmail.com)    //
-// SRAM-based Multi-ported RAMs; University of British Columbia (UBC), March 2013 //
-////////////////////////////////////////////////////////////////////////////////////
-
-`ifndef __UTILS_VH__
-`define __UTILS_VH__
-
-`define DEBUG_MODE // debug mode, comment this line for other modes
-`define VERBOSE    // verbose debug, comment this line for other modes
-
-// Initiate Array structure - use once before calling packing/unpacking modules
-`define ARRINIT integer _i_,_j_
-// pack/unpack 1D/2D/3D arrays; use in "always @*" if combinatorial
-`define ARR2D1D(D1W,D2W,    SRC,DST) for(_i_=1;_i_<=(D1W);_i_=_i_+1)                                 DST[((D2W)*_i_-1)-:D2W] = SRC[_i_-1]
-`define ARR1D2D(D1W,D2W,    SRC,DST) for(_i_=1;_i_<=(D1W);_i_=_i_+1)                                 DST[_i_-1] = SRC[((D2W)*_i_-1)-:D2W]
-`define ARR2D3D(D1W,D2W,D3W,SRC,DST) for(_i_=0;_i_< (D1W);_i_=_i_+1) for(_j_=1;_j_<=(D2W);_j_=_j_+1) DST[_i_][_j_-1] = SRC[_i_][((D3W)*_j_-1)-:D3W]
-`define ARR3D2D(D1W,D2W,D3W,SRC,DST) for(_i_=0;_i_< (D1W);_i_=_i_+1) for(_j_=1;_j_<=(D2W);_j_=_j_+1) DST[_i_][((D3W)*_j_-1)-:D3W] = SRC[_i_][_j_-1]
-
-// print a 2-D array in a comma-delimited list
-`define ARRPRN(ARRLEN,PRNSRC) for (_i_=(ARRLEN)-1;_i_>=0;_i_=_i_-1) $write("%c%h%c",(_i_==(ARRLEN)-1)?"[":"",PRNSRC[_i_],!_i_?"]":",")
-// Initialize a vector with a specific width random number; extra bits are zero padded
-`define GETRAND(RAND,RANDW) RAND=0; repeat ((RANDW)/32) RAND=(RAND<<32)|{$random}; RAND=(RAND<<((RANDW)%32))|({$random}>>(32-(RANDW)%32))
-
-// factorial (n!)
-`define fact(n)  ( ( ((n) >= 2      ) ? 2  : 1) * \
-                   ( ((n) >= 3      ) ? 3  : 1) * \
-                   ( ((n) >= 4      ) ? 4  : 1) * \
-                   ( ((n) >= 5      ) ? 5  : 1) * \
-                   ( ((n) >= 6      ) ? 6  : 1) * \
-                   ( ((n) >= 7      ) ? 7  : 1) * \
-                   ( ((n) >= 8      ) ? 8  : 1) * \
-                   ( ((n) >= 9      ) ? 9  : 1) * \
-                   ( ((n) >= 10     ) ? 10 : 1)   )
-
-// ceiling of log2
-`define log2(x)  ( ( ((x) >  1      ) ? 1  : 0) + \
-                   ( ((x) >  2      ) ? 1  : 0) + \
-                   ( ((x) >  4      ) ? 1  : 0) + \
-                   ( ((x) >  8      ) ? 1  : 0) + \
-                   ( ((x) >  16     ) ? 1  : 0) + \
-                   ( ((x) >  32     ) ? 1  : 0) + \
-                   ( ((x) >  64     ) ? 1  : 0) + \
-                   ( ((x) >  128    ) ? 1  : 0) + \
-                   ( ((x) >  256    ) ? 1  : 0) + \
-                   ( ((x) >  512    ) ? 1  : 0) + \
-                   ( ((x) >  1024   ) ? 1  : 0) + \
-                   ( ((x) >  2048   ) ? 1  : 0) + \
-                   ( ((x) >  4096   ) ? 1  : 0) + \
-                   ( ((x) >  8192   ) ? 1  : 0) + \
-                   ( ((x) >  16384  ) ? 1  : 0) + \
-                   ( ((x) >  32768  ) ? 1  : 0) + \
-                   ( ((x) >  65536  ) ? 1  : 0) + \
-                   ( ((x) >  131072 ) ? 1  : 0) + \
-                   ( ((x) >  262144 ) ? 1  : 0) + \
-                   ( ((x) >  524288 ) ? 1  : 0) + \
-                   ( ((x) >  1048576) ? 1  : 0) + \
-                   ( ((x) >  2097152) ? 1  : 0) + \
-                   ( ((x) >  4194304) ? 1  : 0)   )
-
-// floor of log2
-`define log2f(x) ( ( ((x) >= 2      ) ? 1  : 0) + \
-                   ( ((x) >= 4      ) ? 1  : 0) + \
-                   ( ((x) >= 8      ) ? 1  : 0) + \
-                   ( ((x) >= 16     ) ? 1  : 0) + \
-                   ( ((x) >= 32     ) ? 1  : 0) + \
-                   ( ((x) >= 64     ) ? 1  : 0) + \
-                   ( ((x) >= 128    ) ? 1  : 0) + \
-                   ( ((x) >= 256    ) ? 1  : 0) + \
-                   ( ((x) >= 512    ) ? 1  : 0) + \
-                   ( ((x) >= 1024   ) ? 1  : 0) + \
-                   ( ((x) >= 2048   ) ? 1  : 0) + \
-                   ( ((x) >= 4096   ) ? 1  : 0) + \
-                   ( ((x) >= 8192   ) ? 1  : 0) + \
-                   ( ((x) >= 16384  ) ? 1  : 0) + \
-                   ( ((x) >= 32768  ) ? 1  : 0) + \
-                   ( ((x) >= 65536  ) ? 1  : 0) + \
-                   ( ((x) >= 131072 ) ? 1  : 0) + \
-                   ( ((x) >= 262144 ) ? 1  : 0) + \
-                   ( ((x) >= 524288 ) ? 1  : 0) + \
-                   ( ((x) >= 1048576) ? 1  : 0) + \
-                   ( ((x) >= 2097152) ? 1  : 0) + \
-                   ( ((x) >= 4194304) ? 1  : 0)   )
-
-`endif //__UTILS_VH__
 
 module azadi_soc_top (
 `ifdef USE_POWER_PINS
    inout vccd1,
    inout vssd1,
 `endif
-  input clk_i,
-  input rst_ni,
-  input prog,
+  input logic clk_i,
+  input logic rst_ni,
+  input logic prog,
   //output system_rst_ni,
  // output prog_rst_ni,
-  input  logic [15:0] prog_baude, 
+  input  logic [15:0] clks_per_bit, 
   input  logic [31:0] gpio_i,
   output logic [31:0] gpio_o,
   output logic [31:0] gpio_oe,
@@ -3448,7 +3111,7 @@ uart_rx_prog u_uart_rx_prog(
 	.clk_i         (clk_i),
 	.rst_ni        (rst_ni),
 	.i_Rx_Serial   (uart_rx),
-	.CLKS_PER_BIT  (prog_baude),
+	.CLKS_PER_BIT  (clks_per_bit),
 	.o_Rx_DV       (rx_dv_i),
 	.o_Rx_Byte     (rx_byte_i)
 );
@@ -5153,8 +4816,8 @@ module brq_core_top #(
     parameter int unsigned        DmExceptionAddr  = 0
 )
 (
-  input clk_i,
-  input rst_ni,
+    input logic clk_i,
+    input logic rst_ni,
 
   // instruction memory interface 
     input tlul_pkg::tl_d2h_t tl_i_i,
@@ -5472,7 +5135,7 @@ module brq_cs_registers #(
     input  brq_pkg::csr_num_e   csr_addr_i,
     input  logic [31:0]         csr_wdata_i,
     input  brq_pkg::csr_op_e    csr_op_i,
-    input                       csr_op_en_i,
+    input  logic                csr_op_en_i,
     output logic [31:0]         csr_rdata_o,
 
     // interrupts
@@ -6277,8 +5940,8 @@ module brq_cs_registers #(
     .rd_error_o (unused_error1)
   );
 
-    logic [2:0] frmd;
-    logic [2:0] frmq;
+    wire [2:0] frmd;
+    wire [2:0] frmq;
     assign frm_q = roundmode_e'(frmq);
     assign frmd = frm_d;
   // FRM
@@ -18477,8 +18140,8 @@ module control_mvp
 endmodule
 module data_mem_top
 (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
 // tl-ul insterface
   input tlul_pkg::tl_h2d_t tl_d_i,
@@ -19476,8 +19139,15 @@ module dm_csrs #(
   assign cmd_valid_o = cmd_valid_q;
   assign progbuf_o   = progbuf_q;
   assign data_o      = data_q;
-
-  assign ndmreset_o = dmcontrol_q.ndmreset;
+  
+  always_comb begin
+  	if(~rst_ni) begin
+	 ndmreset_o = 1'b0;
+	end else begin
+	 ndmreset_o = dmcontrol_q.ndmreset;
+	end
+  end
+ // assign ndmreset_o = dmcontrol_q.ndmreset;
 
   logic unused_testmode;
   assign unused_testmode = testmode_i;
@@ -20960,20 +20630,20 @@ module fifo_async #(
   localparam int unsigned DepthW = $clog2(Depth+1) // derived parameter representing [0..Depth]
 ) (
   // write port
-  input                  clk_wr_i,
-  input                  rst_wr_ni,
-  input                  wvalid_i,
-  output                 wready_o,
-  input [Width-1:0]      wdata_i,
-  output [DepthW-1:0]    wdepth_o,
+  input    logic              clk_wr_i,
+  input    logic              rst_wr_ni,
+  input    logic              wvalid_i,
+  output   logic              wready_o,
+  input    logic [Width-1:0]  wdata_i,
+  output   logic [DepthW-1:0] wdepth_o,
 
   // read port
-  input                  clk_rd_i,
-  input                  rst_rd_ni,
-  output                 rvalid_o,
-  input                  rready_i,
-  output [Width-1:0]     rdata_o,
-  output [DepthW-1:0]    rdepth_o
+  input    logic              clk_rd_i,
+  input    logic              rst_rd_ni,
+  output   logic              rvalid_o,
+  input    logic              rready_i,
+  output   logic [Width-1:0]  rdata_o,
+  output   logic [DepthW-1:0] rdepth_o
 );
 
 
@@ -21165,20 +20835,20 @@ module fifo_sync #(
   // derived parameter
   localparam int          DepthW     = tlul_pkg::vbits(Depth+1)
 ) (
-  input                   clk_i,
-  input                   rst_ni,
+  input  logic                 clk_i,
+  input  logic                 rst_ni,
   // synchronous clear / flush port
-  input                   clr_i,
+  input  logic                 clr_i,
   // write port
-  input                   wvalid_i,
-  output                  wready_o,
-  input   [Width-1:0]     wdata_i,
+  input  logic                 wvalid_i,
+  output logic                 wready_o,
+  input  logic [Width-1:0]     wdata_i,
   // read port
-  output                  rvalid_o,
-  input                   rready_i,
-  output  [Width-1:0]     rdata_o,
+  output logic                 rvalid_o,
+  input  logic                 rready_i,
+  output logic [Width-1:0]     rdata_o,
   // occupancy
-  output  [DepthW-1:0]    depth_o
+  output logic [DepthW-1:0]    depth_o
 );
 
   // FIFO is in complete passthrough mode
@@ -21314,7 +20984,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/coregisters.svh"
-// `include "registers.svh"
+//`include "registers.svh"
 module fpnew_cast_multi #(
   parameter fpnew_pkg::fmt_logic_t   FpFmtConfig  = '1,
   parameter fpnew_pkg::ifmt_logic_t  IntFmtConfig = '1,
@@ -21357,7 +21027,7 @@ module fpnew_cast_multi #(
   // Indication of valid data in flight
   output logic                   busy_o
 );
-  `define FFLARNC(__q, __d, __load, __clear, __reset_value, __clk, __arst_n)              
+    `define FFLARNC(__q, __d, __load, __clear, __reset_value, __clk, __arst_n)              
     always_ff @(posedge (__clk) or negedge (__arst_n)) begin                 
       if (!__arst_n) begin                                                   
         __q <= (__reset_value);                                              
@@ -21374,7 +21044,6 @@ module fpnew_cast_multi #(
       __q <= (__load) ? (__d) : (__q);               
     end                                              
   end
-
   // ----------
   // Constants
   // ----------
@@ -22163,7 +21832,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-// `include "registers.svh"
+//`include "registers.svh"
 module fpnew_divsqrt_multi #(
   parameter fpnew_pkg::fmt_logic_t   FpFmtConfig  = '1,
   // FPU configuration
@@ -22386,6 +22055,15 @@ module fpnew_divsqrt_multi #(
       state_d   = IDLE; // go to default state
     end
   end
+  
+  `define FF(__q, __d, __reset_value)                
+  always_ff @(posedge clk_i or negedge rst_ni) begin
+    if (!rst_ni) begin                              
+      __q <= (__reset_value);                       
+    end else begin                                  
+      __q <= (__d);                                 
+    end                                             
+  end
 
   // FSM status register (asynch active low rst_ni)
   `FF(state_q, state_d, IDLE)
@@ -22426,7 +22104,12 @@ module fpnew_divsqrt_multi #(
 
   // Adjust result width and fix FP8
   assign adjusted_result = result_is_fp8_q ? unit_result >> 8 : unit_result;
-
+  
+  `define FFLNR(__q, __d, __load, __clk) 
+  always_ff @(posedge (__clk)) begin   
+    __q <= (__load) ? (__d) : (__q);  
+  end
+  
   // The Hold register (load, no rst_ni)
   `FFLNR(held_result_q, adjusted_result, hold_result, clk_i)
   `FFLNR(held_status_q, unit_status,     hold_result, clk_i)
@@ -22503,7 +22186,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-// `include "registers.svh"
+//`include "registers.svh"
 module fpnew_fma_multi #(
   parameter fpnew_pkg::fmt_logic_t   FpFmtConfig = '1,
   parameter int unsigned             NumPipeRegs = 0,
@@ -23325,7 +23008,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-// `include "registers.svh"
+//`include "registers.svh"
 module fpnew_fma #(
   parameter fpnew_pkg::fp_format_e   FpFormat    = fpnew_pkg::fp_format_e'(0),
   parameter int unsigned             NumPipeRegs = 0,
@@ -23998,7 +23681,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-// `include "registers.svh"
+//`include "registers.svh"
 module fpnew_noncomp #(
   parameter fpnew_pkg::fp_format_e   FpFormat    = fpnew_pkg::fp_format_e'(0),
   parameter int unsigned             NumPipeRegs = 0,
@@ -24908,7 +24591,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-// `include "registers.svh"
+//`include "registers.svh"
 module fpnew_opgroup_multifmt_slice #(
   parameter fpnew_pkg::opgroup_e     OpGroup       = fpnew_pkg::CONV,
   parameter int unsigned             Width         = 64,
@@ -25572,8 +25255,8 @@ endmodule
 
 
 module gpio_reg_top (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   // Below Regster interface can be changed
   input  tlul_pkg::tl_h2d_t tl_i,
@@ -26275,14 +25958,14 @@ endmodule
 
 
 module gpio (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   // Below Regster interface can be changed
   input  tlul_pkg::tl_h2d_t tl_i,
   output tlul_pkg::tl_d2h_t tl_o,
 
-  input        [31:0] cio_gpio_i,
+  input  logic [31:0] cio_gpio_i,
   output logic [31:0] cio_gpio_o,
   output logic [31:0] cio_gpio_en_o,
 
@@ -26551,16 +26234,16 @@ module iccm_controller (
 endmodule
 module instr_mem_top
 (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
   
   input  tlul_pkg::tl_h2d_t tl_i,
   output tlul_pkg::tl_d2h_t tl_o,
 // iccm controller interface 
   input  [11:0] iccm_ctrl_addr,
   input  [31:0] iccm_ctrl_wdata,
-  input         iccm_ctrl_we,
-  input         prog_rst_ni,
+  input  logic  iccm_ctrl_we,
+  input  logic  prog_rst_ni,
     
 
 // sram interface 
@@ -26587,7 +26270,7 @@ assign mask_sel[1] = (tl_wmask[15:8]  != 8'b0) ? 1'b1: 1'b0;
 assign mask_sel[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 1'b0;
 assign mask_sel[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 1'b0;
 
-assign csb     = ~(tl_req | iccm_ctrl_we);
+assign csb     = ~(prog_rst_ni ? tl_req : iccm_ctrl_we);
 
 assign addr_o  = (prog_rst_ni) ? tl_addr  : iccm_ctrl_addr;
 assign wdata_o = (prog_rst_ni) ? tl_wdata : iccm_ctrl_wdata;
@@ -27842,17 +27525,17 @@ module prim_arbiter_ppc #(
   // Derived parameters
   localparam int IdxW = $clog2(N)
 ) (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
-  input        [ N-1:0]    req_i,
-  input        [DW-1:0]    data_i [N],
+  input  logic [ N-1:0]    req_i,
+  input  logic [DW-1:0]    data_i [N],
   output logic [ N-1:0]    gnt_o,
   output logic [IdxW-1:0]  idx_o,
 
   output logic             valid_o,
   output logic [DW-1:0]    data_o,
-  input                    ready_i
+  input  logic             ready_i
 );
 
 
@@ -27933,9 +27616,9 @@ endmodule : prim_arbiter_ppc
 
 
 module prim_clock_gating (
-  input        clk_i,
-  input        en_i,
-  input        test_en_i,
+  input  logic clk_i,
+  input  logic en_i,
+  input  logic test_en_i,
   output logic clk_o
 );
 
@@ -27957,11 +27640,11 @@ endmodule
 //   #Cycles before switching to new value.
 
 module prim_filter_ctr #(parameter int unsigned Cycles = 4) (
-  input  clk_i,
-  input  rst_ni,
-  input  enable_i,
-  input  filter_i,
-  output filter_o
+  input logic clk_i,
+  input logic rst_ni,
+  input logic enable_i,
+  input logic filter_i,
+  output logic filter_o
 );
 
   localparam int unsigned CTR_WIDTH = $clog2(Cycles);
@@ -28015,8 +27698,8 @@ endmodule
 module prim_generic_clock_inv #(
   parameter bit HasScanMode = 1'b1
 ) (
-  input        clk_i,
-  input        scanmode_i,
+  input logic       clk_i,
+  input logic       scanmode_i,
   output logic clk_no      // Inverted
 );
 
@@ -28043,9 +27726,9 @@ endmodule : prim_generic_clock_inv
 module prim_generic_clock_mux2 #(
   parameter bit NoFpgaBufG = 1'b0 // this parameter serves no function in the generic model
 ) (
-  input        clk0_i,
-  input        clk1_i,
-  input        sel_i,
+  input  logic      clk0_i,
+  input  logic      clk1_i,
+  input  logic      sel_i,
   output logic clk_o
 );
 
@@ -28069,9 +27752,9 @@ module prim_generic_flop_2sync #(
   localparam int WidthSubOne = Width-1, // temp work around #2679
   parameter logic [WidthSubOne:0] ResetValue = '0
 ) (
-  input                    clk_i,       // receive clock
-  input                    rst_ni,
-  input        [Width-1:0] d_i,
+  input  logic                  clk_i,       // receive clock
+  input  logic                  rst_ni,
+  input  logic      [Width-1:0] d_i,
   output logic [Width-1:0] q_o
 );
 
@@ -28110,9 +27793,9 @@ module prim_generic_flop # (
   localparam int WidthSubOne = Width-1,
   parameter logic [WidthSubOne:0] ResetValue = 0
 ) (
-  input clk_i,
-  input rst_ni,
-  input [Width-1:0] d_i,
+  input logic clk_i,
+  input logic rst_ni,
+  input logic [Width-1:0] d_i,
   output logic [Width-1:0] q_o
 );
 
@@ -28132,17 +27815,17 @@ module prim_intr_hw # (
   parameter bit FlopOutput = 1
 ) (
   // event
-  input  clk_i,
-  input  rst_ni,
-  input  [Width-1:0]  event_intr_i,
+  input logic clk_i,
+  input logic rst_ni,
+  input logic [Width-1:0]  event_intr_i,
 
   // register interface
-  input  [Width-1:0]  reg2hw_intr_enable_q_i,
-  input  [Width-1:0]  reg2hw_intr_test_q_i,
-  input               reg2hw_intr_test_qe_i,
-  input  [Width-1:0]  reg2hw_intr_state_q_i,
-  output              hw2reg_intr_state_de_o,
-  output [Width-1:0]  hw2reg_intr_state_d_o,
+  input logic [Width-1:0]  reg2hw_intr_enable_q_i,
+  input logic [Width-1:0]  reg2hw_intr_test_q_i,
+  input logic              reg2hw_intr_test_qe_i,
+  input logic [Width-1:0]  reg2hw_intr_state_q_i,
+  output logic             hw2reg_intr_state_de_o,
+  output logic [Width-1:0]  hw2reg_intr_state_d_o,
 
   // outgoing interrupt
   output logic [Width-1:0]  intr_o
@@ -28184,15 +27867,15 @@ module prim_subreg_arb #(
 ) (
   // From SW: valid for RW, WO, W1C, W1S, W0C, RC.
   // In case of RC, top connects read pulse to we.
-  input          we,
-  input [DW-1:0] wd,
+  input logic         we,
+  input logic [DW-1:0] wd,
 
   // From HW: valid for HRW, HWO.
-  input          de,
-  input [DW-1:0] d,
+  input logic         de,
+  input logic [DW-1:0] d,
 
   // From register: actual reg value.
-  input [DW-1:0] q,
+  input logic [DW-1:0] q,
 
   // To register: actual write enable and write data.
   output logic          wr_en,
@@ -28256,11 +27939,11 @@ endmodule
 module prim_subreg_ext #(
   parameter int unsigned DW = 32
 ) (
-  input          re,
-  input          we,
-  input [DW-1:0] wd,
+  input logic         re,
+  input logic         we,
+  input logic [DW-1:0] wd,
 
-  input [DW-1:0] d,
+  input logic [DW-1:0] d,
 
   // output to HW and Reg Read
   output logic          qe,
@@ -28282,17 +27965,17 @@ module prim_subreg #(
   parameter                SWACCESS = "RW",  // {RW, RO, WO, W1C, W1S, W0C, RC}
   parameter logic [DW-1:0] RESVAL   = '0     // Reset value
 ) (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   // From SW: valid for RW, WO, W1C, W1S, W0C, RC
   // In case of RC, Top connects Read Pulse to we
-  input          we,
-  input [DW-1:0] wd,
+  input logic         we,
+  input logic [DW-1:0] wd,
 
   // From HW: valid for HRW, HWO
-  input          de,
-  input [DW-1:0] d,
+  input logic         de,
+  input logic [DW-1:0] d,
 
   // output to HW and Reg Read
   output logic          qe,
@@ -28338,17 +28021,17 @@ endmodule
 
 module pwm_top (
 
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   input  tlul_pkg::tl_h2d_t tl_i,
   output tlul_pkg::tl_d2h_t tl_o,
 
 
-  output        pwm_o,
-  output        pwm_o_2,
-  output        pwm1_oe,
-  output        pwm2_oe
+  output  logic      pwm_o,
+  output  logic      pwm_o_2,
+  output  logic      pwm1_oe,
+  output  logic      pwm2_oe
 
 );
 
@@ -28731,10 +28414,10 @@ module rr_arb_tree #(
 );
 
   // pragma translate_off
-  // `ifndef VERILATOR
-  // // Default SVA rst_ni
-  // default disable iff (!rst_ni || flush_i);
-  // `endif
+  //`ifndef VERILATOR
+  // Default SVA rst_ni
+  //default disable iff (!rst_ni || flush_i);
+  //`endif
   // pragma translate_on
 
   // just pass through in this corner case
@@ -28967,9 +28650,9 @@ endmodule : rr_arb_tree
 
 module rstmgr(
 
-    input clk_i, //system clock
-    input rst_ni, // system reset
-    input prog_rst_ni,
+    input logic clk_i, //system clock
+    input logic rst_ni, // system reset
+    input logic prog_rst_ni,
   
     input  logic  ndmreset, // non-debug module reset
     output logic  sys_rst_ni // reset for system except debug module
@@ -28981,29 +28664,41 @@ module rstmgr(
   always_comb begin
     if(!rst_ni) begin
       rst_d = 1'b0;
-    end else 
-    if(ndmreset) begin
-      rst_d = 1'b0;
-    end else 
-    if(!prog_rst_ni)begin
-      rst_d = 1'b0;
-    end else begin
-      rst_d = 1'b1;
+    end else begin 
+    	if(!prog_rst_ni) begin
+      	   rst_d = 1'b0;
+    	end else begin
+	   if(ndmreset)begin
+      	     rst_d = 1'b0;
+    	   end else begin
+      	     rst_d = prog_rst_ni;
+    	   end
+	end
     end
   end
   
   always_ff @(posedge clk_i ) begin
-    rst_q <= rst_d;
+   if(~rst_ni) begin
+      rst_q <= 1'b0;
+   end else begin
+      rst_q <= rst_d;
+   end
+    
   end
 
   assign rst_fd = rst_q;
   always_ff @(posedge clk_i ) begin
-    rst_fq <= rst_fd;
+    if(~rst_ni) begin
+      rst_fq <= 1'b0;
+    end else begin
+      rst_fq <= rst_fd;
+    end 
   end
 
   assign sys_rst_ni = rst_fq;
 
 endmodule
+
 
 module rv_dm #(
   parameter int              NrHarts = 1,
@@ -29331,14 +29026,14 @@ endmodule
 module rv_plic_gateway #(
   parameter int N_SOURCE = 32
 ) (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
-  input [N_SOURCE-1:0] src_i,
-  input [N_SOURCE-1:0] le_i,      // Level0 Edge1
+  input logic [N_SOURCE-1:0] src_i,
+  input logic [N_SOURCE-1:0] le_i,      // Level0 Edge1
 
-  input [N_SOURCE-1:0] claim_i, // $onehot0(claim_i)
-  input [N_SOURCE-1:0] complete_i, // $onehot0(complete_i)
+  input logic [N_SOURCE-1:0] claim_i, // $onehot0(claim_i)
+  input logic [N_SOURCE-1:0] complete_i, // $onehot0(complete_i)
 
   output logic [N_SOURCE-1:0] ip_o
 );
@@ -29392,8 +29087,8 @@ endmodule
 
 
 module rv_plic_reg_top (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   // Below Regster interface can be changed
   input  tlul_pkg::tl_h2d_t tl_i,
@@ -34421,18 +34116,18 @@ module rv_plic import rv_plic_reg_pkg::*; #(
   // derived parameter
   localparam int SRCW    = $clog2(NumSrc)
 ) (
-  input     clk_i,
-  input     rst_ni,
+  input logic     clk_i,
+  input logic     rst_ni,
 
   // Bus Interface (device)
   input  tlul_pkg::tl_h2d_t tl_i,
   output tlul_pkg::tl_d2h_t tl_o,
 
   // Interrupt Sources
-  input  [NumSrc-1:0] intr_src_i,
+  input  logic [NumSrc-1:0] intr_src_i,
 
   // Interrupt notification to targets
-  output [NumTarget-1:0] irq_o,
+  output logic [NumTarget-1:0] irq_o,
 
   output logic [NumTarget-1:0] msip_o
 );
@@ -34655,14 +34350,14 @@ module rv_plic_target #(
   localparam int SrcWidth  = $clog2(N_SOURCE+1),  // derived parameter
   localparam int PrioWidth = $clog2(MAX_PRIO+1)   // derived parameter
 ) (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
-  input [N_SOURCE-1:0]  ip_i,
-  input [N_SOURCE-1:0]  ie_i,
+  input logic [N_SOURCE-1:0]  ip_i,
+  input logic [N_SOURCE-1:0]  ie_i,
 
-  input [PrioWidth-1:0] prio_i [N_SOURCE],
-  input [PrioWidth-1:0] threshold_i,
+  input logic [PrioWidth-1:0] prio_i [N_SOURCE],
+  input logic [PrioWidth-1:0] threshold_i,
 
   output logic            irq_o,
   output logic [SrcWidth-1:0] irq_id_o
@@ -34769,8 +34464,8 @@ endmodule
 
 
 module rv_timer_reg_top (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   // Below Regster interface can be changed
   input  tlul_pkg::tl_h2d_t tl_i,
@@ -35251,8 +34946,8 @@ endmodule
 
 
 module rv_timer (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   input  tlul_pkg::tl_h2d_t tl_i,
   output tlul_pkg::tl_d2h_t tl_o,
@@ -35486,7 +35181,7 @@ reg [DATA_WIDTH-1:0]    mem [0:RAM_DEPTH-1];
 
 endmodule
 // `include "/home/merl/github_repos/azadi/src/spi_host/rtl/spi_defines.v"
-// `include "spi_defines.v"
+//`include "spi_defines.v"
 
 module spi_clgen (
   input                            clk_i,   // input clock (system clock)
@@ -35554,28 +35249,28 @@ endmodule
  
 // `include "/home/merl/github_repos/azadi/src/spi_host/rtl/spi_defines.v"
 //`include "/home/zeeshan/fyp/azadi/src/spi_host/rtl/spi_defines.v"
-// `include "spi_defines.v"
+//`include "spi_defines.v"
 module spi_core
 (
   // tlul signals
-  input         clk_i,        
-  input         rst_ni,        
-  input  [7:0]  addr_i,            
-  input  [31:0] wdata_i,              
-  output reg [31:0] rdata_o,             
-  input  [3:0]  be_i,           
-  input         we_i,       
-  input         re_i,        
+  input  logic        clk_i,        
+  input  logic        rst_ni,        
+  input  logic [7:0]  addr_i,            
+  input  logic [31:0] wdata_i,              
+  output reg   [31:0] rdata_o,             
+  input  logic [3:0]  be_i,           
+  input  logic        we_i,       
+  input  logic        re_i,        
   output reg    error_o,       
   output reg    intr_rx_o,
   output reg    intr_tx_o,         
                                                      
   // SPI signals                                     
-  output     [`SPI_SS_NB-1:0] ss_o,         // slave select
-  output                      sclk_o,       // serial clock
-  output                      sd_o,
-  output     reg              sd_oe,       // master out slave in
-  input                       sd_i       // master in slave out
+  output logic    [`SPI_SS_NB-1:0] ss_o,         // slave select
+  output logic                     sclk_o,       // serial clock
+  output logic                     sd_o,
+  output reg                       sd_oe,       // master out slave in
+  input  logic                     sd_i       // master in slave out
 );
 
                                                
@@ -35753,7 +35448,7 @@ module spi_core
     );
 endmodule
   
-// `include "spi_defines.v"
+//`include "spi_defines.v"
 
 module spi_shift (
   input                          clk_i,          // system clock
@@ -35858,23 +35553,23 @@ endmodule
 
 // `include "/home/merl/github_repos/azadi/src/spi_host/rtl/spi_defines.v"
 //`include "/home/zeeshan/fyp/azadi/src/spi_host/rtl/spi_defines.v"
-// `include "spi_defines.v"
+//`include "spi_defines.v"
 module spi_top(
 
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   input  tlul_pkg::tl_h2d_t tl_i,
   output tlul_pkg::tl_d2h_t tl_o,
 
   // SPI signals                  
-  output     intr_rx_o,
-  output     intr_tx_o,                   
-  output     [`SPI_SS_NB-1:0] ss_o,        
-  output                      sclk_o,      
-  output                      sd_o,
-  output                      sd_oe,       
-  input                       sd_i      
+  output logic    intr_rx_o,
+  output logic    intr_tx_o,                   
+  output logic    [`SPI_SS_NB-1:0] ss_o,        
+  output logic                     sclk_o,      
+  output logic                     sd_o,
+  output logic                     sd_oe,       
+  input  logic                     sd_i      
 
 );
 
@@ -35941,17 +35636,17 @@ endmodule// Copyright lowRISC contributors.
 module timer_core #(
   parameter int N = 1
 ) (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
-  input        active,
-  input [11:0] prescaler,
-  input [ 7:0] step,
+  input logic       active,
+  input logic [11:0] prescaler,
+  input logic [ 7:0] step,
 
   output logic        tick,
   output logic [63:0] mtime_d,
-  input        [63:0] mtime,
-  input        [63:0] mtimecmp [N],
+  input  logic [63:0] mtime,
+  input  logic [63:0] mtimecmp [N],
 
   output logic [N-1:0] intr
 );
@@ -35986,8 +35681,8 @@ module tlul_adapter_reg import tlul_pkg::*; #(
   parameter  int RegDw = 32, // Shall be matched with TL_DW
   localparam int RegBw = RegDw/8
 ) (
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
   // TL-UL interface
   input  tl_h2d_t tl_i,
@@ -35999,8 +35694,8 @@ module tlul_adapter_reg import tlul_pkg::*; #(
   output logic [RegAw-1:0] addr_o,
   output logic [RegDw-1:0] wdata_o,
   output logic [RegBw-1:0] be_o,
-  input        [RegDw-1:0] rdata_i,
-  input                    error_i
+  input  logic      [RegDw-1:0] rdata_i,
+  input  logic                  error_i
 );
 
   localparam int IW  = $bits(tl_i.a_source);
@@ -36111,8 +35806,8 @@ endmodule
 // after request with no stalling unless response is stuck on the way out.
 //`include "/home/sajjad/Shaheen-sv/src/buraq_core_top/ibex_core/tlul_pkg.sv"
 module tlul_err_resp (
-  input                     clk_i,
-  input                     rst_ni,
+  input  logic              clk_i,
+  input  logic              rst_ni,
   input  tlul_pkg::tl_h2d_t tl_h_i,
   output tlul_pkg::tl_d2h_t tl_h_o
 );
@@ -36260,8 +35955,8 @@ module tlul_fifo_sync #(
   parameter int unsigned SpareReqW = 1,
   parameter int unsigned SpareRspW = 1
 ) (
-  input                     clk_i,
-  input                     rst_ni,
+  input  logic              clk_i,
+  input  logic              rst_ni,
   input  tlul_pkg::tl_h2d_t tl_h_i,
   output tlul_pkg::tl_d2h_t tl_h_o,
   output tlul_pkg::tl_h2d_t tl_d_o,
@@ -36353,8 +36048,8 @@ endmodule
 module tlul_host_adapter #(
     parameter int unsigned MAX_REQS = 1
 ) (
-    input clk_i,
-    input rst_ni,
+    input logic clk_i,
+    input logic rst_ni,
 // interface with host agent 
     input                               req_i,
     output logic                        gnt_o,
@@ -36473,13 +36168,13 @@ module tlul_socket_1n #(
   parameter bit [N*4-1:0] DRspDepth = {N{4'h2}},
   localparam int unsigned NWD       = $clog2(N+1) // derived parameter
 ) (
-  input                     clk_i,
-  input                     rst_ni,
+  input  logic                   clk_i,
+  input  logic                   rst_ni,
   input  tlul_pkg::tl_h2d_t tl_h_i,
   output tlul_pkg::tl_d2h_t tl_h_o,
   output tlul_pkg::tl_h2d_t tl_d_o    [N],
   input  tlul_pkg::tl_d2h_t tl_d_i    [N],
-  input  [NWD-1:0]          dev_select_i
+  input  logic [NWD-1:0]          dev_select_i
 );
 
   // Since our steering is done after potential FIFOing, we need to
@@ -36666,8 +36361,8 @@ module tlul_socket_m1 #(
   parameter bit [3:0]     DReqDepth = 4'h2,
   parameter bit [3:0]     DRspDepth = 4'h2
 ) (
-  input                     clk_i,
-  input                     rst_ni,
+  input  logic                   clk_i,
+  input  logic                   rst_ni,
 
   input  tlul_pkg::tl_h2d_t tl_h_i [M],
   output tlul_pkg::tl_d2h_t tl_h_o [M],
@@ -36896,8 +36591,8 @@ module tlul_sram_adapter #(
   parameter bit ErrOnWrite  = 0,  // 1: Writes not allowed, automatically error
   parameter bit ErrOnRead   = 0   // 1: Reads not allowed, automatically error
 ) (
-  input   clk_i,
-  input   rst_ni,
+  input   logic clk_i,
+  input   logic rst_ni,
 
   // TL-UL interface
   input   tlul_pkg::tl_h2d_t  tl_i,
@@ -36905,14 +36600,14 @@ module tlul_sram_adapter #(
 
   // SRAM interface
   output logic              req_o,
-  input                     gnt_i,
+  input  logic              gnt_i,
   output logic              we_o,
   output logic [SramAw-1:0] addr_o,
   output logic [SramDw-1:0] wdata_o,
   output logic [SramDw-1:0] wmask_o,
-  input        [SramDw-1:0] rdata_i,
-  input                     rvalid_i,
-  input        [1:0]        rerror_i // 2 bit error [1]: Uncorrectable, [0]: Correctable
+  input  logic [SramDw-1:0] rdata_i,
+  input  logic              rvalid_i,
+  input  logic [1:0]        rerror_i // 2 bit error [1]: Uncorrectable, [0]: Correctable
 );
 
   import tlul_pkg::*;
@@ -37224,8 +36919,8 @@ endmodule
 
 module tl_xbar_main (
 
-  input clk_i,
-  input rst_ni,
+  input logic clk_i,
+  input logic rst_ni,
 
 
   // Host interfaces
@@ -38017,17 +37712,17 @@ endmodule // UART_RX
 // `include "prim_assert.sv"
 
 module uart_top (
-    input  clk_i,
-    input  rst_ni,
+    input logic clk_i,
+    input logic rst_ni,
 
   // Bus Interface
     input  tlul_pkg::tl_h2d_t tl_i,
     output tlul_pkg::tl_d2h_t tl_o,
    
-    output tx_o,
-    input  rx_i,
+    output logic tx_o,
+    input  logic rx_i,
     
-    output intr_tx
+    output logic intr_tx
 );
     
     logic [31:0] wdata;

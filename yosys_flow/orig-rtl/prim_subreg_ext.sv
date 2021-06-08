@@ -3,11 +3,11 @@
 module prim_subreg_ext #(
   parameter int unsigned DW = 32
 ) (
-  input          re,
-  input          we,
-  input [DW-1:0] wd,
+  input logic         re,
+  input logic         we,
+  input logic [DW-1:0] wd,
 
-  input [DW-1:0] d,
+  input logic [DW-1:0] d,
 
   // output to HW and Reg Read
   output logic          qe,
