@@ -2561,7 +2561,7 @@ module brq_cs_registers (
 			mcountinhibit_d = mcountinhibit_q;
 	end
 	always @(*) begin : gen_mhpmcounter_incr
-		begin : sv2v_autoblock_81
+		begin : sv2v_autoblock_80
 			reg [31:0] i;
 			for (i = 0; i < 32; i = i + 1)
 				begin : gen_mhpmcounter_incr_inactive
@@ -2583,7 +2583,7 @@ module brq_cs_registers (
 		mhpmcounter_incr[12] = div_wait_i;
 	end
 	always @(*) begin : gen_mhpmevent
-		begin : sv2v_autoblock_82
+		begin : sv2v_autoblock_81
 			reg signed [31:0] i;
 			for (i = 0; i < 32; i = i + 1)
 				begin : gen_mhpmevent_active
@@ -2592,7 +2592,7 @@ module brq_cs_registers (
 				end
 		end
 		mhpmevent[1] = {32 {1'sb0}};
-		begin : sv2v_autoblock_83
+		begin : sv2v_autoblock_82
 			reg [31:0] i;
 			for (i = 3 + MHPMCounterNum; i < 32; i = i + 1)
 				begin : gen_mhpmevent_inactive
@@ -3014,7 +3014,7 @@ module brq_exu_alu (
 		shift_result_ext = $unsigned($signed({shift_ones | (shift_arith & shift_operand[31]), shift_operand}) >>> shift_amt[4:0]);
 		shift_result = shift_result_ext[31:0];
 		unused_shift_result_ext = shift_result_ext[32];
-		begin : sv2v_autoblock_84
+		begin : sv2v_autoblock_83
 			reg [31:0] i;
 			for (i = 0; i < 32; i = i + 1)
 				shift_result_rev[i] = shift_result[31 - i];
@@ -3118,40 +3118,40 @@ module brq_exu_alu (
 				endcase
 			always @(*) begin
 				bitcnt_partial = {32 {6'b000000}};
-				begin : sv2v_autoblock_85
+				begin : sv2v_autoblock_84
 					reg [31:0] i;
 					for (i = 1; i < 32; i = i + 2)
 						bitcnt_partial[(31 - i) * 6+:6] = {5'h00, bitcnt_bits[i]} + {5'h00, bitcnt_bits[i - 1]};
 				end
-				begin : sv2v_autoblock_86
+				begin : sv2v_autoblock_85
 					reg [31:0] i;
 					for (i = 3; i < 32; i = i + 4)
 						bitcnt_partial[(31 - i) * 6+:6] = bitcnt_partial[(33 - i) * 6+:6] + bitcnt_partial[(31 - i) * 6+:6];
 				end
-				begin : sv2v_autoblock_87
+				begin : sv2v_autoblock_86
 					reg [31:0] i;
 					for (i = 7; i < 32; i = i + 8)
 						bitcnt_partial[(31 - i) * 6+:6] = bitcnt_partial[(35 - i) * 6+:6] + bitcnt_partial[(31 - i) * 6+:6];
 				end
-				begin : sv2v_autoblock_88
+				begin : sv2v_autoblock_87
 					reg [31:0] i;
 					for (i = 15; i < 32; i = i + 16)
 						bitcnt_partial[(31 - i) * 6+:6] = bitcnt_partial[(39 - i) * 6+:6] + bitcnt_partial[(31 - i) * 6+:6];
 				end
 				bitcnt_partial[0+:6] = bitcnt_partial[96+:6] + bitcnt_partial[0+:6];
 				bitcnt_partial[48+:6] = bitcnt_partial[96+:6] + bitcnt_partial[48+:6];
-				begin : sv2v_autoblock_89
+				begin : sv2v_autoblock_88
 					reg [31:0] i;
 					for (i = 11; i < 32; i = i + 8)
 						bitcnt_partial[(31 - i) * 6+:6] = bitcnt_partial[(35 - i) * 6+:6] + bitcnt_partial[(31 - i) * 6+:6];
 				end
-				begin : sv2v_autoblock_90
+				begin : sv2v_autoblock_89
 					reg [31:0] i;
 					for (i = 5; i < 32; i = i + 4)
 						bitcnt_partial[(31 - i) * 6+:6] = bitcnt_partial[(33 - i) * 6+:6] + bitcnt_partial[(31 - i) * 6+:6];
 				end
 				bitcnt_partial[186+:6] = {5'h00, bitcnt_bits[0]};
-				begin : sv2v_autoblock_91
+				begin : sv2v_autoblock_90
 					reg [31:0] i;
 					for (i = 2; i < 32; i = i + 2)
 						bitcnt_partial[(31 - i) * 6+:6] = bitcnt_partial[(32 - i) * 6+:6] + {5'h00, bitcnt_bits[i]};
@@ -3252,35 +3252,35 @@ module brq_exu_alu (
 				assign bitcnt_partial_msb_d[31] = 1'b0;
 				always @(*) begin
 					bitcnt_partial_q = {32 {6'b000000}};
-					begin : sv2v_autoblock_92
+					begin : sv2v_autoblock_91
 						reg [31:0] i;
 						for (i = 0; i < 32; i = i + 1)
 							begin : gen_bitcnt_reg_out_lsb
 								bitcnt_partial_q[(31 - i) * 6] = imd_val_q_i[32 + i];
 							end
 					end
-					begin : sv2v_autoblock_93
+					begin : sv2v_autoblock_92
 						reg [31:0] i;
 						for (i = 0; i < 16; i = i + 1)
 							begin : gen_bitcnt_reg_out_b1
 								bitcnt_partial_q[((31 - ((2 * i) + 1)) * 6) + 1] = imd_val_q_i[i];
 							end
 					end
-					begin : sv2v_autoblock_94
+					begin : sv2v_autoblock_93
 						reg [31:0] i;
 						for (i = 0; i < 8; i = i + 1)
 							begin : gen_bitcnt_reg_out_b2
 								bitcnt_partial_q[((31 - ((4 * i) + 3)) * 6) + 2] = imd_val_q_i[16 + i];
 							end
 					end
-					begin : sv2v_autoblock_95
+					begin : sv2v_autoblock_94
 						reg [31:0] i;
 						for (i = 0; i < 4; i = i + 1)
 							begin : gen_bitcnt_reg_out_b3
 								bitcnt_partial_q[((31 - ((8 * i) + 7)) * 6) + 3] = imd_val_q_i[24 + i];
 							end
 					end
-					begin : sv2v_autoblock_96
+					begin : sv2v_autoblock_95
 						reg [31:0] i;
 						for (i = 0; i < 2; i = i + 1)
 							begin : gen_bitcnt_reg_out_b4
@@ -4447,7 +4447,7 @@ module brq_fp_register_file_ff (
 		sv2v_cast_5 = inp;
 	endfunction
 	always @(*) begin : we_a_decoder
-		begin : sv2v_autoblock_97
+		begin : sv2v_autoblock_96
 			reg [31:0] i;
 			for (i = 0; i < NUM_WORDS; i = i + 1)
 				we_a_dec[i] = (waddr_a_i == sv2v_cast_5(i) ? we_a_i : 1'b0);
@@ -4639,10 +4639,6 @@ module brq_idu_controller (
 	wire ebrk_insn;
 	wire csr_pipe_flush;
 	wire instr_fetch_err;
-	localparam [3:0] DECODE = 5;
-	always @(negedge clk_i)
-		if ((((ctrl_fsm_cs == DECODE) && instr_valid_i) && !instr_fetch_err_i) && illegal_insn_d)
-			$display("%t: Illegal instruction (hart %0x) at PC 0x%h: 0x%h", $time, brq_core.hart_id_i, brq_idu.pc_id_i, brq_idu.instr_rdata_i);
 	assign load_err_d = load_err_i;
 	assign store_err_d = store_err_i;
 	assign ecall_insn = ecall_insn_i & instr_valid_i;
@@ -4749,6 +4745,7 @@ module brq_idu_controller (
 	localparam [3:0] BOOT_SET = 1;
 	localparam [3:0] DBG_TAKEN_ID = 9;
 	localparam [3:0] DBG_TAKEN_IF = 8;
+	localparam [3:0] DECODE = 5;
 	localparam [3:0] FIRST_FETCH = 4;
 	localparam [3:0] IRQ_TAKEN = 7;
 	localparam [3:0] RESET = 0;
@@ -8383,7 +8380,7 @@ module brq_pmp (
 			end
 			always @(*) begin
 				access_fault[c] = priv_mode_i[(0 >= (PMPNumChan - 1) ? c : (PMPNumChan - 1) - c) * 2+:2] != brq_pkg_PRIV_LVL_M;
-				begin : sv2v_autoblock_98
+				begin : sv2v_autoblock_97
 					reg signed [31:0] r;
 					for (r = PMPNumRegions - 1; r >= 0; r = r - 1)
 						if (region_match_all[(c * PMPNumRegions) + r])
@@ -8395,6 +8392,82 @@ module brq_pmp (
 	endgenerate
 endmodule
 module brq_register_file_ff (
+  clk_i,
+  rst_ni,
+  dummy_instr_id_i,
+  raddr_a_i,
+  rdata_a_o,
+  raddr_b_i,
+  rdata_b_o,
+  waddr_a_i,
+  wdata_a_i,
+  we_a_i
+  );
+    parameter        RV32E = 0;
+    parameter [31:0] DataWidth = 32;
+    parameter        DummyInstructions = 0;
+    
+    input  wire                 clk_i;
+    input  wire                 rst_ni;
+    input  wire                 dummy_instr_id_i;
+    //Read port R1
+    input  wire [4:0]           raddr_a_i;
+    output wire [DataWidth-1:0] rdata_a_o;
+    //Read port R2
+    input  wire [4:0]           raddr_b_i;
+    output wire [DataWidth-1:0] rdata_b_o;
+    // Write port W1
+    input  wire [4:0]           waddr_a_i;
+    input  wire [DataWidth-1:0] wdata_a_i;
+    input  wire                 we_a_i;
+
+    localparam ADDR_WIDTH = 5;
+    localparam NUM_WORDS  = 2**ADDR_WIDTH;
+    
+    reg [NUM_WORDS-1:1] we_a_dec;
+    reg [DataWidth-1:0] rf_reg   [NUM_WORDS-1:0];
+    reg [DataWidth-1:0] rf_reg_q [NUM_WORDS-1:1];
+    
+    function automatic [4:0] sv2v_cast_5;
+          input reg [4:0] inp;
+          sv2v_cast_5 = inp;
+    endfunction
+    reg [31:0] j;
+    always @(*) begin
+    begin
+    //reg [31:0] j;  
+    for (j = 0; j < NUM_WORDS; j = j +1)
+        we_a_dec[j] = (waddr_a_i == sv2v_cast_5(j)) ?  we_a_i : 1'b0;
+    end
+    end
+
+    //assign rf_reg[0] = 32'b0;
+    generate
+    // No flops for R0 as it's hard-wired to 0
+    genvar i;
+    for (i = 1; i < NUM_WORDS; i=i+1) begin 
+      always @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+          rf_reg_q[i] <= 0;
+        end else if(we_a_dec[i]) begin
+          rf_reg_q[i] <= wdata_a_i;
+        end
+	  rf_reg[0] <= 32'b0;
+      	  rf_reg[i] <= rf_reg_q[i];
+        end
+    end
+    endgenerate
+
+    wire   unused_dummy_instr_id;
+    assign unused_dummy_instr_id = dummy_instr_id_i;
+    // R0 is nil
+   //assign rf_reg[0] = 32'b0;
+    
+    //assign rf_reg[NUM_WORDS-1:1] = rf_reg_q;
+    assign rdata_a_o = rf_reg[raddr_a_i];
+    assign rdata_b_o = rf_reg[raddr_b_i];
+endmodule
+/*module brq_register_file_ff (
 	clk_i,
 	rst_ni,
 	dummy_instr_id_i,
@@ -8419,17 +8492,17 @@ module brq_register_file_ff (
 	input wire [4:0] waddr_a_i;
 	input wire [DataWidth - 1:0] wdata_a_i;
 	input wire we_a_i;
-	localparam [31:0] ADDR_WIDTH = (RV32E ? 4 : 5);
+	localparam [31:0] ADDR_WIDTH = 5;
 	localparam [31:0] NUM_WORDS = 2 ** ADDR_WIDTH;
-	wire [(NUM_WORDS * DataWidth) - 1:0] rf_reg;
-	reg [((NUM_WORDS - 1) >= 1 ? ((NUM_WORDS - 1) * DataWidth) + (DataWidth - 1) : ((3 - NUM_WORDS) * DataWidth) + (((NUM_WORDS - 1) * DataWidth) - 1)):((NUM_WORDS - 1) >= 1 ? DataWidth : (NUM_WORDS - 1) * DataWidth)] rf_reg_q;
+	wire [DataWidth - 1:0] rf_reg [NUM_WORDS-1:0];
+	reg  [DataWidth -1 :0] rf_reg_q [NUM_WORDS-1:1];
 	reg [NUM_WORDS - 1:1] we_a_dec;
 	function automatic [4:0] sv2v_cast_5;
 		input reg [4:0] inp;
 		sv2v_cast_5 = inp;
 	endfunction
 	always @(*) begin : we_a_decoder
-		begin : sv2v_autoblock_99
+		begin : sv2v_autoblock_98
 			reg [31:0] i;
 			for (i = 1; i < NUM_WORDS; i = i + 1)
 				we_a_dec[i] = (waddr_a_i == sv2v_cast_5(i) ? we_a_i : 1'b0);
@@ -8446,27 +8519,27 @@ module brq_register_file_ff (
 		end
 	endgenerate
 	generate
-		if (DummyInstructions) begin : g_dummy_r0
+		if (1'b0) begin : g_dummy_r0
 			wire we_r0_dummy;
 			reg [DataWidth - 1:0] rf_r0_q;
 			assign we_r0_dummy = we_a_i & dummy_instr_id_i;
 			always @(posedge clk_i or negedge rst_ni)
 				if (!rst_ni)
-					rf_r0_q <= {DataWidth {1'sb0}};
+					rf_r0_q <= {DataWidth {1'b0}};
 				else if (we_r0_dummy)
 					rf_r0_q <= wdata_a_i;
-			assign rf_reg[0+:DataWidth] = (dummy_instr_id_i ? rf_r0_q : {DataWidth {1'sb0}});
+			assign rf_reg[0] = ({DataWidth {1'b0}});
 		end
 		else begin : g_normal_r0
 			wire unused_dummy_instr_id;
 			assign unused_dummy_instr_id = dummy_instr_id_i;
-			assign rf_reg[0+:DataWidth] = {DataWidth {1'sb0}};
+			assign rf_reg[0] = {DataWidth {1'b0}};
 		end
 	endgenerate
-	assign rf_reg[DataWidth * (((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : ((NUM_WORDS - 1) + ((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : 3 - NUM_WORDS)) - 1) - (((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : 3 - NUM_WORDS) - 1))+:DataWidth * ((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : 3 - NUM_WORDS)] = rf_reg_q[DataWidth * ((NUM_WORDS - 1) >= 1 ? ((NUM_WORDS - 1) >= 1 ? ((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : ((NUM_WORDS - 1) + ((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : 3 - NUM_WORDS)) - 1) - (((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : 3 - NUM_WORDS) - 1) : ((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : ((NUM_WORDS - 1) + ((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : 3 - NUM_WORDS)) - 1)) : 1 - (((NUM_WORDS - 1) >= 1 ? ((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : ((NUM_WORDS - 1) + ((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : 3 - NUM_WORDS)) - 1) - (((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : 3 - NUM_WORDS) - 1) : ((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : ((NUM_WORDS - 1) + ((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : 3 - NUM_WORDS)) - 1)) - (NUM_WORDS - 1)))+:DataWidth * ((NUM_WORDS - 1) >= 1 ? NUM_WORDS - 1 : 3 - NUM_WORDS)];
-	assign rdata_a_o = rf_reg[raddr_a_i * DataWidth+:DataWidth];
-	assign rdata_b_o = rf_reg[raddr_b_i * DataWidth+:DataWidth];
-endmodule
+	assign rf_reg[31:1] = rf_reg_q[31:1];
+	assign rdata_a_o = rf_reg[raddr_a_i];
+	assign rdata_b_o = rf_reg[raddr_b_i];
+endmodule*/
 module brq_wbu (
 	clk_i,
 	rst_ni,
@@ -11065,7 +11138,7 @@ module dm_csrs (
 		halted_flat1 = {(((NrHarts - 1) / 1024) + 1) * 32 {1'sb0}};
 		haltsum1 = {32 {1'sb0}};
 		hartsel_idx1 = hartsel_o[19:10];
-		begin : sv2v_autoblock_100
+		begin : sv2v_autoblock_99
 			reg [31:0] k;
 			for (k = 0; k < (((NrHarts - 1) / 32) + 1); k = k + 1)
 				halted_flat1[k] = |halted_reshaped0[(((NrHarts - 1) / 32) >= 0 ? k : ((NrHarts - 1) / 32) - k) * 32+:32];
@@ -11083,7 +11156,7 @@ module dm_csrs (
 		halted_flat2 = {(((NrHarts - 1) / 32768) + 1) * 32 {1'sb0}};
 		haltsum2 = {32 {1'sb0}};
 		hartsel_idx2 = hartsel_o[19:15];
-		begin : sv2v_autoblock_101
+		begin : sv2v_autoblock_100
 			reg [31:0] k;
 			for (k = 0; k < (((NrHarts - 1) / 1024) + 1); k = k + 1)
 				halted_flat2[k] = |halted_reshaped1[(((NrHarts - 1) / 1024) >= 0 ? k : ((NrHarts - 1) / 1024) - k) * 32+:32];
@@ -11094,7 +11167,7 @@ module dm_csrs (
 	end
 	always @(*) begin : p_reduction3
 		halted_flat3 = {32 {1'sb0}};
-		begin : sv2v_autoblock_102
+		begin : sv2v_autoblock_101
 			reg [31:0] k;
 			for (k = 0; k < ((NrHarts / 32768) + 1); k = k + 1)
 				halted_flat3[k] = |halted_reshaped2[(((NrHarts - 1) / 32768) >= 0 ? k : ((NrHarts - 1) / 32768) - k) * 32+:32];
@@ -11312,7 +11385,7 @@ module dm_csrs (
 					sbcs_d[22] = 1'b1;
 				else
 					resp_queue_data = sbdata_q[63:32];
-		if ((dmi_req_ready_o && dmi_req_valid_i) && (dtm_op == dm_DTM_WRITE)) begin : sv2v_autoblock_103
+		if ((dmi_req_ready_o && dmi_req_valid_i) && (dtm_op == dm_DTM_WRITE)) begin : sv2v_autoblock_102
 			reg [7:0] sv2v_temp_7E498;
 			sv2v_temp_7E498 = sv2v_cast_8({1'b0, dmi_req_i[40-:7]});
 			if ((dm_Data0 <= sv2v_temp_7E498) && (DataEnd >= sv2v_temp_7E498)) begin
@@ -12284,7 +12357,7 @@ module dm_mem (
 					exception = 1'b1;
 				else if ((DataBaseAddr <= addr_i[11:0]) && (DataEndAddr >= addr_i[11:0])) begin
 					data_valid_o = 1'b1;
-					begin : sv2v_autoblock_104
+					begin : sv2v_autoblock_103
 						reg signed [31:0] i;
 						for (i = 0; i < (BusWidth / 8); i = i + 1)
 							if (be_i[i])
@@ -12766,7 +12839,7 @@ module fifo_async (
 		reg unused_decsub_msb;
 		begin
 			dec_tmp[PTR_WIDTH - 2] = grayval[PTR_WIDTH - 2];
-			begin : sv2v_autoblock_105
+			begin : sv2v_autoblock_104
 				reg signed [31:0] i;
 				for (i = PTR_WIDTH - 3; i >= 0; i = i - 1)
 					dec_tmp[i] = dec_tmp[i + 1] ^ grayval[i];
@@ -12909,7 +12982,7 @@ module fifo_sync (
 					fifo_wptr <= {PTR_WIDTH {1'b0}};
 				else if (clr_i)
 					fifo_wptr <= {PTR_WIDTH {1'b0}};
-				else if (fifo_incr_wptr) begin : sv2v_autoblock_106
+				else if (fifo_incr_wptr) begin : sv2v_autoblock_105
 					reg [((PTR_WIDTH - 2) >= 0 ? PTR_WIDTH - 1 : 3 - PTR_WIDTH) - 1:0] sv2v_tmp_cast;
 					sv2v_tmp_cast = Depth - 1;
 					if (fifo_wptr[PTR_WIDTH - 2:0] == sv2v_tmp_cast)
@@ -12922,7 +12995,7 @@ module fifo_sync (
 					fifo_rptr <= {PTR_WIDTH {1'b0}};
 				else if (clr_i)
 					fifo_rptr <= {PTR_WIDTH {1'b0}};
-				else if (fifo_incr_rptr) begin : sv2v_autoblock_107
+				else if (fifo_incr_rptr) begin : sv2v_autoblock_106
 					reg [((PTR_WIDTH - 2) >= 0 ? PTR_WIDTH - 1 : 3 - PTR_WIDTH) - 1:0] sv2v_tmp_cast_1;
 					sv2v_tmp_cast_1 = Depth - 1;
 					if (fifo_rptr[PTR_WIDTH - 2:0] == sv2v_tmp_cast_1)
@@ -13017,7 +13090,7 @@ module fpnew_cast_multi_8A35C_87530 (
 		reg [31:0] res;
 		begin
 			res = 0;
-			begin : sv2v_autoblock_108
+			begin : sv2v_autoblock_107
 				reg [31:0] i;
 				for (i = 0; i < fpnew_pkg_NUM_FP_FORMATS; i = i + 1)
 					if (cfg[i])
@@ -13049,7 +13122,7 @@ module fpnew_cast_multi_8A35C_87530 (
 		reg [31:0] res;
 		begin
 			res = 0;
-			begin : sv2v_autoblock_109
+			begin : sv2v_autoblock_108
 				reg signed [31:0] ifmt;
 				for (ifmt = 0; ifmt < fpnew_pkg_NUM_INT_FORMATS; ifmt = ifmt + 1)
 					if (cfg[ifmt])
@@ -13093,8 +13166,7 @@ module fpnew_cast_multi_8A35C_87530 (
 		if (!rst_ni)
 			__q <= __reset_value;
 		else
-			__q <= (__load ? __d : __q);
-	*/
+			__q <= (__load ? __d : __q);*/
 	localparam [31:0] NUM_INT_FORMATS = fpnew_pkg_NUM_INT_FORMATS;
 	localparam [31:0] MAX_INT_WIDTH = fpnew_pkg_max_int_width(IntFmtConfig);
 	function automatic [31:0] fpnew_pkg_exp_bits;
@@ -13110,7 +13182,7 @@ module fpnew_cast_multi_8A35C_87530 (
 		reg [63:0] res;
 		begin
 			res = {64 {1'sb0}};
-			begin : sv2v_autoblock_110
+			begin : sv2v_autoblock_109
 				reg [31:0] fmt;
 				for (fmt = 0; fmt < fpnew_pkg_NUM_FP_FORMATS; fmt = fmt + 1)
 					if (cfg[fmt]) begin
@@ -13758,7 +13830,7 @@ module fpnew_divsqrt_multi_28154_735ED (
 		reg [31:0] res;
 		begin
 			res = 0;
-			begin : sv2v_autoblock_111
+			begin : sv2v_autoblock_110
 				reg [31:0] i;
 				for (i = 0; i < fpnew_pkg_NUM_FP_FORMATS; i = i + 1)
 					if (cfg[i])
@@ -13924,8 +13996,7 @@ module fpnew_divsqrt_multi_28154_735ED (
 		if (!rst_ni)
 			__q <= __reset_value;
 		else
-			__q <= __d;
-	*/
+			__q <= __d;*/
 	wire result_is_fp8_q;
 	wire result_tag_q;
 	wire [AuxType_AUX_BITS - 1:0] result_aux_q;
@@ -14034,7 +14105,7 @@ module fpnew_fma_multi_E4D0A_BE123 (
 		reg [31:0] res;
 		begin
 			res = 0;
-			begin : sv2v_autoblock_112
+			begin : sv2v_autoblock_111
 				reg [31:0] i;
 				for (i = 0; i < fpnew_pkg_NUM_FP_FORMATS; i = i + 1)
 					if (cfg[i])
@@ -14081,7 +14152,7 @@ module fpnew_fma_multi_E4D0A_BE123 (
 		reg [63:0] res;
 		begin
 			res = {64 {1'sb0}};
-			begin : sv2v_autoblock_113
+			begin : sv2v_autoblock_112
 				reg [31:0] fmt;
 				for (fmt = 0; fmt < fpnew_pkg_NUM_FP_FORMATS; fmt = fmt + 1)
 					if (cfg[fmt]) begin
@@ -15492,7 +15563,7 @@ module fpnew_opgroup_block_BE2AB (
 		reg [0:1] _sv2v_jump;
 		begin
 			_sv2v_jump = 2'b00;
-			begin : sv2v_autoblock_114
+			begin : sv2v_autoblock_113
 				reg [31:0] i;
 				for (i = 0; i < fpnew_pkg_NUM_FP_FORMATS; i = i + 1)
 					if (_sv2v_jump < 2'b10) begin
@@ -15521,7 +15592,7 @@ module fpnew_opgroup_block_BE2AB (
 		reg [0:1] _sv2v_jump;
 		begin
 			_sv2v_jump = 2'b00;
-			begin : sv2v_autoblock_115
+			begin : sv2v_autoblock_114
 				reg [31:0] i;
 				for (i = 0; i < fpnew_pkg_NUM_FP_FORMATS; i = i + 1)
 					if (_sv2v_jump < 2'b10) begin
@@ -15547,7 +15618,7 @@ module fpnew_opgroup_block_BE2AB (
 		reg [0:1] _sv2v_jump;
 		begin
 			_sv2v_jump = 2'b00;
-			begin : sv2v_autoblock_116
+			begin : sv2v_autoblock_115
 				reg [31:0] i;
 				for (i = 0; i < fpnew_pkg_NUM_FP_FORMATS; i = i + 1)
 					if (_sv2v_jump < 2'b10) begin
@@ -15653,7 +15724,7 @@ module fpnew_opgroup_block_BE2AB (
 		reg [31:0] res;
 		begin
 			res = 0;
-			begin : sv2v_autoblock_117
+			begin : sv2v_autoblock_116
 				reg [31:0] i;
 				for (i = 0; i < fpnew_pkg_NUM_FP_FORMATS; i = i + 1)
 					if (cfg[i] && (types[(4 - i) * 2+:2] == fpnew_pkg_MERGED))
@@ -15858,7 +15929,7 @@ module fpnew_opgroup_fmt_slice_30528 (
 					sv2v_cast_32_signed = inp;
 				endfunction
 				always @(*) begin : prepare_input
-					begin : sv2v_autoblock_118
+					begin : sv2v_autoblock_117
 						reg signed [31:0] i;
 						for (i = 0; i < sv2v_cast_32_signed(NUM_OPERANDS); i = i + 1)
 							local_operands[i * FP_WIDTH+:FP_WIDTH] = operands_i[(i * Width) + (((($unsigned(lane) + 1) * FP_WIDTH) - 1) >= ($unsigned(lane) * FP_WIDTH) ? (($unsigned(lane) + 1) * FP_WIDTH) - 1 : (((($unsigned(lane) + 1) * FP_WIDTH) - 1) + (((($unsigned(lane) + 1) * FP_WIDTH) - 1) >= ($unsigned(lane) * FP_WIDTH) ? (((($unsigned(lane) + 1) * FP_WIDTH) - 1) - ($unsigned(lane) * FP_WIDTH)) + 1 : (($unsigned(lane) * FP_WIDTH) - ((($unsigned(lane) + 1) * FP_WIDTH) - 1)) + 1)) - 1)-:(((($unsigned(lane) + 1) * FP_WIDTH) - 1) >= ($unsigned(lane) * FP_WIDTH) ? (((($unsigned(lane) + 1) * FP_WIDTH) - 1) - ($unsigned(lane) * FP_WIDTH)) + 1 : (($unsigned(lane) * FP_WIDTH) - ((($unsigned(lane) + 1) * FP_WIDTH) - 1)) + 1)];
@@ -15963,7 +16034,7 @@ module fpnew_opgroup_fmt_slice_30528 (
 	always @(*) begin : output_processing
 		reg [4:0] temp_status;
 		temp_status = {5 {1'sb0}};
-		begin : sv2v_autoblock_119
+		begin : sv2v_autoblock_118
 			reg signed [31:0] i;
 			for (i = 0; i < sv2v_cast_32_signed(NUM_LANES); i = i + 1)
 				temp_status = temp_status | lane_status[i * 5+:5];
@@ -16065,7 +16136,7 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 		reg [31:0] res;
 		begin
 			res = 0;
-			begin : sv2v_autoblock_120
+			begin : sv2v_autoblock_119
 				reg [31:0] i;
 				for (i = 0; i < fpnew_pkg_NUM_FP_FORMATS; i = i + 1)
 					if (cfg[i])
@@ -16097,7 +16168,7 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 		reg [31:0] res;
 		begin
 			res = 0;
-			begin : sv2v_autoblock_121
+			begin : sv2v_autoblock_120
 				reg signed [31:0] ifmt;
 				for (ifmt = 0; ifmt < fpnew_pkg_NUM_INT_FORMATS; ifmt = ifmt + 1)
 					if (cfg[ifmt])
@@ -16117,7 +16188,7 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 		reg [31:0] res;
 		begin
 			res = fpnew_pkg_max_fp_width(cfg);
-			begin : sv2v_autoblock_122
+			begin : sv2v_autoblock_121
 				reg [31:0] i;
 				for (i = 0; i < fpnew_pkg_NUM_FP_FORMATS; i = i + 1)
 					if (cfg[i])
@@ -16184,7 +16255,7 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 	reg [4:0] is_boxed_1op;
 	reg [9:0] is_boxed_2op;
 	always @(*) begin : boxed_2op
-		begin : sv2v_autoblock_123
+		begin : sv2v_autoblock_122
 			reg signed [31:0] fmt;
 			for (fmt = 0; fmt < NUM_FORMATS; fmt = fmt + 1)
 				begin
@@ -16216,10 +16287,10 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 		begin
 			res = {4 {1'sb0}};
 			lanefmts = fpnew_pkg_get_conv_lane_formats(width, cfg, lane_no);
-			begin : sv2v_autoblock_124
+			begin : sv2v_autoblock_123
 				reg [31:0] ifmt;
 				for (ifmt = 0; ifmt < fpnew_pkg_NUM_INT_FORMATS; ifmt = ifmt + 1)
-					begin : sv2v_autoblock_125
+					begin : sv2v_autoblock_124
 						reg [31:0] fmt;
 						for (fmt = 0; fmt < fpnew_pkg_NUM_FP_FORMATS; fmt = fmt + 1)
 							res[ifmt] = res[ifmt] | ((icfg[ifmt] && lanefmts[fmt]) && (fpnew_pkg_fp_width(sv2v_cast_38622(fmt)) == fpnew_pkg_int_width(sv2v_cast_E880F(ifmt))));
@@ -16250,10 +16321,10 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 		begin
 			res = {4 {1'sb0}};
 			lanefmts = fpnew_pkg_get_lane_formats(width, cfg, lane_no);
-			begin : sv2v_autoblock_126
+			begin : sv2v_autoblock_125
 				reg [31:0] ifmt;
 				for (ifmt = 0; ifmt < fpnew_pkg_NUM_INT_FORMATS; ifmt = ifmt + 1)
-					begin : sv2v_autoblock_127
+					begin : sv2v_autoblock_126
 						reg [31:0] fmt;
 						for (fmt = 0; fmt < fpnew_pkg_NUM_FP_FORMATS; fmt = fmt + 1)
 							if (fpnew_pkg_fp_width(sv2v_cast_38622(fmt)) == fpnew_pkg_int_width(sv2v_cast_E880F(ifmt)))
@@ -16299,7 +16370,7 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 					sv2v_cast_5 = inp;
 				endfunction
 				always @(*) begin : prepare_input
-					begin : sv2v_autoblock_128
+					begin : sv2v_autoblock_127
 						reg [31:0] i;
 						for (i = 0; i < NUM_OPERANDS; i = i + 1)
 							local_operands[i * sv2v_cast_32((OpGroup == fpnew_pkg_CONV ? sv2v_cast_32(fpnew_pkg_max_fp_width(sv2v_cast_5(fpnew_pkg_get_conv_lane_formats(Width, FpFmtConfig, sv2v_cast_32($unsigned(lane)))))) : sv2v_cast_32(fpnew_pkg_max_fp_width(sv2v_cast_5(fpnew_pkg_get_lane_formats(Width, FpFmtConfig, sv2v_cast_32($unsigned(lane))))))))+:sv2v_cast_32((OpGroup == fpnew_pkg_CONV ? sv2v_cast_32(fpnew_pkg_max_fp_width(sv2v_cast_5(fpnew_pkg_get_conv_lane_formats(Width, FpFmtConfig, sv2v_cast_32($unsigned(lane)))))) : sv2v_cast_32(fpnew_pkg_max_fp_width(sv2v_cast_5(fpnew_pkg_get_lane_formats(Width, FpFmtConfig, sv2v_cast_32($unsigned(lane))))))))] = operands_i[i * Width+:Width] >> (LANE * fpnew_pkg_fp_width(src_fmt_i));
@@ -16534,7 +16605,7 @@ module fpnew_opgroup_multifmt_slice_7C482 (
 	always @(*) begin : output_processing
 		reg [4:0] temp_status;
 		temp_status = {5 {1'sb0}};
-		begin : sv2v_autoblock_129
+		begin : sv2v_autoblock_128
 			reg signed [31:0] i;
 			for (i = 0; i < sv2v_cast_32_signed(NUM_LANES); i = i + 1)
 				temp_status = temp_status | lane_status[i * 5+:5];
@@ -16753,7 +16824,7 @@ module fpnew_top_F1920 (
 				sv2v_cast_32 = inp;
 			endfunction
 			always @(*) begin : slice_inputs
-				begin : sv2v_autoblock_130
+				begin : sv2v_autoblock_129
 					reg [31:0] fmt;
 					for (fmt = 0; fmt < NUM_FORMATS; fmt = fmt + 1)
 						input_boxed[fmt * sv2v_cast_32(fpnew_pkg_num_operands(sv2v_cast_2(opgrp)))+:sv2v_cast_32(fpnew_pkg_num_operands(sv2v_cast_2(opgrp)))] = is_boxed[(fmt * 3) + (NUM_OPS - 1)-:NUM_OPS];
@@ -17688,7 +17759,7 @@ module lzc (
 			wire [((2 ** NumLevels) * NumLevels) - 1:0] index_nodes;
 			reg [WIDTH - 1:0] in_tmp;
 			always @(*) begin : flip_vector
-				begin : sv2v_autoblock_131
+				begin : sv2v_autoblock_130
 					reg [31:0] i;
 					for (i = 0; i < WIDTH; i = i + 1)
 						in_tmp[i] = (MODE ? in_i[(WIDTH - 1) - i] : in_i[i]);
@@ -18529,7 +18600,7 @@ module prim_arbiter_ppc (
 			assign arb_req = (|masked_req ? masked_req : req_i);
 			always @(*) begin
 				ppc_out[0] = arb_req[0];
-				begin : sv2v_autoblock_132
+				begin : sv2v_autoblock_131
 					reg signed [31:0] i;
 					for (i = 1; i < N; i = i + 1)
 						ppc_out[i] = ppc_out[i - 1] | arb_req[i];
@@ -18549,7 +18620,7 @@ module prim_arbiter_ppc (
 			if (EnDataPort == 1) begin : gen_datapath
 				always @(*) begin
 					data_o = {DW {1'sb0}};
-					begin : sv2v_autoblock_133
+					begin : sv2v_autoblock_132
 						reg signed [31:0] i;
 						for (i = 0; i < N; i = i + 1)
 							if (winner[i])
@@ -18564,7 +18635,7 @@ module prim_arbiter_ppc (
 			end
 			always @(*) begin
 				idx_o = {IdxW {1'sb0}};
-				begin : sv2v_autoblock_134
+				begin : sv2v_autoblock_133
 					reg [31:0] i;
 					for (i = 0; i < N; i = i + 1)
 						if (winner[i])
@@ -18584,31 +18655,17 @@ module prim_clock_gating (
 	input wire en_i;
 	input wire test_en_i;
 	output wire clk_o;
-	/*sky130_fd_sc_hd__dlclkp_1 CG(
-		.CLK(clk_i),
-		.GCLK(clk_o),
-		.GATE(en_i | test_en_i)
-	);*/
-	prim_generic_clock_gating CG (
-	.clk_i(clk_i),
-	.en_i(en_i),
-	.test_en_i(test_en_i),
-	.clk_o(clk_o)
-	);
-
-endmodule
-module prim_generic_clock_gating (
-  input        clk_i,
-  input        en_i,
-  input        test_en_i,
-  output wire  clk_o
-);
-  reg en_latch;
-    always @ (*) begin
-        if (!clk_i) begin
+	//sky130_fd_sc_hd__dlclkp_1 CG(
+	//	.CLK(clk_i),
+	//	.GCLK(clk_o),
+	//	.GATE(en_i | test_en_i)
+	//);
+	reg en_latch;
+        always @ (*) begin
+          if (!clk_i) begin
             en_latch = en_i | test_en_i;
+          end
         end
-    end
   assign clk_o = en_latch & clk_i;
 endmodule
 module prim_filter_ctr (
@@ -19008,16 +19065,16 @@ module pwm (
 	oe_pwm1,
 	oe_pwm2
 );
-	input clk_i;
-	input rst_ni;
-	input re_i;
-	input we_i;
-	input [7:0] addr_i;
-	input [31:0] wdata_i;
-	input [3:0] be_i;
-	output [31:0] rdata_o;
-	output o_pwm;
-	output o_pwm_2;
+	input wire clk_i;
+	input wire rst_ni;
+	input wire re_i;
+	input wire we_i;
+	input wire [7:0] addr_i;
+	input wire [31:0] wdata_i;
+	input wire [3:0] be_i;
+	output wire [31:0] rdata_o;
+	output wire o_pwm;
+	output wire o_pwm_2;
 	output reg oe_pwm1;
 	output reg oe_pwm2;
 	parameter adr_ctrl_1 = 0;
@@ -19040,20 +19097,20 @@ module pwm (
 	assign write = we_i & ~re_i;
 	always @(posedge clk_i)
 		if (~rst_ni) begin
-			ctrl[4:2] <= 0;
-			ctrl[0] <= 0;
+			ctrl[4:2] <= 3'b000;
+			ctrl[0] <= 1'b0;
 			ctrl[1] <= 1'b0;
-			ctrl[7:6] <= 0;
-			DC_1 <= 0;
-			period <= 0;
-			divisor <= 0;
-			ctrl_2[4:2] <= 0;
+			ctrl[7:5] <= 3'b000;
+			DC_1 <= 16'b0000000000000000;
+			period <= 16'b0000000000000000;
+			divisor <= 16'b0000000000000000;
+			ctrl_2[4:2] <= 3'b000;
 			ctrl_2[0] <= 1'b0;
-			ctrl_2[7:6] <= 0;
+			ctrl_2[7:5] <= 3'b000;
 			ctrl_2[1] <= 1'b0;
-			DC_2 <= 0;
-			period_2 <= 0;
-			divisor_2 <= 0;
+			DC_2 <= 16'b0000000000000000;
+			period_2 <= 16'b0000000000000000;
+			divisor_2 <= 16'b0000000000000000;
 		end
 		else if (write)
 			case (addr_i)
@@ -19061,13 +19118,13 @@ module pwm (
 					ctrl[0] <= wdata_i[0];
 					ctrl[1] <= 1'b1;
 					ctrl[4:2] <= wdata_i[4:2];
-					ctrl[7:6] <= wdata_i[7:6];
+					ctrl[7:5] <= wdata_i[7:5];
 				end
 				adr_ctrl_2: begin
 					ctrl_2[0] <= wdata_i[0];
 					ctrl_2[1] <= 1'b1;
 					ctrl_2[4:2] <= wdata_i[4:2];
-					ctrl_2[7:6] <= wdata_i[7:6];
+					ctrl_2[7:5] <= wdata_i[7:5];
 				end
 				adr_divisor_1: divisor <= wdata_i[15:0];
 				adr_period_1: period <= wdata_i[15:0];
@@ -19092,37 +19149,37 @@ module pwm (
 		if (~rst_ni) begin
 			clock_p1 <= 1'b0;
 			clock_p2 <= 1'b0;
-			counter_p1 <= 0;
-			counter_p2 <= 0;
+			counter_p1 <= 16'b0000000000000000;
+			counter_p2 <= 16'b0000000000000000;
 		end
 		else begin
 			if (pwm_1) begin
-				counter_p1 <= counter_p1 + 1;
+				counter_p1 <= counter_p1 + 16'b0000000000000001;
 				if (counter_p1 == (divisor - 1)) begin
-					counter_p1 <= 0;
+					counter_p1 <= 16'b0000000000000000;
 					clock_p1 <= ~clock_p1;
 				end
 			end
 			if (pwm_2) begin
-				counter_p2 <= counter_p2 + 1;
+				counter_p2 <= counter_p2 + 16'b0000000000000001;
 				if (counter_p2 == (divisor_2 - 1)) begin
-					counter_p2 <= 0;
+					counter_p2 <= 16'b0000000000000000;
 					clock_p2 <= ~clock_p2;
 				end
 			end
 		end
 	always @(posedge clock_p1)
 		if (~rst_ni) begin
-			pts <= 0;
-			period_counter1 <= 0;
+			pts <= 1'b0;
+			period_counter1 <= 16'b0000000000000000;
 		end
 		else if (ctrl[2]) begin
 			if (pwm_1) begin
 				oe_pwm1 <= 1'b1;
 				if (period_counter1 >= period)
-					period_counter1 <= 0;
+					period_counter1 <= 16'b0000000000000000;
 				else
-					period_counter1 <= period_counter1 + 1;
+					period_counter1 <= period_counter1 + 16'b0000000000000001;
 				if (period_counter1 < DC_1)
 					pts <= 1'b1;
 				else
@@ -19131,21 +19188,21 @@ module pwm (
 		end
 		else begin
 			pts <= 1'b0;
-			period_counter1 <= 0;
-			oe_pwm1 <= 0;
+			period_counter1 <= 16'b0000000000000000;
+			oe_pwm1 <= 1'b0;
 		end
 	always @(posedge clock_p2)
 		if (~rst_ni) begin
-			pts_2 <= 0;
-			period_counter2 <= 0;
+			pts_2 <= 1'b0;
+			period_counter2 <= 16'b0000000000000000;
 		end
 		else if (ctrl_2[2]) begin
 			if (pwm_2) begin
 				oe_pwm2 <= 1'b1;
 				if (period_counter2 >= period_2)
-					period_counter2 <= 0;
+					period_counter2 <= 16'b0000000000000000;
 				else
-					period_counter2 <= period_counter2 + 1;
+					period_counter2 <= period_counter2 + 16'b0000000000000001;
 				if (period_counter2 < DC_2)
 					pts_2 <= 1'b1;
 				else
@@ -19154,12 +19211,12 @@ module pwm (
 		end
 		else begin
 			pts_2 <= 1'b0;
-			period_counter2 <= 0;
+			period_counter2 <= 16'b0000000000000000;
 			oe_pwm2 <= 1'b0;
 		end
-	assign o_pwm = (ctrl[4] ? pts : 0);
-	assign o_pwm_2 = (ctrl_2[4] ? pts_2 : 0);
-	assign rdata_o = (addr_i == adr_ctrl_1 ? {8'h00, ctrl} : (addr_i == adr_divisor_1 ? divisor : (addr_i == adr_period_1 ? period : (addr_i == adr_DC_1 ? DC_1 : (addr_i == adr_DC_2 ? DC_2 : (addr_i == adr_period_2 ? period_2 : (addr_i == adr_divisor_2 ? divisor_2 : (addr_i == adr_ctrl_2 ? {8'h00, ctrl_2} : 0))))))));
+	assign o_pwm = (ctrl[4] ? pts : 1'b0);
+	assign o_pwm_2 = (ctrl_2[4] ? pts_2 : 1'b0);
+	assign rdata_o = (addr_i == adr_ctrl_1 ? {8'h00, ctrl} : (addr_i == adr_divisor_1 ? divisor : (addr_i == adr_period_1 ? period : (addr_i == adr_DC_1 ? DC_1 : (addr_i == adr_DC_2 ? DC_2 : (addr_i == adr_period_2 ? period_2 : (addr_i == adr_divisor_2 ? divisor_2 : (addr_i == adr_ctrl_2 ? {8'h00, ctrl_2} : 32'b00000000000000000000000000000000))))))));
 endmodule
 module rr_arb_tree_252F1_F315E (
 	clk_i,
@@ -19233,8 +19290,6 @@ module rr_arb_tree_252F1_F315E (
 						else
 							lock_q <= lock_d;
 					end
-					wire [NumIn - 1:0] req_tmp;
-					assign req_tmp = req_q & req_i;
 					always @(posedge clk_i or negedge rst_ni) begin : p_req_regs
 						if (!rst_ni)
 							req_q <= {NumIn {1'sb0}};
@@ -19350,9 +19405,6 @@ module rr_arb_tree_252F1_F315E (
 					end
 				end
 			end
-			initial begin : p_assert
-				
-			end
 		end
 	endgenerate
 endmodule
@@ -19428,8 +19480,6 @@ module rr_arb_tree_CBEBF_6E668 (
 						else
 							lock_q <= lock_d;
 					end
-					wire [NumIn - 1:0] req_tmp;
-					assign req_tmp = req_q & req_i;
 					always @(posedge clk_i or negedge rst_ni) begin : p_req_regs
 						if (!rst_ni)
 							req_q <= {NumIn {1'sb0}};
@@ -19545,9 +19595,6 @@ module rr_arb_tree_CBEBF_6E668 (
 					end
 				end
 			end
-			initial begin : p_assert
-				
-			end
 		end
 	endgenerate
 endmodule
@@ -19563,31 +19610,18 @@ module rstmgr (
 	input wire prog_rst_ni;
 	input wire ndmreset;
 	output wire sys_rst_ni;
-	reg rst_d;
 	reg rst_q;
-	wire rst_fd;
-	reg rst_fq;
-	always @(*)
+	always @(posedge clk_i) begin
 		if (!rst_ni)
-			rst_d = 1'b0;
+			rst_q = 1'b0;
 		else if (!prog_rst_ni)
-			rst_d = 1'b0;
+			rst_q = 1'b0;
 		else if (ndmreset)
-			rst_d = 1'b0;
+			rst_q = 1'b0;
 		else
-			rst_d = prog_rst_ni;
-	always @(posedge clk_i)
-		if (~rst_ni)
-			rst_q <= 1'b0;
-		else
-			rst_q <= rst_d;
-	assign rst_fd = rst_q;
-	always @(posedge clk_i)
-		if (~rst_ni)
-			rst_fq <= 1'b0;
-		else
-			rst_fq <= rst_fd;
-	assign sys_rst_ni = rst_fq;
+			rst_q = 1'b1;
+	end
+	assign sys_rst_ni = rst_q;
 endmodule
 module rv_dm (
 	clk_i,
@@ -19889,7 +19923,7 @@ module rv_plic_gateway (
 			src_q <= {N_SOURCE {1'sb0}};
 		else
 			src_q <= src_i;
-	always @(*) begin : sv2v_autoblock_135
+	always @(*) begin : sv2v_autoblock_134
 		reg signed [31:0] i;
 		for (i = 0; i < N_SOURCE; i = i + 1)
 			set[i] = (le_i[i] ? src_i[i] & ~src_q[i] : src_i[i]);
@@ -23164,7 +23198,7 @@ module rv_plic (
 	assign cc_id = irq_id_o;
 	always @(*) begin
 		claim = {36 {1'sb0}};
-		begin : sv2v_autoblock_136
+		begin : sv2v_autoblock_135
 			reg signed [31:0] i;
 			for (i = 0; i < rv_plic_reg_pkg_NumTarget; i = i + 1)
 				if (claim_re[i])
@@ -23173,7 +23207,7 @@ module rv_plic (
 	end
 	always @(*) begin
 		complete = {36 {1'sb0}};
-		begin : sv2v_autoblock_137
+		begin : sv2v_autoblock_136
 			reg signed [31:0] i;
 			for (i = 0; i < rv_plic_reg_pkg_NumTarget; i = i + 1)
 				if (complete_we[i])
@@ -23781,9 +23815,9 @@ module sky130_sram_4kbyte_1rw1r_32x1024_8 (
 	parameter DATA_WIDTH = 32;
 	parameter ADDR_WIDTH = 10;
 	parameter RAM_DEPTH = 1 << ADDR_WIDTH;
-	parameter DELAY = 3;
+	parameter DELAY = 0;
 	parameter VERBOSE = 1;
-	parameter T_HOLD = 1;
+	parameter T_HOLD = 0;
 	input clk0;
 	input csb0;
 	input web0;
@@ -23856,12 +23890,12 @@ module spi_clgen (
 	pos_edge,
 	neg_edge
 );
-	input clk_i;
-	input rst_ni;
-	input enable;
-	input go;
-	input last_clk;
-	input [15:0] divider;
+	input wire clk_i;
+	input wire rst_ni;
+	input wire enable;
+	input wire go;
+	input wire last_clk;
+	input wire [15:0] divider;
 	output reg clk_out;
 	output reg pos_edge;
 	output reg neg_edge;
@@ -24079,25 +24113,25 @@ module spi_shift (
 	s_out,
 	rx_en
 );
-	input clk_i;
-	input rst_ni;
-	input latch;
-	input [3:0] byte_sel;
-	input [4:0] len;
-	input lsb;
-	input go;
-	input pos_edge;
-	input neg_edge;
-	input rx_negedge;
-	input tx_negedge;
+	input wire clk_i;
+	input wire rst_ni;
+	input wire latch;
+	input wire [3:0] byte_sel;
+	input wire [4:0] len;
+	input wire lsb;
+	input wire go;
+	input wire pos_edge;
+	input wire neg_edge;
+	input wire rx_negedge;
+	input wire tx_negedge;
 	output reg tip;
-	output last;
-	input [31:0] p_in;
-	output [31:0] p_out;
-	input s_clk;
-	input s_in;
+	output wire last;
+	input wire [31:0] p_in;
+	output wire [31:0] p_out;
+	input wire s_clk;
+	input wire s_in;
 	output reg s_out;
-	input rx_en;
+	input wire rx_en;
 	reg [5:0] cnt;
 	reg [31:0] data;
 	reg [31:0] data_rx;
@@ -24771,7 +24805,7 @@ module tlul_socket_1n (
 	endfunction
 	always @(*) begin
 		hfifo_reqready = tl_u_i[N][0];
-		begin : sv2v_autoblock_138
+		begin : sv2v_autoblock_137
 			reg signed [31:0] idx;
 			for (idx = 0; idx < N; idx = idx + 1)
 				if (dev_select_t == sv2v_cast_BB804_signed(idx))
@@ -24783,7 +24817,7 @@ module tlul_socket_1n (
 	assign tl_t_i[0] = tl_t_o[85] & hfifo_reqready;
 	always @(*) begin
 		tl_t_p = tl_u_i[N];
-		begin : sv2v_autoblock_139
+		begin : sv2v_autoblock_138
 			reg signed [31:0] idx;
 			for (idx = 0; idx < N; idx = idx + 1)
 				if (dev_select_outstanding == sv2v_cast_BB804_signed(idx))
@@ -25206,7 +25240,7 @@ module tlul_sram_adapter (
 	always @(*) begin
 		wmask_int = {WidthMult * tlul_pkg_TL_DW {1'sb0}};
 		wdata_int = {WidthMult * tlul_pkg_TL_DW {1'sb0}};
-		if (tl_i[85]) begin : sv2v_autoblock_140
+		if (tl_i[85]) begin : sv2v_autoblock_139
 			reg signed [31:0] i;
 			for (i = 0; i < 4; i = i + 1)
 				begin
@@ -25257,7 +25291,7 @@ module tlul_sram_adapter (
 	wire [31:0] rdata_tlword;
 	always @(*) begin
 		rmask = {WidthMult * tlul_pkg_TL_DW {1'sb0}};
-		begin : sv2v_autoblock_141
+		begin : sv2v_autoblock_140
 			reg signed [31:0] i;
 			for (i = 0; i < 4; i = i + 1)
 				rmask[(sramreqfifo_rdata[WoffsetWidth - 1-:WoffsetWidth] * 32) + (8 * i)+:8] = {8 {sramreqfifo_rdata[(tlul_pkg_TL_DBW + (WoffsetWidth - 1)) - (3 - i)]}};
@@ -25708,16 +25742,16 @@ module uart_core (
 	rx_i,
 	intr_tx
 );
-	input clk_i;
-	input rst_ni;
-	input ren;
-	input we;
-	input [31:0] wdata;
-	output [31:0] rdata;
-	input [3:0] addr;
-	output tx_o;
-	input rx_i;
-	output intr_tx;
+	input wire clk_i;
+	input wire rst_ni;
+	input wire ren;
+	input wire we;
+	input wire [31:0] wdata;
+	output wire [31:0] rdata;
+	input wire [3:0] addr;
+	output wire tx_o;
+	input wire rx_i;
+	output wire intr_tx;
 	localparam ADDR_CTRL = 0;
 	localparam ADDR_TX = 4;
 	localparam ADDR_RX = 8;
@@ -25756,11 +25790,11 @@ module uart_core (
 	uart_rx u_rx(
 		.clk_i(clk_i),
 		.rst_ni(rst_ni),
-		.i_RX_Serial(rx_i),
-		.o_RX_DV(rx_status),
+		.i_Rx_Serial(rx_i),
+		.o_Rx_DV(rx_status),
 		.rx_en(control[1]),
 		.CLKS_PER_BIT(control[18:3]),
-		.o_RX_Byte(rx)
+		.o_Rx_Byte(rx)
 	);
 	assign rdata = (addr == 0 ? control : (addr == 8 ? rx : 0));
 endmodule
@@ -25772,12 +25806,12 @@ module uart_rx_prog (
 	o_Rx_DV,
 	o_Rx_Byte
 );
-	input clk_i;
-	input rst_ni;
-	input i_Rx_Serial;
-	input [15:0] CLKS_PER_BIT;
-	output o_Rx_DV;
-	output [7:0] o_Rx_Byte;
+	input wire clk_i;
+	input wire rst_ni;
+	input wire i_Rx_Serial;
+	input wire [15:0] CLKS_PER_BIT;
+	output wire o_Rx_DV;
+	output wire [7:0] o_Rx_Byte;
 	parameter s_IDLE = 3'b000;
 	parameter s_RX_START_BIT = 3'b001;
 	parameter s_RX_DATA_BITS = 3'b010;
@@ -25803,15 +25837,17 @@ module uart_rx_prog (
 		if (~rst_ni) begin
 			r_SM_Main <= s_IDLE;
 			r_Rx_DV <= 1'b0;
-			r_Clock_Count <= 0;
-			r_Bit_Index <= 0;
+			r_Clock_Count <= 16'b0000000000000000;
+			r_Bit_Index <= 3'b000;
+			r_Rx_Byte <= 8'b00000000;
 		end
 		else
 			case (r_SM_Main)
 				s_IDLE: begin
 					r_Rx_DV <= 1'b0;
-					r_Clock_Count <= 0;
-					r_Bit_Index <= 0;
+					r_Clock_Count <= 16'b0000000000000000;
+					r_Bit_Index <= 3'b000;
+					r_Rx_Byte <= 8'b00000000;
 					if (r_Rx_Data == 1'b0)
 						r_SM_Main <= s_RX_START_BIT;
 					else
@@ -25820,41 +25856,41 @@ module uart_rx_prog (
 				s_RX_START_BIT:
 					if (r_Clock_Count == ((CLKS_PER_BIT - 1) >> 1)) begin
 						if (r_Rx_Data == 1'b0) begin
-							r_Clock_Count <= 0;
+							r_Clock_Count <= 16'b0000000000000000;
 							r_SM_Main <= s_RX_DATA_BITS;
 						end
 						else
 							r_SM_Main <= s_IDLE;
 					end
 					else begin
-						r_Clock_Count <= r_Clock_Count + 1;
+						r_Clock_Count <= r_Clock_Count + 16'b0000000000000001;
 						r_SM_Main <= s_RX_START_BIT;
 					end
 				s_RX_DATA_BITS:
 					if (r_Clock_Count < (CLKS_PER_BIT - 1)) begin
-						r_Clock_Count <= r_Clock_Count + 1;
+						r_Clock_Count <= r_Clock_Count + 16'b0000000000000001;
 						r_SM_Main <= s_RX_DATA_BITS;
 					end
 					else begin
-						r_Clock_Count <= 0;
+						r_Clock_Count <= 16'b0000000000000000;
 						r_Rx_Byte[r_Bit_Index] <= r_Rx_Data;
 						if (r_Bit_Index < 7) begin
-							r_Bit_Index <= r_Bit_Index + 1;
+							r_Bit_Index <= r_Bit_Index + 3'b001;
 							r_SM_Main <= s_RX_DATA_BITS;
 						end
 						else begin
-							r_Bit_Index <= 0;
+							r_Bit_Index <= 3'b000;
 							r_SM_Main <= s_RX_STOP_BIT;
 						end
 					end
 				s_RX_STOP_BIT:
 					if (r_Clock_Count < (CLKS_PER_BIT - 1)) begin
-						r_Clock_Count <= r_Clock_Count + 1;
+						r_Clock_Count <= r_Clock_Count + 16'b0000000000000001;
 						r_SM_Main <= s_RX_STOP_BIT;
 					end
 					else begin
 						r_Rx_DV <= 1'b1;
-						r_Clock_Count <= 0;
+						r_Clock_Count <= 16'b0000000000000000;
 						r_SM_Main <= s_CLEANUP;
 					end
 				s_CLEANUP: begin
@@ -25869,103 +25905,110 @@ endmodule
 module uart_rx (
 	clk_i,
 	rst_ni,
-	i_RX_Serial,
-	o_RX_DV,
 	rx_en,
+	i_Rx_Serial,
 	CLKS_PER_BIT,
-	o_RX_Byte
+	o_Rx_DV,
+	o_Rx_Byte
 );
-	input clk_i;
-	input rst_ni;
-	input i_RX_Serial;
-	output o_RX_DV;
-	input rx_en;
-	input [15:0] CLKS_PER_BIT;
-	output [7:0] o_RX_Byte;
-	localparam IDLE = 3'b000;
-	localparam RX_START_BIT = 3'b001;
-	localparam RX_DATA_BITS = 3'b010;
-	localparam RX_STOP_BIT = 3'b011;
-	localparam CLEANUP = 3'b100;
+	input wire clk_i;
+	input wire rst_ni;
+	input wire rx_en;
+	input wire i_Rx_Serial;
+	input wire [15:0] CLKS_PER_BIT;
+	output wire o_Rx_DV;
+	output wire [7:0] o_Rx_Byte;
+	parameter s_IDLE = 3'b000;
+	parameter s_RX_START_BIT = 3'b001;
+	parameter s_RX_DATA_BITS = 3'b010;
+	parameter s_RX_STOP_BIT = 3'b011;
+	parameter s_CLEANUP = 3'b100;
+	reg r_Rx_Data_R;
+	reg r_Rx_Data;
 	reg [15:0] r_Clock_Count;
 	reg [2:0] r_Bit_Index;
-	reg [7:0] r_RX_Byte;
-	reg r_RX_DV;
+	reg [7:0] r_Rx_Byte;
+	reg r_Rx_DV;
 	reg [2:0] r_SM_Main;
 	always @(posedge clk_i)
 		if (~rst_ni) begin
-			r_Clock_Count <= 0;
-			r_Bit_Index <= 0;
-			r_RX_Byte <= 0;
-			r_RX_DV <= 0;
-			r_SM_Main <= 0;
+			r_Rx_Data_R <= 1'b1;
+			r_Rx_Data <= 1'b1;
 		end
-		else if (rx_en)
+		else begin
+			r_Rx_Data_R <= i_Rx_Serial;
+			r_Rx_Data <= r_Rx_Data_R;
+		end
+	always @(posedge clk_i or negedge rst_ni)
+		if (~rst_ni) begin
+			r_SM_Main <= s_IDLE;
+			r_Rx_DV <= 1'b0;
+			r_Clock_Count <= 16'b0000000000000000;
+			r_Bit_Index <= 3'b000;
+		end
+		else
 			case (r_SM_Main)
-				IDLE: begin
-					r_RX_DV <= 1'b0;
-					r_Clock_Count <= 0;
-					r_Bit_Index <= 0;
-					if (i_RX_Serial == 1'b0)
-						r_SM_Main <= RX_START_BIT;
+				s_IDLE: begin
+					r_Rx_DV <= 1'b0;
+					r_Clock_Count <= 16'b0000000000000000;
+					r_Bit_Index <= 3'b000;
+					if (r_Rx_Data == 1'b0) begin
+						if (rx_en == 1'b1)
+							r_SM_Main <= s_RX_START_BIT;
+						else
+							r_SM_Main <= s_IDLE;
+					end
 					else
-						r_SM_Main <= IDLE;
+						r_SM_Main <= s_IDLE;
 				end
-				RX_START_BIT:
-					if (r_Clock_Count == ((CLKS_PER_BIT - 1) / 2)) begin
-						if (i_RX_Serial == 1'b0) begin
-							r_Clock_Count <= 0;
-							r_SM_Main <= RX_DATA_BITS;
+				s_RX_START_BIT:
+					if (r_Clock_Count == ((CLKS_PER_BIT - 1) >> 1)) begin
+						if (r_Rx_Data == 1'b0) begin
+							r_Clock_Count <= 16'b0000000000000000;
+							r_SM_Main <= s_RX_DATA_BITS;
 						end
 						else
-							r_SM_Main <= IDLE;
+							r_SM_Main <= s_IDLE;
 					end
 					else begin
-						r_Clock_Count <= r_Clock_Count + 1;
-						r_SM_Main <= RX_START_BIT;
+						r_Clock_Count <= r_Clock_Count + 16'b0000000000000001;
+						r_SM_Main <= s_RX_START_BIT;
 					end
-				RX_DATA_BITS:
-					if (r_Clock_Count < (CLKS_PER_BIT - 1)) begin
-						r_Clock_Count <= r_Clock_Count + 1;
-						r_SM_Main <= RX_DATA_BITS;
+				s_RX_DATA_BITS:
+					if (r_Clock_Count < (CLKS_PER_BIT - 16'b0000000000000001)) begin
+						r_Clock_Count <= r_Clock_Count + 16'b0000000000000001;
+						r_SM_Main <= s_RX_DATA_BITS;
 					end
 					else begin
-						r_Clock_Count <= 0;
-						r_RX_Byte[r_Bit_Index] <= i_RX_Serial;
+						r_Clock_Count <= 16'b0000000000000000;
+						r_Rx_Byte[r_Bit_Index] <= r_Rx_Data;
 						if (r_Bit_Index < 7) begin
-							r_Bit_Index <= r_Bit_Index + 1;
-							r_SM_Main <= RX_DATA_BITS;
+							r_Bit_Index <= r_Bit_Index + 3'b001;
+							r_SM_Main <= s_RX_DATA_BITS;
 						end
 						else begin
-							r_Bit_Index <= 0;
-							r_SM_Main <= RX_STOP_BIT;
+							r_Bit_Index <= 3'b000;
+							r_SM_Main <= s_RX_STOP_BIT;
 						end
 					end
-				RX_STOP_BIT:
-					if (r_Clock_Count < (CLKS_PER_BIT - 1)) begin
-						r_Clock_Count <= r_Clock_Count + 1;
-						r_SM_Main <= RX_STOP_BIT;
+				s_RX_STOP_BIT:
+					if (r_Clock_Count < (CLKS_PER_BIT - 16'b0000000000000001)) begin
+						r_Clock_Count <= r_Clock_Count + 16'b0000000000000001;
+						r_SM_Main <= s_RX_STOP_BIT;
 					end
 					else begin
-						r_RX_DV <= 1'b1;
-						r_Clock_Count <= 0;
-						r_SM_Main <= CLEANUP;
+						r_Rx_DV <= 1'b1;
+						r_Clock_Count <= 16'b0000000000000000;
+						r_SM_Main <= s_CLEANUP;
 					end
-				CLEANUP: begin
-					r_SM_Main <= IDLE;
-					r_RX_DV <= 1'b0;
+				s_CLEANUP: begin
+					r_SM_Main <= s_IDLE;
+					r_Rx_DV <= 1'b0;
 				end
-				default: r_SM_Main <= IDLE;
+				default: r_SM_Main <= s_IDLE;
 			endcase
-		else begin
-			r_Clock_Count <= 0;
-			r_Bit_Index <= 0;
-			r_RX_Byte <= 0;
-			r_RX_DV <= 0;
-			r_SM_Main <= 0;
-		end
-	assign o_RX_DV = r_RX_DV;
-	assign o_RX_Byte = r_RX_Byte;
+	assign o_Rx_DV = r_Rx_DV;
+	assign o_Rx_Byte = r_Rx_Byte;
 endmodule
 module uart_top (
 	clk_i,
@@ -26033,13 +26076,13 @@ module uart_tx (
 	o_TX_Serial,
 	o_TX_Done
 );
-	input clk_i;
-	input rst_ni;
-	input tx_en;
-	input [7:0] i_TX_Byte;
-	input [15:0] CLKS_PER_BIT;
+	input wire clk_i;
+	input wire rst_ni;
+	input wire tx_en;
+	input wire [7:0] i_TX_Byte;
+	input wire [15:0] CLKS_PER_BIT;
 	output reg o_TX_Serial;
-	output o_TX_Done;
+	output wire o_TX_Done;
 	localparam IDLE = 3'b000;
 	localparam TX_START_BIT = 3'b001;
 	localparam TX_DATA_BITS = 3'b010;
@@ -26052,19 +26095,19 @@ module uart_tx (
 	reg r_TX_Done;
 	always @(posedge clk_i)
 		if (~rst_ni) begin
-			r_SM_Main <= 0;
-			r_Clock_Count <= 0;
-			r_Bit_Index <= 0;
-			r_TX_Data <= 0;
-			r_TX_Done <= 0;
+			r_SM_Main <= 3'b000;
+			r_Clock_Count <= 16'b0000000000000000;
+			r_Bit_Index <= 3'b000;
+			r_TX_Data <= 8'b00000000;
+			r_TX_Done <= 1'b0;
 		end
 		else
 			case (r_SM_Main)
 				IDLE: begin
 					o_TX_Serial <= 1'b1;
 					r_TX_Done <= 1'b0;
-					r_Clock_Count <= 0;
-					r_Bit_Index <= 0;
+					r_Clock_Count <= 16'b0000000000000000;
+					r_Bit_Index <= 3'b000;
 					if (tx_en == 1'b1) begin
 						r_TX_Data <= i_TX_Byte;
 						r_SM_Main <= TX_START_BIT;
@@ -26075,41 +26118,41 @@ module uart_tx (
 				TX_START_BIT: begin
 					o_TX_Serial <= 1'b0;
 					if (r_Clock_Count < (CLKS_PER_BIT - 1)) begin
-						r_Clock_Count <= r_Clock_Count + 1;
+						r_Clock_Count <= r_Clock_Count + 16'b0000000000000001;
 						r_SM_Main <= TX_START_BIT;
 					end
 					else begin
-						r_Clock_Count <= 0;
+						r_Clock_Count <= 16'b0000000000000000;
 						r_SM_Main <= TX_DATA_BITS;
 					end
 				end
 				TX_DATA_BITS: begin
 					o_TX_Serial <= r_TX_Data[r_Bit_Index];
-					if (r_Clock_Count < (CLKS_PER_BIT - 1)) begin
-						r_Clock_Count <= r_Clock_Count + 1;
+					if (r_Clock_Count < (CLKS_PER_BIT - 16'b0000000000000001)) begin
+						r_Clock_Count <= r_Clock_Count + 16'b0000000000000001;
 						r_SM_Main <= TX_DATA_BITS;
 					end
 					else begin
-						r_Clock_Count <= 0;
+						r_Clock_Count <= 3'b000;
 						if (r_Bit_Index < 7) begin
-							r_Bit_Index <= r_Bit_Index + 1;
+							r_Bit_Index <= r_Bit_Index + 3'b001;
 							r_SM_Main <= TX_DATA_BITS;
 						end
 						else begin
-							r_Bit_Index <= 0;
+							r_Bit_Index <= 3'b000;
 							r_SM_Main <= TX_STOP_BIT;
 						end
 					end
 				end
 				TX_STOP_BIT: begin
 					o_TX_Serial <= 1'b1;
-					if (r_Clock_Count < (CLKS_PER_BIT - 1)) begin
-						r_Clock_Count <= r_Clock_Count + 1;
+					if (r_Clock_Count < (CLKS_PER_BIT - 16'b0000000000000001)) begin
+						r_Clock_Count <= r_Clock_Count + 16'b0000000000000001;
 						r_SM_Main <= TX_STOP_BIT;
 					end
 					else begin
 						r_TX_Done <= 1'b1;
-						r_Clock_Count <= 0;
+						r_Clock_Count <= 16'b0000000000000000;
 						r_SM_Main <= CLEANUP;
 					end
 				end
