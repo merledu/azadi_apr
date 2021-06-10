@@ -1,17 +1,17 @@
 
 module uart_core (
-    input  clk_i,
-    input  rst_ni,
+    input  wire clk_i,
+    input  wire rst_ni,
     
-    input  ren,
-    input  we,
-    input  [31:0] wdata,
-    output [31:0] rdata,
-    input  [7:0]  addr,    
-    output tx_o,
-    input  rx_i,
+    input  wire ren,
+    input  wire we,
+    input  wire [31:0] wdata,
+    output wire [31:0] rdata,
+    input  wire [3:0]  addr,    
+    output wire tx_o,
+    input  wire rx_i,
     
-    output intr_tx
+    output wire intr_tx
 );
     
     localparam ADDR_CTRL = 0;
@@ -59,11 +59,11 @@ uart_tx u_tx (
 uart_rx u_rx(
   .clk_i        (clk_i),
   .rst_ni       (rst_ni),
-  .i_RX_Serial  (rx_i),
-  .o_RX_DV      (rx_status),
+  .i_Rx_Serial  (rx_i),
+  .o_Rx_DV      (rx_status),
   .rx_en        (control[1]),
   .CLKS_PER_BIT (control[18:3]),
-  .o_RX_Byte    (rx)
+  .o_Rx_Byte    (rx)
 );
   
  assign rdata = (addr == 0)? control: (addr == 8)? rx : 0;   

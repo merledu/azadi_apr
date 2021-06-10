@@ -558,20 +558,20 @@ package cf_math_pkg;
     function automatic integer ceil_div (input longint dividend, input longint divisor);
         automatic longint remainder;
 
-        // pragma translate_off
-        `ifndef VERILATOR
-        if (dividend < 0) begin
-            $fatal(1, "Dividend %0d is not a natural number!", dividend);
-        end
+        // // pragma translate_off
+        // `ifndef VERILATOR
+        // if (dividend < 0) begin
+        //     $fatal(1, "Dividend %0d is not a natural number!", dividend);
+        // end
 
-        if (divisor < 0) begin
-            $fatal(1, "Divisor %0d is not a natural number!", divisor);
-        end
+        // if (divisor < 0) begin
+        //     $fatal(1, "Divisor %0d is not a natural number!", divisor);
+        // end
 
-        if (divisor == 0) begin
-            $fatal(1, "Division by zero!");
-        end
-        `endif
+        // if (divisor == 0) begin
+        //     $fatal(1, "Division by zero!");
+        // end
+        // `endif
         // pragma translate_on
 
         remainder = dividend;
@@ -4214,38 +4214,38 @@ assign       test_en_i = 1'b0;
 
 
   // Explict INC_ASSERT block to avoid unused signal lint warnings were asserts are not included
-  `ifdef INC_ASSERT
-  // Signals used for assertions only
-  logic outstanding_load_resp;
-  logic outstanding_store_resp;
+  // `ifdef INC_ASSERT
+  // // Signals used for assertions only
+  // logic outstanding_load_resp;
+  // logic outstanding_store_resp;
 
-  logic outstanding_load_id;
-  logic outstanding_store_id;
+  // logic outstanding_load_id;
+  // logic outstanding_store_id;
 
-  assign outstanding_load_id  = id_stage_i.instr_executing & id_stage_i.lsu_req_dec &
-                                ~id_stage_i.lsu_we;
-  assign outstanding_store_id = id_stage_i.instr_executing & id_stage_i.lsu_req_dec &
-                                id_stage_i.lsu_we;
+  // assign outstanding_load_id  = id_stage_i.instr_executing & id_stage_i.lsu_req_dec &
+  //                               ~id_stage_i.lsu_we;
+  // assign outstanding_store_id = id_stage_i.instr_executing & id_stage_i.lsu_req_dec &
+  //                               id_stage_i.lsu_we;
 
-  if (WritebackStage) begin : gen_wb_stage
-    // When the writeback stage is present a load/store could be in ID or WB. A Load/store in ID can
-    // see a response before it moves to WB when it is unaligned otherwise we should only see
-    // a response when load/store is in WB.
-    assign outstanding_load_resp  = outstanding_load_wb |
-      (outstanding_load_id  & load_store_unit_i.split_misaligned_access);
+  // if (WritebackStage) begin : gen_wb_stage
+  //   // When the writeback stage is present a load/store could be in ID or WB. A Load/store in ID can
+  //   // see a response before it moves to WB when it is unaligned otherwise we should only see
+  //   // a response when load/store is in WB.
+  //   assign outstanding_load_resp  = outstanding_load_wb |
+  //     (outstanding_load_id  & load_store_unit_i.split_misaligned_access);
 
-    assign outstanding_store_resp = outstanding_store_wb |
-      (outstanding_store_id & load_store_unit_i.split_misaligned_access);
+  //   assign outstanding_store_resp = outstanding_store_wb |
+  //     (outstanding_store_id & load_store_unit_i.split_misaligned_access);
 
-    // When writing back the result of a load, the load must have made it to writeback
+  //   // When writing back the result of a load, the load must have made it to writeback
 
-  end else begin : gen_no_wb_stage
-    // Without writeback stage only look into whether load or store is in ID to determine if
-    // a response is expected.
-    assign outstanding_load_resp  = outstanding_load_id;
-    assign outstanding_store_resp = outstanding_store_id;
-  end
-  `endif
+  // end else begin : gen_no_wb_stage
+  //   // Without writeback stage only look into whether load or store is in ID to determine if
+  //   // a response is expected.
+  //   assign outstanding_load_resp  = outstanding_load_id;
+  //   assign outstanding_store_resp = outstanding_store_id;
+  // end
+  // `endif
   
 
   ////////////////////////
@@ -9235,19 +9235,19 @@ module brq_idu_controller #(
   logic csr_pipe_flush;
   logic instr_fetch_err;
 
-`ifndef SYNTHESIS
-  // synopsys translate_off
-  // make sure we are called later so that we do not generate messages for
-  // glitches
-  always_ff @(negedge clk_i) begin
-    // print warning in case of decoding errors
-    if ((ctrl_fsm_cs == DECODE) && instr_valid_i && !instr_fetch_err_i && illegal_insn_d) begin
-      $display("%t: Illegal instruction (hart %0x) at PC 0x%h: 0x%h", $time, brq_core.hart_id_i,
-               brq_idu.pc_id_i, brq_idu.instr_rdata_i);
-    end
-  end
+// `ifndef SYNTHESIS
+//   // synopsys translate_off
+//   // make sure we are called later so that we do not generate messages for
+//   // glitches
+//   always_ff @(negedge clk_i) begin
+//     // print warning in case of decoding errors
+//     if ((ctrl_fsm_cs == DECODE) && instr_valid_i && !instr_fetch_err_i && illegal_insn_d) begin
+//       $display("%t: Illegal instruction (hart %0x) at PC 0x%h: 0x%h", $time, brq_core.hart_id_i,
+//                brq_idu.pc_id_i, brq_idu.instr_rdata_i);
+//     end
+//   end
   // synopsys translate_on
-`endif
+// `endif
 
   ////////////////
   // Exceptions //
@@ -20611,12 +20611,12 @@ module dm_sba #(
 
 
   //pragma translate_off
-  `ifndef VERILATOR
-    // maybe bump severity to $error if not handled at runtime
-    dm_sba_access_size: assert property(@(posedge clk_i) disable iff (dmactive_i !== 1'b0)
-        (state_d != Idle) |-> (sbaccess_i < 4))
-            else $warning ("accesses > 8 byte not supported at the moment");
-  `endif
+  // `ifndef VERILATOR
+  //   // maybe bump severity to $error if not handled at runtime
+  //   dm_sba_access_size: assert property(@(posedge clk_i) disable iff (dmactive_i !== 1'b0)
+  //       (state_d != Idle) |-> (sbaccess_i < 4))
+  //           else $warning ("accesses > 8 byte not supported at the moment");
+  // `endif
   //pragma translate_on
 
 endmodule : dm_sba
@@ -20984,7 +20984,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/coregisters.svh"
-//`include "registers.svh"
+// `include "registers.svh"
 module fpnew_cast_multi #(
   parameter fpnew_pkg::fmt_logic_t   FpFmtConfig  = '1,
   parameter fpnew_pkg::ifmt_logic_t  IntFmtConfig = '1,
@@ -21027,7 +21027,7 @@ module fpnew_cast_multi #(
   // Indication of valid data in flight
   output logic                   busy_o
 );
-    `define FFLARNC(__q, __d, __load, __clear, __reset_value, __clk, __arst_n)              
+      `define FFLARNC(__q, __d, __load, __clear, __reset_value, __clk, __arst_n)              
     always_ff @(posedge (__clk) or negedge (__arst_n)) begin                 
       if (!__arst_n) begin                                                   
         __q <= (__reset_value);                                              
@@ -21832,7 +21832,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-//`include "registers.svh"
+// `include "registers.svh"
 module fpnew_divsqrt_multi #(
   parameter fpnew_pkg::fmt_logic_t   FpFmtConfig  = '1,
   // FPU configuration
@@ -22186,7 +22186,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-//`include "registers.svh"
+// `include "registers.svh"
 module fpnew_fma_multi #(
   parameter fpnew_pkg::fmt_logic_t   FpFmtConfig = '1,
   parameter int unsigned             NumPipeRegs = 0,
@@ -23008,7 +23008,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-//`include "registers.svh"
+// `include "registers.svh"
 module fpnew_fma #(
   parameter fpnew_pkg::fp_format_e   FpFormat    = fpnew_pkg::fp_format_e'(0),
   parameter int unsigned             NumPipeRegs = 0,
@@ -23681,7 +23681,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-//`include "registers.svh"
+// `include "registers.svh"
 module fpnew_noncomp #(
   parameter fpnew_pkg::fp_format_e   FpFormat    = fpnew_pkg::fp_format_e'(0),
   parameter int unsigned             NumPipeRegs = 0,
@@ -24591,7 +24591,7 @@ endmodule
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-//`include "registers.svh"
+// `include "registers.svh"
 module fpnew_opgroup_multifmt_slice #(
   parameter fpnew_pkg::opgroup_e     OpGroup       = fpnew_pkg::CONV,
   parameter int unsigned             Width         = 64,
@@ -26427,9 +26427,9 @@ module lzc #(
     localparam int unsigned NumLevels = $clog2(WIDTH);
 
     // pragma translate_off
-    initial begin
-      assert(WIDTH > 0) else $fatal(1, "input must be at least one bit wide");
-    end
+    // initial begin
+    //   assert(WIDTH > 0) else $fatal(1, "input must be at least one bit wide");
+    // end
     // pragma translate_on
 
     logic [WIDTH-1:0][NumLevels-1:0] index_lut;
@@ -28102,17 +28102,17 @@ bit 7:	When set, counter reset for PWM/timer, it's output and bit 5 will also be
 */
 module	pwm(
 //tlul interface
-	input 			clk_i,												
-	input 			rst_ni,												
+	input wire			clk_i,												
+	input wire			rst_ni,												
 
-	input 			re_i,											
-	input 			we_i,											
-	input  [7:0]    addr_i,											
-	input  [31:0]   wdata_i,											
-	input  [3:0]	be_i,										
-	output [31:0]   rdata_o,																								
-    output          o_pwm,
-	output          o_pwm_2,
+	input wire			re_i,											
+	input wire			we_i,											
+	input wire  [7:0]    addr_i,											
+	input wire [31:0]   wdata_i,											
+	input wire [3:0]	be_i,										
+	output wire [31:0]   rdata_o,																								
+  output wire         o_pwm,
+	output wire         o_pwm_2,
 	output  reg     oe_pwm1,
 	output  reg     oe_pwm2
 
@@ -28148,22 +28148,22 @@ assign	   write = we_i & ~re_i;
 
 always@(posedge clk_i)
 	if(~rst_ni)begin
-		ctrl[4:2]	<=	0;
-		ctrl[0]  	<=	0;
-		ctrl[1] <= 1'b0;
-		ctrl[7:6]	<=	0;
-		DC_1			<=	0;
-		period		<=	0;
-		divisor		<=	0;
+		ctrl[4:2]	<=	3'b0;
+		ctrl[0]  	<=	1'b0;
+		ctrl[1]     <= 1'b0;
+		ctrl[7:5]	<=	3'b0;
+		DC_1		<=	16'b0;
+		period		<=	16'b0;
+		divisor		<=	16'b0;
 
 		
-		ctrl_2[4:2]	 <=	0;
+		ctrl_2[4:2]	 <=	3'b0;
 		ctrl_2[0]  	 <=	1'b0;
-		ctrl_2[7:6]	 <=	0;
+		ctrl_2[7:5]	 <=	3'b0;
 		ctrl_2[1]   <=  1'b0;
-		DC_2		<=	0;
-		period_2	<=	0;
-		divisor_2	<=	0;
+		DC_2		<=	16'b0;
+		period_2	<=	16'b0;
+		divisor_2	<=	16'b0;
 	end
 	else if(write)begin
 		case(addr_i)
@@ -28171,14 +28171,14 @@ always@(posedge clk_i)
 				ctrl[0]	<=	wdata_i[0];
 				ctrl[1] <= 1'b1;
 				ctrl[4:2]	<=	wdata_i[4:2];
-				ctrl[7:6]	<=	wdata_i[7:6];
+				ctrl[7:5]	<=	wdata_i[7:5];
 			end
 
 			adr_ctrl_2:begin
 				ctrl_2[0]	<=	wdata_i[0];
 				ctrl_2[1]   <= 1'b1;
 				ctrl_2[4:2]	<=	wdata_i[4:2];
-				ctrl_2[7:6]	<=	wdata_i[7:6];
+				ctrl_2[7:5]	<=	wdata_i[7:5];
 			end
 
 			adr_divisor_1	:  divisor	<=	wdata_i[15:0];
@@ -28213,22 +28213,22 @@ always @(posedge clk_i or negedge rst_ni) begin
   if(~rst_ni) begin
     clock_p1   <= 1'b0;
     clock_p2   <= 1'b0;
-    counter_p1 <= 0;
-    counter_p2 <= 0;
+    counter_p1 <= 16'b0;
+    counter_p2 <= 16'b0;
   end else begin
     if(pwm_1) begin
-      counter_p1 <= counter_p1 + 1;
+      counter_p1 <= counter_p1 + 16'b1;
       if(counter_p1 == divisor-1) begin
-        counter_p1 <= 0;
+        counter_p1 <= 16'b0;
         clock_p1   <= ~clock_p1;
       end
     end
 
     
     if(pwm_2) begin
-      counter_p2 <= counter_p2 + 1;
+      counter_p2 <= counter_p2 + 16'b1;
       if(counter_p2 == divisor_2-1) begin
-        counter_p2 <= 0;
+        counter_p2 <= 16'b0;
         clock_p2    <= ~clock_p2;
       end
     end
@@ -28242,15 +28242,15 @@ end
 
 always@(posedge clock_p1 )
 	if(~rst_ni)begin
-		pts   <= 0;
-		period_counter1    <= 0;
+		pts   <= 1'b0;
+		period_counter1    <= 16'b0;
 	end
 	else begin
 	if(ctrl[2])begin
 		if(pwm_1) begin
 		    oe_pwm1 <= 1'b1;
-			if(period_counter1	>=	period) period_counter1 <=	0;
-			else period_counter1	<=	period_counter1+1;
+			if(period_counter1	>=	period) period_counter1 <=	16'b0;
+			else period_counter1	<=	period_counter1+ 16'b1;
 
 			if(period_counter1	<	DC_1)	pts	<=	1'b1;
 			else pts	<=	1'b0;
@@ -28258,8 +28258,8 @@ always@(posedge clock_p1 )
 	end
 	else begin
 			pts	    <= 1'b0;
-			period_counter1	    <= 0;
-			oe_pwm1 <= 0;
+			period_counter1	    <= 16'b0;
+			oe_pwm1 <= 1'b0;
 	end
 end
 
@@ -28267,15 +28267,15 @@ end
 
 always@(posedge clock_p2 )
 	if(~rst_ni)begin
-		pts_2	<=	0;
-		period_counter2	<=	0;
+		pts_2	<=	1'b0;
+		period_counter2	<=	16'b0;
 	end
 	else begin
 	if(ctrl_2[2])begin
 		if(pwm_2) begin
 		     oe_pwm2 <= 1'b1;
-			if(period_counter2	>=	period_2) period_counter2	<=	0;
-			else period_counter2	<=	period_counter2+1;
+			if(period_counter2	>=	period_2) period_counter2	<=	16'b0;
+			else period_counter2	<=	period_counter2+ 16'b1;
 
 			if(period_counter2	<	DC_2)	pts_2	<=	1'b1;
 			else pts_2	<=	1'b0;
@@ -28283,14 +28283,14 @@ always@(posedge clock_p2 )
 	end
 	else begin
 			pts_2	<=	1'b0;
-			period_counter2	<=	0;
+			period_counter2	<=	16'b0;
 			oe_pwm2 <=  1'b0;
 	end
 end
 //////////////////////////////////////////////////////////
 
-assign	o_pwm   = ctrl[4]? pts: 0;
-assign	o_pwm_2 = ctrl_2[4]? pts_2: 0;
+assign	o_pwm   = ctrl[4]? pts: 1'b0;
+assign	o_pwm_2 = ctrl_2[4]? pts_2: 1'b0;
 assign	rdata_o = (addr_i == adr_ctrl_1)   ? {8'h0,ctrl}  :
 			  	(addr_i == adr_divisor_1)? divisor	  :
 			  	(addr_i == adr_period_1) ? period		  :
@@ -28298,7 +28298,7 @@ assign	rdata_o = (addr_i == adr_ctrl_1)   ? {8'h0,ctrl}  :
 				  (addr_i == adr_DC_2)	   ? DC_2		  :
 				  (addr_i == adr_period_2) ? period_2	  :
 				  (addr_i == adr_divisor_2)? divisor_2    :
-				  (addr_i == adr_ctrl_2)   ? {8'h0,ctrl_2}:0;
+				  (addr_i == adr_ctrl_2)   ? {8'h0,ctrl_2}: 32'b0;
 
 
 endmodule
@@ -28414,10 +28414,10 @@ module rr_arb_tree #(
 );
 
   // pragma translate_off
-  //`ifndef VERILATOR
-  // Default SVA rst_ni
-  //default disable iff (!rst_ni || flush_i);
-  //`endif
+  // `ifndef VERILATOR
+  // // Default SVA rst_ni
+  // default disable iff (!rst_ni || flush_i);
+  // `endif
   // pragma translate_on
 
   // just pass through in this corner case
@@ -28471,20 +28471,20 @@ module rr_arb_tree #(
         end
 
         // pragma translate_off
-        `ifndef VERILATOR
-          lock: assert property(
-            @(posedge clk_i) LockIn |-> req_o && !gnt_i |=> idx_o == $past(idx_o)) else
-                $fatal (1, "Lock implies same arbiter decision in next cycle if output is not \
-                            ready.");
+        // `ifndef VERILATOR
+        //   lock: assert property(
+        //     @(posedge clk_i) LockIn |-> req_o && !gnt_i |=> idx_o == $past(idx_o)) else
+        //         $fatal (1, "Lock implies same arbiter decision in next cycle if output is not \
+        //                     ready.");
 
-          logic [NumIn-1:0] req_tmp;
-          assign req_tmp = req_q & req_i;
-          lock_req: assume property(
-            @(posedge clk_i) LockIn |-> lock_d |=> req_tmp == req_q) else
-                $fatal (1, "It is disallowed to deassert unserved request signals when LockIn is \
-                            enabled.");
-        `endif
-        // pragma translate_on
+        //   logic [NumIn-1:0] req_tmp;
+        //   assign req_tmp = req_q & req_i;
+        //   lock_req: assume property(
+        //     @(posedge clk_i) LockIn |-> lock_d |=> req_tmp == req_q) else
+        //         $fatal (1, "It is disallowed to deassert unserved request signals when LockIn is \
+        //                     enabled.");
+        // `endif
+        // pragma transla//te_on
 
         always_ff @(posedge clk_i or negedge rst_ni) begin : p_req_regs
           if (!rst_ni) begin
@@ -28608,40 +28608,40 @@ module rr_arb_tree #(
       end
     end
 
-    // pragma translate_off
-    `ifndef VERILATOR
-    initial begin : p_assert
-      assert(NumIn)
-        else $fatal(1, "Input must be at least one element wide.");
-      assert(!(LockIn && ExtPrio))
-        else $fatal(1,"Cannot use LockIn feature together with external ExtPrio.");
-    end
+    // // pragma translate_off
+    // `ifndef VERILATOR
+    // initial begin : p_assert
+    //   assert(NumIn)
+    //     else $fatal(1, "Input must be at least one element wide.");
+    //   assert(!(LockIn && ExtPrio))
+    //     else $fatal(1,"Cannot use LockIn feature together with external ExtPrio.");
+    // end
 
-    hot_one : assert property(
-      @(posedge clk_i) $onehot0(gnt_o))
-        else $fatal (1, "Grant signal must be hot1 or zero.");
+    // hot_one : assert property(
+    //   @(posedge clk_i) $onehot0(gnt_o))
+    //     else $fatal (1, "Grant signal must be hot1 or zero.");
 
-    gnt0 : assert property(
-      @(posedge clk_i) |gnt_o |-> gnt_i)
-        else $fatal (1, "Grant out implies grant in.");
+    // gnt0 : assert property(
+    //   @(posedge clk_i) |gnt_o |-> gnt_i)
+    //     else $fatal (1, "Grant out implies grant in.");
 
-    gnt1 : assert property(
-      @(posedge clk_i) req_o |-> gnt_i |-> |gnt_o)
-        else $fatal (1, "Req out and grant in implies grant out.");
+    // gnt1 : assert property(
+    //   @(posedge clk_i) req_o |-> gnt_i |-> |gnt_o)
+    //     else $fatal (1, "Req out and grant in implies grant out.");
 
-    gnt_idx : assert property(
-      @(posedge clk_i) req_o |->  gnt_i |-> gnt_o[idx_o])
-        else $fatal (1, "Idx_o / gnt_o do not match.");
+    // gnt_idx : assert property(
+    //   @(posedge clk_i) req_o |->  gnt_i |-> gnt_o[idx_o])
+    //     else $fatal (1, "Idx_o / gnt_o do not match.");
 
-    req0 : assert property(
-      @(posedge clk_i) |req_i |-> req_o)
-        else $fatal (1, "Req in implies req out.");
+    // req0 : assert property(
+    //   @(posedge clk_i) |req_i |-> req_o)
+    //     else $fatal (1, "Req in implies req out.");
 
-    req1 : assert property(
-      @(posedge clk_i) req_o |-> |req_i)
-        else $fatal (1, "Req out implies req in.");
-    `endif
-    // pragma translate_on
+    // req1 : assert property(
+    //   @(posedge clk_i) req_o |-> |req_i)
+    //     else $fatal (1, "Req out implies req in.");
+    // `endif
+    // // pragma translate_on
   end
 
 endmodule : rr_arb_tree
@@ -35181,15 +35181,15 @@ reg [DATA_WIDTH-1:0]    mem [0:RAM_DEPTH-1];
 
 endmodule
 // `include "/home/merl/github_repos/azadi/src/spi_host/rtl/spi_defines.v"
-//`include "spi_defines.v"
+// `include "spi_defines.v"
 
 module spi_clgen (
-  input                            clk_i,   // input clock (system clock)
-  input                            rst_ni,      // reset
-  input                            enable,   // clock enable
-  input                            go,       // start transfer
-  input                            last_clk, // last clock
-  input     [`SPI_DIVIDER_LEN-1:0] divider,  // clock divider (output clock is divided by this value)
+  input    wire                        clk_i,   // input clock (system clock)
+  input    wire                        rst_ni,      // reset
+  input    wire                        enable,   // clock enable
+  input    wire                        go,       // start transfer
+  input    wire                        last_clk, // last clock
+  input    wire [`SPI_DIVIDER_LEN-1:0] divider,  // clock divider (output clock is divided by this value)
   output    reg                    clk_out,  // output clock
   output    reg                    pos_edge, // pulse marking positive edge of clk_out
   output    reg                    neg_edge // pulse marking negative edge of clk_out
@@ -35249,7 +35249,7 @@ endmodule
  
 // `include "/home/merl/github_repos/azadi/src/spi_host/rtl/spi_defines.v"
 //`include "/home/zeeshan/fyp/azadi/src/spi_host/rtl/spi_defines.v"
-//`include "spi_defines.v"
+// `include "spi_defines.v"
 module spi_core
 (
   // tlul signals
@@ -35448,28 +35448,28 @@ module spi_core
     );
 endmodule
   
-//`include "spi_defines.v"
+// `include "spi_defines.v"
 
 module spi_shift (
-  input                          clk_i,          // system clock
-  input                          rst_ni,          // reset
-  input                          latch,        // latch signal for storing the data in shift register
-  input                    [3:0] byte_sel,     // byte select signals for storing the data in shift register
-  input [`SPI_CHAR_LEN_BITS-1:0] len,          // data len in bits (minus one)
-  input                          lsb,          // lbs first_ni on the line
-  input                          go,           // start stansfer
-  input                          pos_edge,     // recognize posedge of sclk_i
-  input                          neg_edge,     // recognize negedge of sclk_i
-  input                          rx_negedge,   // s_in is sampled on negative edge 
-  input                          tx_negedge,   // s_out is driven on negative edge
+  input  wire                        clk_i,          // system clock
+  input  wire                        rst_ni,          // reset
+  input  wire                        latch,        // latch signal for storing the data in shift register
+  input  wire                  [3:0] byte_sel,     // byte select signals for storing the data in shift register
+  input  wire [`SPI_CHAR_LEN_BITS-1:0] len,          // data len in bits (minus one)
+  input  wire                        lsb,          // lbs first_ni on the line
+  input  wire                        go,           // start stansfer
+  input  wire                        pos_edge,     // recognize posedge of sclk_i
+  input  wire                        neg_edge,     // recognize negedge of sclk_i
+  input  wire                        rx_negedge,   // s_in is sampled on negative edge 
+  input  wire                        tx_negedge,   // s_out is driven on negative edge
   output   reg                   tip,          // transfer in progress
-  output                         last,         // last bit
-  input                   [31:0] p_in,         // parallel in
-  output     [`SPI_MAX_CHAR-1:0] p_out,        // parallel out
-  input                          s_clk,        // serial clock
-  input                          s_in,         // serial in
+  output wire                        last,         // last bit
+  input  wire                 [31:0] p_in,         // parallel in
+  output wire    [`SPI_MAX_CHAR-1:0] p_out,        // parallel out
+  input  wire                        s_clk,        // serial clock
+  input  wire                        s_in,         // serial in
   output   reg                   s_out,        // serial out
-  input                          rx_en         // serial rx enable  
+  input  wire                        rx_en         // serial rx enable  
 );
                                    
  // reg                            s_out;        
@@ -35553,7 +35553,7 @@ endmodule
 
 // `include "/home/merl/github_repos/azadi/src/spi_host/rtl/spi_defines.v"
 //`include "/home/zeeshan/fyp/azadi/src/spi_host/rtl/spi_defines.v"
-//`include "spi_defines.v"
+// `include "spi_defines.v"
 module spi_top(
 
   input logic clk_i,
@@ -37339,18 +37339,18 @@ module tl_xbar_main (
 
 endmodule
 module uart_core (
-    input  clk_i,
-    input  rst_ni,
+    input  wire clk_i,
+    input  wire rst_ni,
     
-    input  ren,
-    input  we,
-    input  [31:0] wdata,
-    output [31:0] rdata,
-    input  [7:0]  addr,    
-    output tx_o,
-    input  rx_i,
+    input  wire ren,
+    input  wire we,
+    input  wire [31:0] wdata,
+    output wire [31:0] rdata,
+    input  wire [3:0]  addr,    
+    output wire tx_o,
+    input  wire rx_i,
     
-    output intr_tx
+    output wire intr_tx
 );
     
     localparam ADDR_CTRL = 0;
@@ -37398,11 +37398,11 @@ uart_tx u_tx (
 uart_rx u_rx(
   .clk_i        (clk_i),
   .rst_ni       (rst_ni),
-  .i_RX_Serial  (rx_i),
-  .o_RX_DV      (rx_status),
+  .i_Rx_Serial  (rx_i),
+  .o_Rx_DV      (rx_status),
   .rx_en        (control[1]),
   .CLKS_PER_BIT (control[18:3]),
-  .o_RX_Byte    (rx)
+  .o_Rx_Byte    (rx)
 );
   
  assign rdata = (addr == 0)? control: (addr == 8)? rx : 0;   
@@ -37419,12 +37419,12 @@ endmodule
 // (10000000)/(115200) = 87
   
 module uart_rx_prog (
-   input         clk_i,
-   input         rst_ni,
-   input         i_Rx_Serial,
-   input  [15:0] CLKS_PER_BIT,
-   output        o_Rx_DV,
-   output  [7:0] o_Rx_Byte
+   input  wire       clk_i,
+   input  wire       rst_ni,
+   input  wire       i_Rx_Serial,
+   input  wire [15:0] CLKS_PER_BIT,
+   output wire        o_Rx_DV,
+   output wire  [7:0] o_Rx_Byte
    );
     
   parameter s_IDLE         = 3'b000;
@@ -37463,16 +37463,17 @@ module uart_rx_prog (
       if (~rst_ni) begin
         r_SM_Main <= s_IDLE;
         r_Rx_DV       <= 1'b0;
-        r_Clock_Count <= 0;
-        r_Bit_Index   <= 0;
+        r_Clock_Count <= 16'b0;
+        r_Bit_Index   <= 3'b0;
+	r_Rx_Byte     <= 8'b0;
       end else begin       
       case (r_SM_Main)
         s_IDLE :
           begin
             r_Rx_DV       <= 1'b0;
-            r_Clock_Count <= 0;
-            r_Bit_Index   <= 0;
-             
+            r_Clock_Count <= 16'b0;
+            r_Bit_Index   <= 3'b0;
+            r_Rx_Byte     <= 8'b0; 
             if (r_Rx_Data == 1'b0)          // Start bit detected
               r_SM_Main <= s_RX_START_BIT;
             else
@@ -37486,7 +37487,7 @@ module uart_rx_prog (
               begin
                 if (r_Rx_Data == 1'b0)
                   begin
-                    r_Clock_Count <= 0;  // reset counter, found the middle
+                    r_Clock_Count <= 16'b0;  // reset counter, found the middle
                     r_SM_Main     <= s_RX_DATA_BITS;
                   end
                 else
@@ -37494,7 +37495,7 @@ module uart_rx_prog (
               end
             else
               begin
-                r_Clock_Count <= r_Clock_Count + 1;
+                r_Clock_Count <= r_Clock_Count + 16'b1;
                 r_SM_Main     <= s_RX_START_BIT;
               end
           end // case: s_RX_START_BIT
@@ -37505,23 +37506,23 @@ module uart_rx_prog (
           begin
             if (r_Clock_Count < CLKS_PER_BIT-1)
               begin
-                r_Clock_Count <= r_Clock_Count + 1;
+                r_Clock_Count <= r_Clock_Count + 16'b1;
                 r_SM_Main     <= s_RX_DATA_BITS;
               end
             else
               begin
-                r_Clock_Count          <= 0;
+                r_Clock_Count          <= 16'b0;
                 r_Rx_Byte[r_Bit_Index] <= r_Rx_Data;
                  
                 // Check if we have received all bits
                 if (r_Bit_Index < 7)
                   begin
-                    r_Bit_Index <= r_Bit_Index + 1;
+                    r_Bit_Index <= r_Bit_Index + 3'b1;
                     r_SM_Main   <= s_RX_DATA_BITS;
                   end
                 else
                   begin
-                    r_Bit_Index <= 0;
+                    r_Bit_Index <= 3'b0;
                     r_SM_Main   <= s_RX_STOP_BIT;
                   end
               end
@@ -37534,13 +37535,13 @@ module uart_rx_prog (
             // Wait CLKS_PER_BIT-1 clock cycles for Stop bit to finish
             if (r_Clock_Count < CLKS_PER_BIT-1)
               begin
-                r_Clock_Count <= r_Clock_Count + 1;
+                r_Clock_Count <= r_Clock_Count + 16'b1;
                 r_SM_Main     <= s_RX_STOP_BIT;
               end
             else
               begin
                 r_Rx_DV       <= 1'b1;
-                r_Clock_Count <= 0;
+                r_Clock_Count <= 16'b0;
                 r_SM_Main     <= s_CLEANUP;
               end
           end // case: s_RX_STOP_BIT
@@ -37565,145 +37566,167 @@ module uart_rx_prog (
   assign o_Rx_Byte = r_Rx_Byte;
    
 endmodule // uart_rx
+`timescale 1ns / 1ps
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+
+// Set Parameter CLKS_PER_BIT as follows:
+// CLKS_PER_BIT = (Frequency of i_Clock)/(Frequency of UART)
+// Example: 10 MHz Clock, 115200 baud UART
+// (10000000)/(115200) = 87
+  
 module uart_rx (
-   input        clk_i,
-   input        rst_ni,
-   input        i_RX_Serial,
-   output       o_RX_DV,
-   input        rx_en,
-   input  [15:0]CLKS_PER_BIT,
-   output [7:0] o_RX_Byte
+   input wire        clk_i,
+   input wire        rst_ni,
+   input wire        rx_en,
+   input wire        i_Rx_Serial,
+   input wire [15:0] CLKS_PER_BIT,
+   output wire        o_Rx_DV,
+   output wire [7:0] o_Rx_Byte
    );
+    
+  parameter s_IDLE         = 3'b000;
+  parameter s_RX_START_BIT = 3'b001;
+  parameter s_RX_DATA_BITS = 3'b010;
+  parameter s_RX_STOP_BIT  = 3'b011;
+  parameter s_CLEANUP      = 3'b100;
    
-  localparam IDLE         = 3'b000;
-  localparam RX_START_BIT = 3'b001;
-  localparam RX_DATA_BITS = 3'b010;
-  localparam RX_STOP_BIT  = 3'b011;
-  localparam CLEANUP      = 3'b100;
-  
-  reg [15:0] r_Clock_Count;
-  reg [2:0] r_Bit_Index  ; //8 bits total
-  reg [7:0] r_RX_Byte    ;
-  reg       r_RX_DV      ;
-  reg [2:0] r_SM_Main    ;
-  
-  
-  // Purpose: Control RX state machine
+  reg           r_Rx_Data_R ;
+  reg           r_Rx_Data   ;
+   
+  reg [15:0]     r_Clock_Count ;
+  reg [2:0]     r_Bit_Index  ; //8 bits total
+  reg [7:0]     r_Rx_Byte   ;
+  reg           r_Rx_DV     ;
+  reg [2:0]     r_SM_Main   ;
+   
+  // Purpose: Double-register the incoming data.
+  // This allows it to be used in the UART RX Clock Domain.
+  // (It removes problems caused by metastability)
   always @(posedge clk_i)
-  begin
-      if(~rst_ni) begin
-        r_Clock_Count <= 0;
-        r_Bit_Index   <= 0; //8 bits total
-        r_RX_Byte     <= 0;
-        r_RX_DV       <= 0;
-        r_SM_Main     <= 0;
-      end else if(rx_en) begin
-    case (r_SM_Main)
-      IDLE :
-        begin
-          r_RX_DV       <= 1'b0;
-          r_Clock_Count <= 0;
-          r_Bit_Index   <= 0;
-          
-          if (i_RX_Serial == 1'b0)          // Start bit detected
-            r_SM_Main <= RX_START_BIT;
-          else
-            r_SM_Main <= IDLE;
-        end
-      
-      // Check middle of start bit to make sure it's still low
-      RX_START_BIT :
-        begin
-          if (r_Clock_Count == (CLKS_PER_BIT-1)/2)
-          begin
-            if (i_RX_Serial == 1'b0)
-            begin
-              r_Clock_Count <= 0;  // reset counter, found the middle
-              r_SM_Main     <= RX_DATA_BITS;
-            end
-            else
-              r_SM_Main <= IDLE;
-          end
-          else
-          begin
-            r_Clock_Count <= r_Clock_Count + 1;
-            r_SM_Main     <= RX_START_BIT;
-          end
-        end // case: RX_START_BIT
-      
-      
-      // Wait CLKS_PER_BIT-1 clock cycles to sample serial data
-      RX_DATA_BITS :
-        begin
-          if (r_Clock_Count < CLKS_PER_BIT-1)
-          begin
-            r_Clock_Count <= r_Clock_Count + 1;
-            r_SM_Main     <= RX_DATA_BITS;
-          end
-          else
-          begin
-            r_Clock_Count          <= 0;
-            r_RX_Byte[r_Bit_Index] <= i_RX_Serial;
-            
-            // Check if we have received all bits
-            if (r_Bit_Index < 7)
-            begin
-              r_Bit_Index <= r_Bit_Index + 1;
-              r_SM_Main   <= RX_DATA_BITS;
-            end
-            else
-            begin
-              r_Bit_Index <= 0;
-              r_SM_Main   <= RX_STOP_BIT;
-            end
-          end
-        end // case: RX_DATA_BITS
-      
-      
-      // Receive Stop bit.  Stop bit = 1
-      RX_STOP_BIT :
-        begin
-          // Wait CLKS_PER_BIT-1 clock cycles for Stop bit to finish
-          if (r_Clock_Count < CLKS_PER_BIT-1)
-          begin
-            r_Clock_Count <= r_Clock_Count + 1;
-     	    r_SM_Main     <= RX_STOP_BIT;
-          end
-          else
-          begin
-       	    r_RX_DV       <= 1'b1;
-            r_Clock_Count <= 0;
-            r_SM_Main     <= CLEANUP;
-          end
-        end // case: RX_STOP_BIT
-      
-      
-      // Stay here 1 clock
-      CLEANUP :
-        begin
-          r_SM_Main <= IDLE;
-          r_RX_DV   <= 1'b0;
-        end
-      
-      
-      default :
-        r_SM_Main <= IDLE;
-      
-    endcase
+    begin
+    if (~rst_ni) begin
+      r_Rx_Data_R <= 1'b1;
+      r_Rx_Data   <= 1'b1;
     end else begin
-        r_Clock_Count <= 0;
-        r_Bit_Index   <= 0; //8 bits total
-        r_RX_Byte     <= 0;
-        r_RX_DV       <= 0;
-        r_SM_Main     <= 0;
-    end 
-  end    
-  
-  assign o_RX_DV   = r_RX_DV;
-  assign o_RX_Byte = r_RX_Byte;
-  
-endmodule // UART_RX 
-// Copyright lowRISC contributors.
+      r_Rx_Data_R <= i_Rx_Serial;
+      r_Rx_Data   <= r_Rx_Data_R;
+    end
+  end
+   
+   
+  // Purpose: Control RX state machine
+  always @(posedge clk_i or negedge rst_ni)
+    begin
+      if (~rst_ni) begin
+        r_SM_Main <= s_IDLE;
+        r_Rx_DV       <= 1'b0;
+        r_Clock_Count <= 16'b0;
+        r_Bit_Index   <= 3'b0;
+      end else begin       
+      case (r_SM_Main)
+        s_IDLE :
+          begin
+            r_Rx_DV       <= 1'b0;
+            r_Clock_Count <= 16'b0;
+            r_Bit_Index   <= 3'b0;
+             
+            if (r_Rx_Data == 1'b0) begin
+                if(rx_en == 1'b1) begin          // Start bit detected
+                    r_SM_Main <= s_RX_START_BIT;
+                end else begin
+                    r_SM_Main <= s_IDLE;
+                end
+              end else
+              r_SM_Main <= s_IDLE;
+          end
+         
+        // Check middle of start bit to make sure it's still low
+        s_RX_START_BIT :
+          begin
+            if (r_Clock_Count == ((CLKS_PER_BIT-1)>>1))
+              begin
+                if (r_Rx_Data == 1'b0)
+                  begin
+                    r_Clock_Count <= 16'b0;  // reset counter, found the middle
+                    r_SM_Main     <= s_RX_DATA_BITS;
+                  end
+                else
+                  r_SM_Main <= s_IDLE;
+              end
+            else
+              begin
+                r_Clock_Count <= r_Clock_Count + 16'b1;
+                r_SM_Main     <= s_RX_START_BIT;
+              end
+          end // case: s_RX_START_BIT
+         
+         
+        // Wait CLKS_PER_BIT-1 clock cycles to sample serial data
+        s_RX_DATA_BITS :
+          begin
+            if (r_Clock_Count < CLKS_PER_BIT- 16'b1)
+              begin
+                r_Clock_Count <= r_Clock_Count + 16'b1;
+                r_SM_Main     <= s_RX_DATA_BITS;
+              end
+            else
+              begin
+                r_Clock_Count          <= 16'b0;
+                r_Rx_Byte[r_Bit_Index] <= r_Rx_Data;
+                 
+                // Check if we have received all bits
+                if (r_Bit_Index < 7)
+                  begin
+                    r_Bit_Index <= r_Bit_Index + 3'b1;
+                    r_SM_Main   <= s_RX_DATA_BITS;
+                  end
+                else
+                  begin
+                    r_Bit_Index <= 3'b0;
+                    r_SM_Main   <= s_RX_STOP_BIT;
+                  end
+              end
+          end // case: s_RX_DATA_BITS
+     
+     
+        // Receive Stop bit.  Stop bit = 1
+        s_RX_STOP_BIT :
+          begin
+            // Wait CLKS_PER_BIT-1 clock cycles for Stop bit to finish
+            if (r_Clock_Count < CLKS_PER_BIT- 16'b1)
+              begin
+                r_Clock_Count <= r_Clock_Count + 16'b1;
+                r_SM_Main     <= s_RX_STOP_BIT;
+              end
+            else
+              begin
+                r_Rx_DV       <= 1'b1;
+                r_Clock_Count <= 16'b0;
+                r_SM_Main     <= s_CLEANUP;
+              end
+          end // case: s_RX_STOP_BIT
+     
+         
+        // Stay here 1 clock
+        s_CLEANUP :
+          begin
+            r_SM_Main <= s_IDLE;
+            r_Rx_DV   <= 1'b0;
+          end
+         
+         
+        default :
+          r_SM_Main <= s_IDLE;
+         
+      endcase
+      end 
+    end   
+   
+  assign o_Rx_DV   = r_Rx_DV;
+  assign o_Rx_Byte = r_Rx_Byte;
+   
+endmodule // uart_rx// Copyright lowRISC contributors.
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -37768,14 +37791,14 @@ uart_core u_uart_core(
 );
 endmodule
 module uart_tx (
-   input       clk_i,
-   input       rst_ni,
-   input       tx_en,
-   input [7:0] i_TX_Byte, 
-   input [15:0]CLKS_PER_BIT,
+   input wire      clk_i,
+   input wire      rst_ni,
+   input wire      tx_en,
+   input wire [7:0] i_TX_Byte, 
+   input wire [15:0]CLKS_PER_BIT,
    //output      o_TX_Active,
    output reg  o_TX_Serial,
-   output      o_TX_Done
+   output wire     o_TX_Done
    );
  
   localparam IDLE         = 3'b000;
@@ -37794,11 +37817,11 @@ module uart_tx (
   always @(posedge clk_i)
   begin
     if(~rst_ni) begin
-        r_SM_Main     <= 0;
-        r_Clock_Count <= 0;
-        r_Bit_Index   <= 0;
-        r_TX_Data     <= 0;
-        r_TX_Done     <= 0;
+        r_SM_Main     <= 3'b0;
+        r_Clock_Count <= 16'b0;
+        r_Bit_Index   <= 3'b0;
+        r_TX_Data     <= 8'b0;
+        r_TX_Done     <= 1'b0;
        // r_TX_Active   = 0;
     end else begin
     case (r_SM_Main)
@@ -37806,8 +37829,8 @@ module uart_tx (
         begin
           o_TX_Serial   <= 1'b1;         // Drive Line High for Idle
           r_TX_Done     <= 1'b0;
-          r_Clock_Count <= 0;
-          r_Bit_Index   <= 0;
+          r_Clock_Count <= 16'b0;
+          r_Bit_Index   <= 3'b0;
           
           if (tx_en == 1'b1)
           begin
@@ -37828,12 +37851,12 @@ module uart_tx (
           // Wait CLKS_PER_BIT-1 clock cycles for start bit to finish
           if (r_Clock_Count < CLKS_PER_BIT-1)
           begin
-            r_Clock_Count <= r_Clock_Count + 1;
+            r_Clock_Count <= r_Clock_Count + 16'b1;
             r_SM_Main     <= TX_START_BIT;
           end
           else
           begin
-            r_Clock_Count <= 0;
+            r_Clock_Count <= 16'b0;
             r_SM_Main     <= TX_DATA_BITS;
           end
         end // case: TX_START_BIT
@@ -37844,24 +37867,24 @@ module uart_tx (
         begin
           o_TX_Serial <= r_TX_Data[r_Bit_Index];
           
-          if (r_Clock_Count < CLKS_PER_BIT-1)
+          if (r_Clock_Count < CLKS_PER_BIT-16'b1)
           begin
-            r_Clock_Count <= r_Clock_Count + 1;
+            r_Clock_Count <= r_Clock_Count + 16'b1;
             r_SM_Main     <= TX_DATA_BITS;
           end
           else
           begin
-            r_Clock_Count <= 0;
+            r_Clock_Count <= 3'b0;
             
             // Check if we have sent out all bits
             if (r_Bit_Index < 7)
             begin
-              r_Bit_Index <= r_Bit_Index + 1;
+              r_Bit_Index <= r_Bit_Index + 3'b1;
               r_SM_Main   <= TX_DATA_BITS;
             end
             else
             begin
-              r_Bit_Index <= 0;
+              r_Bit_Index <= 3'b0;
               r_SM_Main   <= TX_STOP_BIT;
             end
           end 
@@ -37874,15 +37897,15 @@ module uart_tx (
           o_TX_Serial <= 1'b1;
           
           // Wait CLKS_PER_BIT-1 clock cycles for Stop bit to finish
-          if (r_Clock_Count < CLKS_PER_BIT-1)
+          if (r_Clock_Count < CLKS_PER_BIT- 16'b1)
           begin
-            r_Clock_Count <= r_Clock_Count + 1;
+            r_Clock_Count <= r_Clock_Count + 16'b1;
             r_SM_Main     <= TX_STOP_BIT;
           end
           else
           begin
             r_TX_Done     <= 1'b1;
-            r_Clock_Count <= 0;
+            r_Clock_Count <= 16'b0;
             r_SM_Main     <= CLEANUP;
            // r_TX_Active   <= 1'b0;
           end 
