@@ -12,7 +12,7 @@
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-`include "registers.svh"
+//`include "registers.svh"
 module fpnew_fma_multi #(
   parameter fpnew_pkg::fmt_logic_t   FpFmtConfig = '1,
   parameter int unsigned             NumPipeRegs = 0,

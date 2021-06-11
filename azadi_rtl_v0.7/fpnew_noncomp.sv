@@ -12,7 +12,7 @@
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/common_cells/registers.svh"
-`include "registers.svh"
+//`include "registers.svh"
 module fpnew_noncomp #(
   parameter fpnew_pkg::fp_format_e   FpFormat    = fpnew_pkg::fp_format_e'(0),
   parameter int unsigned             NumPipeRegs = 0,
