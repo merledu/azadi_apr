@@ -544,8 +544,15 @@ module dm_csrs #(
   assign cmd_valid_o = cmd_valid_q;
   assign progbuf_o   = progbuf_q;
   assign data_o      = data_q;
-
-  assign ndmreset_o = dmcontrol_q.ndmreset;
+  
+  always_comb begin
+  	if(~rst_ni) begin
+	 ndmreset_o = 1'b0;
+	end else begin
+	 ndmreset_o = dmcontrol_q.ndmreset;
+	end
+  end
+ // assign ndmreset_o = dmcontrol_q.ndmreset;
 
   logic unused_testmode;
   assign unused_testmode = testmode_i;

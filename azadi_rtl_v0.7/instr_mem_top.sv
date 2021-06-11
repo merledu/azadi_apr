@@ -36,7 +36,7 @@ assign mask_sel[1] = (tl_wmask[15:8]  != 8'b0) ? 1'b1: 1'b0;
 assign mask_sel[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 1'b0;
 assign mask_sel[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 1'b0;
 
-assign csb     = ~(tl_req | iccm_ctrl_we);
+assign csb     = ~(prog_rst_ni ? tl_req : iccm_ctrl_we);
 
 assign addr_o  = (prog_rst_ni) ? tl_addr  : iccm_ctrl_addr;
 assign wdata_o = (prog_rst_ni) ? tl_wdata : iccm_ctrl_wdata;
