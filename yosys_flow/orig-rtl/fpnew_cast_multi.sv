@@ -12,7 +12,7 @@
 // Author: Stefan Mach <smach@iis.ee.ethz.ch>
 
 //`include "/home/merl-lab/fyp/azadi/src/fpnew/src/common_cells/include/coregisters.svh"
-`include "registers.svh"
+//`include "registers.svh"
 module fpnew_cast_multi #(
   parameter fpnew_pkg::fmt_logic_t   FpFmtConfig  = '1,
   parameter fpnew_pkg::ifmt_logic_t  IntFmtConfig = '1,

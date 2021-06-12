@@ -1,4 +1,4 @@
-`include "spi_defines.v"
+//`include "spi_defines.v"
 
 module spi_shift (
   input  wire                        clk_i,          // system clock
