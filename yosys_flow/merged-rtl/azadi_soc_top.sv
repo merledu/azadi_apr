@@ -658,6 +658,20 @@ package dm;
     DevTreeAddr3 = 8'h1C,
     NextDM       = 8'h1D,
     ProgBuf0     = 8'h20,
+    ProgBuf1     = 8'h21,
+    ProgBuf2     = 8'h22,
+    ProgBuf3     = 8'h23,
+    ProgBuf4     = 8'h24,
+    ProgBuf5     = 8'h25,
+    ProgBuf6     = 8'h26,
+    ProgBuf7     = 8'h27,
+    ProgBuf8     = 8'h28,
+    ProgBuf9     = 8'h29,
+    ProgBuf10    = 8'h2A,
+    ProgBuf11    = 8'h2B,
+    ProgBuf12    = 8'h2C,
+    ProgBuf13    = 8'h2D,
+    ProgBuf14    = 8'h2E,
     ProgBuf15    = 8'h2F,
     AuthData     = 8'h30,
     HaltSum2     = 8'h34,
@@ -896,6 +910,14 @@ package dm;
     CSR_INSTRET        = 12'hC02
   } csr_reg_t;
 
+  // SBA state
+  typedef enum logic [2:0] {
+    Idle,
+    Read,
+    Write,
+    WaitRead,
+    WaitWrite
+  } sba_state_e;
 
   // Instruction Generation Helpers
   function automatic logic [31:0] jal (logic [4:0]  rd,
@@ -1008,6 +1030,7 @@ package dm;
   endfunction
 
 endpackage : dm
+
 // Copyright 2019 ETH Zurich and University of Bologna.
 //
 // Copyright and related rights are licensed under the Solderpad Hardware
@@ -3728,7 +3751,8 @@ assign       test_en_i = 1'b0;
       .DataIndTiming   ( DataIndTiming   ),
       .SpecBranch      ( SpecBranch      ),
       .WritebackStage  ( WritebackStage  ),
-      .BranchPredictor ( BranchPredictor )
+      .BranchPredictor ( BranchPredictor ),
+      .FloatingPoint   ( FloatingPoint   )
   ) id_stage_i (
       .clk_i                        ( clk                      ),
       .rst_ni                       ( rst_ni                   ),
@@ -4392,7 +4416,7 @@ assign       test_en_i = 1'b0;
     .dst_fmt_i      ( fp_dst_fmt       ),
     .int_fmt_i      ( fpnew_pkg::INT32 ),
     .vectorial_op_i ( 1'b0             ),
-    .tag_i          ( '1               ),
+    .tag_i          (                  ),
     .in_valid_i     ( in_valid_c2fpu   ),
     .in_ready_o     ( out_ready_fpu2c  ),
     .flush_i        ( fp_flush         ),
@@ -5050,21 +5074,8 @@ module brq_counter #(
     end
   end
 
-`ifdef FPGA_XILINX
-  // Set DSP pragma for supported xilinx FPGAs
-  localparam int DspPragma = CounterWidth < 49  ? "yes" : "no";
-  (* use_dsp = DspPragma *) logic [CounterWidth-1:0] counter_q;
-
-  // DSP output register requires synchronous reset.
-  `define COUNTER_FLOP_RST posedge clk_i
-`else
-  logic [CounterWidth-1:0] counter_q;
-
-  `define COUNTER_FLOP_RST posedge clk_i or negedge rst_ni
-`endif
-
   // Counter flop
-  always_ff @(`COUNTER_FLOP_RST) begin
+  always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
       counter_q <= '0;
     end else begin
@@ -5087,7 +5098,6 @@ module brq_counter #(
 endmodule
 
 // Keep helper defines file-local.
-`undef COUNTER_FLOP_RST
 
 /**
  * Control and Status Registers
@@ -9180,10 +9190,9 @@ module brq_idu_controller #(
     // performance monitors
     output logic                  perf_jump_o,             // we are executing a jump
                                                            // instruction (j, jr, jal, jalr)
-    output logic                  perf_tbranch_o,          // we are executing a taken branch
+    output logic                  perf_tbranch_o          // we are executing a taken branch
                                                            // instruction
-    input  logic                  fpu_busy_i
-);
+  );
   import brq_pkg::*;
   logic         instr_bp_taken_i;
   assign        instr_bp_taken_i = '0;
@@ -9860,7 +9869,7 @@ module brq_idu_controller #(
   // If high current instruction cannot complete this cycle. Either because it needs more cycles to
   // finish (stall_id_i) or because the writeback stage cannot accept it yet (stall_wb_i). If there
   // is no writeback stage stall_wb_i is a constant 0.
-  assign stall = stall_id_i | stall_wb_i | fpu_busy_i;
+  assign stall = stall_id_i | stall_wb_i;
 
   // signal to IF stage that ID stage is ready for next instr
   assign id_in_ready_o = ~stall & ~halt_if & ~retain_id;
@@ -11636,7 +11645,8 @@ module brq_idu #(
     parameter bit                BranchTargetALU = 0,
     parameter bit                SpecBranch      = 0,
     parameter bit                WritebackStage  = 0,
-    parameter bit                BranchPredictor = 0
+    parameter bit                BranchPredictor = 0,
+    parameter                    FloatingPoint   = 1
 ) (
     input  logic                      clk_i,
     input  logic                      rst_ni,
@@ -11860,6 +11870,7 @@ module brq_idu #(
   logic        stall_jump;
   logic        stall_id;
   logic        stall_wb;
+  logic        stall_fpu;
   logic        flush_id;
   logic        multicycle_done;
 
@@ -12281,8 +12292,7 @@ module brq_idu #(
 
       // Performance Counters
       .perf_jump_o                    ( perf_jump_o             ),
-      .perf_tbranch_o                 ( perf_tbranch_o          ),
-      .fpu_busy_i                     ( fpu_busy_i              )
+      .perf_tbranch_o                 ( perf_tbranch_o          )
   );
 
   assign fp_flush_o     = flush_id;
@@ -12399,6 +12409,7 @@ module brq_idu #(
     stall_jump              = 1'b0;
     stall_branch            = 1'b0;
     stall_alu               = 1'b0;
+    stall_fpu               = 1'b0;
     branch_set_d            = 1'b0;
     branch_spec             = 1'b0;
     branch_not_set          = 1'b0;
@@ -12418,6 +12429,9 @@ module brq_idu #(
                   id_fsm_d  = MULTI_CYCLE;
                 end
               end
+            end
+            FloatingPoint: begin
+              stall_fpu = fpu_busy_i;
             end
             multdiv_en_dec: begin
               // MUL or DIV operation
@@ -12475,12 +12489,12 @@ module brq_idu #(
             stall_multdiv   = multdiv_en_dec;
             stall_branch    = branch_in_dec;
             stall_jump      = jump_in_dec;
+            stall_fpu       = fpu_busy_i;
           end
         end
-
-       // default: begin
-       //   id_fsm_d          = FIRST_CYCLE;
-       // end
+       default: begin
+         id_fsm_d          = FIRST_CYCLE;
+       end
       endcase
     end
   end
@@ -12491,7 +12505,7 @@ module brq_idu #(
 
   // Stall ID/EX stage for reason that relates to instruction in ID/EX
   assign stall_id = stall_ld_hz | stall_mem | stall_multdiv | stall_jump | stall_branch |
-                      stall_alu;
+                      stall_alu | stall_fpu;
 
   assign instr_done = ~stall_id & ~flush_id & instr_executing;
 
@@ -13187,16 +13201,18 @@ module brq_ifu_fifo #(
   end
 
   for (genvar i = 0; i < DEPTH; i++) begin : g_fifo_regs
-    always_ff @(posedge clk_i) begin
-      if (entry_en[i]) begin
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+      if (~rst_ni) begin
+        rdata_q[i]   <= '0;
+        err_q[i]     <= '0;
+      end
+      else if (entry_en[i]) begin
         rdata_q[i]   <= rdata_d[i];
         err_q[i]     <= err_d[i];
       end
     end
   end
-
-
-
+  
 endmodule
 
 /**
@@ -14613,8 +14629,19 @@ module brq_wbu #(
       end
     end
 
-    always_ff @(posedge clk_i) begin
-      if(en_wb_i) begin
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+      if (~rst_ni) begin
+        rf_we_wb_q       <= '0;
+        rf_waddr_wb_q    <= '0;
+        rf_wdata_wb_q    <= '0;
+        wb_instr_type_q  <= '0;
+        wb_pc_q          <= '0;
+        wb_compressed_q  <= '0;
+        wb_count_q       <= '0;
+        fp_rf_we_wb_q    <= '0;
+        fp_load_q        <= '0;
+      end
+      else if(en_wb_i) begin
         rf_we_wb_q       <= rf_we_id_i;
         rf_waddr_wb_q    <= rf_waddr_id_i;
         rf_wdata_wb_q    <= rf_wdata_id_i;
@@ -14622,11 +14649,8 @@ module brq_wbu #(
         wb_pc_q          <= pc_id_i;
         wb_compressed_q  <= instr_is_compressed_id_i;
         wb_count_q       <= instr_perf_count_id_i;
-
         // added for floating point registers for wb stage
         fp_rf_we_wb_q    <= fp_rf_wen_id_i;
-      //  fp_rf_waddr_wb_q <= rf_waddr_id_i;
-        //fp_rf_wdata_wb_q <= rf_wdata_id_i;
         fp_load_q        <= fp_load_i;
       end
     end
@@ -18684,8 +18708,8 @@ module dm_csrs #(
 
   logic [31:0] resp_queue_data;
 
-  localparam dm::dm_csr_e DataEnd = dm::dm_csr_e'(dm::Data0 + {4'b0, dm::DataCount} - 8'h1);
-  localparam dm::dm_csr_e ProgBufEnd = dm::dm_csr_e'(dm::ProgBuf0 + {4'b0, dm::ProgBufSize} - 8'h1);
+  localparam dm::dm_csr_e DataEnd = dm::dm_csr_e'(dm::Data0 + {4'h0, dm::DataCount} - 8'h1);
+  localparam dm::dm_csr_e ProgBufEnd = dm::dm_csr_e'(dm::ProgBuf0 + {4'h0, dm::ProgBufSize} - 8'h1);
 
   logic [31:0] haltsum0, haltsum1, haltsum2, haltsum3;
   logic [((NrHarts-1)/2**5 + 1) * 32 - 1 : 0] halted;
@@ -18801,10 +18825,17 @@ module dm_csrs #(
   end
 
   // helper variables
+  dm::dm_csr_e dm_csr_addr;
   dm::sbcs_t sbcs;
-  dm::dmcontrol_t dmcontrol;
   dm::abstractcs_t a_abstractcs;
-  logic [4:0] autoexecdata_idx;
+  logic [3:0] autoexecdata_idx; // 0 == Data0 ... 11 == Data11
+
+  // Get the data index, i.e. 0 for dm::Data0 up to 11 for dm::Data11
+  assign dm_csr_addr = dm::dm_csr_e'({1'b0, dmi_req_i.addr});
+  // Xilinx Vivado 2020.1 does not allow subtraction of two enums; do the subtraction with logic
+  // types instead.
+  assign autoexecdata_idx = 4'({dm_csr_addr} - {dm::Data0});
+
   always_comb begin : csr_read_write
     // --------------------
     // Static Values (R/O)
@@ -18861,7 +18892,7 @@ module dm_csrs #(
     sbaddr_d            = 64'(sbaddress_i);
     sbdata_d            = sbdata_q;
 
-    resp_queue_data         = 32'b0;
+    resp_queue_data         = 32'h0;
     cmd_valid_d             = 1'b0;
     sbaddress_write_valid_o = 1'b0;
     sbdata_read_valid_o     = 1'b0;
@@ -18870,24 +18901,19 @@ module dm_csrs #(
 
     // helper variables
     sbcs         = '0;
-    dmcontrol    = '0;
     a_abstractcs = '0;
 
-    autoexecdata_idx    = dmi_req_i.addr[4:0] - 5'(dm::Data0);
-
-    // localparam int unsigned DataCountAlign = $clog2(dm::DataCount);
     // reads
     if (dmi_req_ready_o && dmi_req_valid_i && dtm_op == dm::DTM_READ) begin
-      unique case ({1'b0, dmi_req_i.addr}) inside
+      unique case (dm_csr_addr) inside
         [(dm::Data0):DataEnd]: begin
-          // logic [$clog2(dm::DataCount)-1:0] resp_queue_idx;
-          // resp_queue_idx = dmi_req_i.addr[4:0] - int'(dm::Data0);
           resp_queue_data = data_q[$clog2(dm::DataCount)'(autoexecdata_idx)];
           if (!cmdbusy_i) begin
             // check whether we need to re-execute the command (just give a cmd_valid)
-            if (autoexecdata_idx < $bits(abstractauto_q.autoexecdata)) begin
-              cmd_valid_d = abstractauto_q.autoexecdata[autoexecdata_idx];
-            end
+            cmd_valid_d = abstractauto_q.autoexecdata[autoexecdata_idx];
+          // An abstract command was executing while one of the data registers was read
+          end else if (cmderr_q == dm::CmdErrNone) begin
+            cmderr_d = dm::CmdErrBusy;
           end
         end
         dm::DMControl:    resp_queue_data = dmcontrol_q;
@@ -18903,6 +18929,10 @@ module dm_csrs #(
             // check whether we need to re-execute the command (just give a cmd_valid)
             // range of autoexecprogbuf is 31:16
             cmd_valid_d = abstractauto_q.autoexecprogbuf[{1'b1, dmi_req_i.addr[3:0]}];
+
+          // An abstract command was executing while one of the progbuf registers was read
+          end else if (cmderr_q == dm::CmdErrNone) begin
+            cmderr_d = dm::CmdErrBusy;
           end
         end
         dm::HaltSum0: resp_queue_data = haltsum0;
@@ -18913,24 +18943,14 @@ module dm_csrs #(
           resp_queue_data = sbcs_q;
         end
         dm::SBAddress0: begin
-          // access while the SBA was busy
-          if (sbbusy_i) begin
-            sbcs_d.sbbusyerror = 1'b1;
-          end else begin
-            resp_queue_data = sbaddr_q[31:0];
-          end
+          resp_queue_data = sbaddr_q[31:0];
         end
         dm::SBAddress1: begin
-          // access while the SBA was busy
-          if (sbbusy_i) begin
-            sbcs_d.sbbusyerror = 1'b1;
-          end else begin
-            resp_queue_data = sbaddr_q[63:32];
-          end
+          resp_queue_data = sbaddr_q[63:32];
         end
         dm::SBData0: begin
           // access while the SBA was busy
-          if (sbbusy_i) begin
+          if (sbbusy_i || sbcs_q.sbbusyerror) begin
             sbcs_d.sbbusyerror = 1'b1;
           end else begin
             sbdata_read_valid_o = (sbcs_q.sberror == '0);
@@ -18939,7 +18959,7 @@ module dm_csrs #(
         end
         dm::SBData1: begin
           // access while the SBA was busy
-          if (sbbusy_i) begin
+          if (sbbusy_i || sbcs_q.sbbusyerror) begin
             sbcs_d.sbbusyerror = 1'b1;
           end else begin
             resp_queue_data = sbdata_q[63:32];
@@ -18951,24 +18971,26 @@ module dm_csrs #(
 
     // write
     if (dmi_req_ready_o && dmi_req_valid_i && dtm_op == dm::DTM_WRITE) begin
-      unique case (dm::dm_csr_e'({1'b0, dmi_req_i.addr})) inside
+      unique case (dm_csr_addr) inside
         [(dm::Data0):DataEnd]: begin
-          // attempts to write them while busy is set does not change their value
-          if (!cmdbusy_i && dm::DataCount > 0) begin
-            data_d[dmi_req_i.addr[$clog2(dm::DataCount)-1:0]] = dmi_req_i.data;
-            // check whether we need to re-execute the command (just give a cmd_valid)
-            if (autoexecdata_idx < $bits(abstractauto_q.autoexecdata)) begin
+          if (dm::DataCount > 0) begin
+            // attempts to write them while busy is set does not change their value
+            if (!cmdbusy_i) begin
+              data_d[dmi_req_i.addr[$clog2(dm::DataCount)-1:0]] = dmi_req_i.data;
+              // check whether we need to re-execute the command (just give a cmd_valid)
               cmd_valid_d = abstractauto_q.autoexecdata[autoexecdata_idx];
+            //An abstract command was executing while one of the data registers was written
+            end else if (cmderr_q == dm::CmdErrNone) begin
+              cmderr_d = dm::CmdErrBusy;
             end
           end
         end
         dm::DMControl: begin
-          dmcontrol = dm::dmcontrol_t'(dmi_req_i.data);
+          dmcontrol_d = dmi_req_i.data;
           // clear the havreset of the selected hart
-          if (dmcontrol.ackhavereset) begin
+          if (dmcontrol_d.ackhavereset) begin
             havereset_d_aligned[selected_hart] = 1'b0;
           end
-          dmcontrol_d = dmi_req_i.data;
         end
         dm::DMStatus:; // write are ignored to R/O register
         dm::Hartinfo:; // hartinfo is R/O
@@ -19000,7 +19022,7 @@ module dm_csrs #(
         dm::AbstractAuto: begin
           // this field can only be written legally when there is no command executing
           if (!cmdbusy_i) begin
-            abstractauto_d                 = 32'b0;
+            abstractauto_d                 = 32'h0;
             abstractauto_d.autoexecdata    = 12'(dmi_req_i.data[dm::DataCount-1:0]);
             abstractauto_d.autoexecprogbuf = 16'(dmi_req_i.data[dm::ProgBufSize-1+16:16]);
           end else if (cmderr_q == dm::CmdErrNone) begin
@@ -19016,6 +19038,9 @@ module dm_csrs #(
             // was busy
             // range of autoexecprogbuf is 31:16
             cmd_valid_d = abstractauto_q.autoexecprogbuf[{1'b1, dmi_req_i.addr[3:0]}];
+          //An abstract command was executing while one of the progbuf registers was written
+          end else if (cmderr_q == dm::CmdErrNone) begin
+            cmderr_d = dm::CmdErrBusy;
           end
         end
         dm::SBCS: begin
@@ -19032,7 +19057,7 @@ module dm_csrs #(
         end
         dm::SBAddress0: begin
           // access while the SBA was busy
-          if (sbbusy_i) begin
+          if (sbbusy_i || sbcs_q.sbbusyerror) begin
             sbcs_d.sbbusyerror = 1'b1;
           end else begin
             sbaddr_d[31:0] = dmi_req_i.data;
@@ -19041,7 +19066,7 @@ module dm_csrs #(
         end
         dm::SBAddress1: begin
           // access while the SBA was busy
-          if (sbbusy_i) begin
+          if (sbbusy_i || sbcs_q.sbbusyerror) begin
             sbcs_d.sbbusyerror = 1'b1;
           end else begin
             sbaddr_d[63:32] = dmi_req_i.data;
@@ -19049,7 +19074,7 @@ module dm_csrs #(
         end
         dm::SBData0: begin
           // access while the SBA was busy
-          if (sbbusy_i) begin
+          if (sbbusy_i || sbcs_q.sbbusyerror) begin
            sbcs_d.sbbusyerror = 1'b1;
           end else begin
             sbdata_d[31:0] = dmi_req_i.data;
@@ -19058,7 +19083,7 @@ module dm_csrs #(
         end
         dm::SBData1: begin
           // access while the SBA was busy
-          if (sbbusy_i) begin
+          if (sbbusy_i || sbcs_q.sbbusyerror) begin
            sbcs_d.sbbusyerror = 1'b1;
           end else begin
             sbdata_d[63:32] = dmi_req_i.data;
@@ -19128,7 +19153,7 @@ module dm_csrs #(
     // default assignment
     haltreq_o = '0;
     resumereq_o = '0;
-    if (selected_hart < (HartSelLen+1)'(NrHarts)) begin
+    if (selected_hart <= HartSelLen'(NrHarts-1)) begin
       haltreq_o[selected_hart]   = dmcontrol_q.haltreq;
       resumereq_o[selected_hart] = dmcontrol_q.resumereq;
     end
@@ -19139,15 +19164,8 @@ module dm_csrs #(
   assign cmd_valid_o = cmd_valid_q;
   assign progbuf_o   = progbuf_q;
   assign data_o      = data_q;
-  
-  always_comb begin
-  	if(~rst_ni) begin
-	 ndmreset_o = 1'b0;
-	end else begin
-	 ndmreset_o = dmcontrol_q.ndmreset;
-	end
-  end
- // assign ndmreset_o = dmcontrol_q.ndmreset;
+
+  assign ndmreset_o = dmcontrol_q.ndmreset;
 
   logic unused_testmode;
   assign unused_testmode = testmode_i;
@@ -19167,7 +19185,8 @@ module dm_csrs #(
     .rdata_o ( dmi_resp_o.data      ),
     .rvalid_o( dmi_resp_valid_o     ),
     .rready_i( dmi_resp_ready_i     ),
-    .depth_o (                      )  // Doesn't use
+    .full_o  (                      ), // Unused
+    .depth_o (                      )  // Unused
   );
 
   always_ff @(posedge clk_i or negedge rst_ni) begin : p_regs
@@ -19226,9 +19245,6 @@ module dm_csrs #(
       end
     end
   end
-
-
-  //pragma translate_on
 
 endmodule : dm_csrs
 /* Copyright 2018 ETH Zurich and University of Bologna.
@@ -19315,8 +19331,7 @@ module dmi_cdc (
     .rdepth_o    (                  )
   );
 
-endmodule : dmi_cdc
-/* Copyright 2018 ETH Zurich and University of Bologna.
+endmodule : dmi_cdc/* Copyright 2018 ETH Zurich and University of Bologna.
 * Copyright and related rights are licensed under the Solderpad Hardware
 * License, Version 0.51 (the “License”); you may not use this file except in
 * compliance with the License.  You may obtain a copy of the License at
@@ -19449,8 +19464,15 @@ module dmi_jtag #(
 
       Write: begin
         dmi_req_valid = 1'b1;
-        // got a valid answer go back to idle
+        // request sent, wait for response before going back to idle
         if (dmi_req_ready) begin
+          state_d = WaitWriteValid;
+        end
+      end
+
+      WaitWriteValid: begin
+        // got a valid answer go back to idle
+        if (dmi_resp_valid) begin
           state_d = Idle;
         end
       end
@@ -19480,7 +19502,7 @@ module dmi_jtag #(
       error_d = DMIBusy;
     end
     // clear sticky error flag
-    if (dmi_reset && dtmcs_select) begin
+    if (update_dr && dmi_reset && dtmcs_select) begin
       error_d = DMINoError;
     end
   end
@@ -19536,13 +19558,13 @@ module dmi_jtag #(
     .IrLength (5),
     .IdcodeValue(IdcodeValue)
   ) i_dmi_jtag_tap (
-    .tck_i (tck_i) ,
-    .tms_i (tms_i),
-    .trst_ni (trst_ni),
-    .td_i    (td_i),
-    .td_o    (td_o),
-    .tdo_oe_o(tdo_oe_o),
-    .testmode_i (testmode_i),
+    .tck_i,
+    .tms_i,
+    .trst_ni,
+    .td_i,
+    .td_o,
+    .tdo_oe_o,
+    .testmode_i,
     .test_logic_reset_o ( test_logic_reset ),
     .shift_dr_o         ( shift_dr         ),
     .update_dr_o        ( update_dr        ),
@@ -19560,8 +19582,8 @@ module dmi_jtag #(
   // ---------
   dmi_cdc i_dmi_cdc (
     // JTAG side (master side)
-    .tck_i  (tck_i),
-    .trst_ni (trst_ni),
+    .tck_i,
+    .trst_ni,
     .jtag_dmi_req_i    ( dmi_req          ),
     .jtag_dmi_ready_o  ( dmi_req_ready    ),
     .jtag_dmi_valid_i  ( dmi_req_valid    ),
@@ -19738,7 +19760,7 @@ module dmi_jtag_tap #(
                       dmireset     : 1'b0,
                       zero0        : '0,
                       idle         : 3'd1, // 1: Enter Run-Test/Idle and leave it immediately
-                      dmistat      : dmi_error_i, // 0: No error, 1: Op failed, 2: too fast
+                      dmistat      : dmi_error_i, // 0: No error, 2: Op failed, 3: too fast
                       abits        : 6'd7, // The size of address in dmi
                       version      : 4'd1  // Version described in spec version 0.13 (and later?)
                     };
@@ -19906,7 +19928,7 @@ module dmi_jtag_tap #(
         update_ir = 1'b1;
         tap_state_d = (tms_i) ? SelectDrScan : RunTestIdle;
       end
-      //default: ; // can't actually happen since case is full
+      default: ; // can't actually happen since case is full
     endcase
   end
 
@@ -20114,7 +20136,7 @@ module dm_mem #(
         end
       end
 
-      //default: ;
+      default: ;
     endcase
 
     // only signal once that cmd is unsupported so that we can clear cmderr
@@ -20282,7 +20304,7 @@ module dm_mem #(
       dm::AccessRegister: begin
         if (32'(ac_ar.aarsize) < MaxAar && ac_ar.transfer && ac_ar.write) begin
           // store a0 in dscratch1
-          abstract_cmd[0][31:0] = HasSndScratch ? dm::csrr(dm::CSR_DSCRATCH1, 5'd10) : dm::nop();
+          abstract_cmd[0][31:0] = HasSndScratch ? dm::csrw(dm::CSR_DSCRATCH1, 5'd10) : dm::nop();
           // this range is reserved
           if (ac_ar.regno[15:14] != '0) begin
             abstract_cmd[0][31:0] = dm::ebreak(); // we leave asap
@@ -20324,7 +20346,7 @@ module dm_mem #(
         end else if (32'(ac_ar.aarsize) < MaxAar && ac_ar.transfer && !ac_ar.write) begin
           // store a0 in dscratch1
           abstract_cmd[0][31:0]  = HasSndScratch ?
-                                   dm::csrr(dm::CSR_DSCRATCH1, LoadBaseAddr) :
+                                   dm::csrw(dm::CSR_DSCRATCH1, LoadBaseAddr) :
                                    dm::nop();
           // this range is reserved
           if (ac_ar.regno[15:14] != '0) begin
@@ -20466,7 +20488,8 @@ endmodule : dm_mem
 *
 */
 module dm_sba #(
-  parameter int unsigned BusWidth = 32
+  parameter int unsigned BusWidth = 32,
+  parameter bit          ReadByteEnable = 1
 ) (
   input  logic                   clk_i,       // Clock
   input  logic                   rst_ni,
@@ -20502,17 +20525,37 @@ module dm_sba #(
   output logic [2:0]             sberror_o // bus error occurred
 );
 
-  typedef enum logic [2:0] { Idle, Read, Write, WaitRead, WaitWrite } state_e;
-  state_e state_d, state_q;
+  dm::sba_state_e state_d, state_q;
 
   logic [BusWidth-1:0]           address;
   logic                          req;
   logic                          gnt;
   logic                          we;
   logic [BusWidth/8-1:0]         be;
+  logic [BusWidth/8-1:0]         be_mask;
   logic [$clog2(BusWidth/8)-1:0] be_idx;
 
-  assign sbbusy_o = logic'(state_q != Idle);
+  assign sbbusy_o = logic'(state_q != dm::Idle);
+
+  always_comb begin : p_be_mask
+    be_mask = '0;
+
+    // generate byte enable mask
+    unique case (sbaccess_i)
+      3'b000: begin
+        be_mask[be_idx] = '1;
+      end
+      3'b001: begin
+        be_mask[int'({be_idx[$high(be_idx):1], 1'b0}) +: 2] = '1;
+      end
+      3'b010: begin
+        if (BusWidth == 32'd64) be_mask[int'({be_idx[$high(be_idx)], 2'h0}) +: 4] = '1;
+        else                    be_mask = '1;
+      end
+      3'b011: be_mask = '1;
+      default: ;
+    endcase
+  end
 
   always_comb begin : p_fsm
     req     = 1'b0;
@@ -20528,64 +20571,51 @@ module dm_sba #(
     state_d = state_q;
 
     unique case (state_q)
-      Idle: begin
+      dm::Idle: begin
         // debugger requested a read
-        if (sbaddress_write_valid_i && sbreadonaddr_i)  state_d = Read;
+        if (sbaddress_write_valid_i && sbreadonaddr_i)  state_d = dm::Read;
         // debugger requested a write
-        if (sbdata_write_valid_i) state_d = Write;
+        if (sbdata_write_valid_i) state_d = dm::Write;
         // perform another read
-        if (sbdata_read_valid_i && sbreadondata_i) state_d = Read;
+        if (sbdata_read_valid_i && sbreadondata_i) state_d = dm::Read;
       end
 
-      Read: begin
+      dm::Read: begin
         req = 1'b1;
-        if (gnt) state_d = WaitRead;
+        if (ReadByteEnable) be = be_mask;
+        if (gnt) state_d = dm::WaitRead;
       end
 
-      Write: begin
+      dm::Write: begin
         req = 1'b1;
         we  = 1'b1;
-        // generate byte enable mask
-        unique case (sbaccess_i)
-          3'b000: begin
-            be[be_idx] = '1;
-          end
-          3'b001: begin
-            be[int'({be_idx[$high(be_idx):1], 1'b0}) +: 2] = '1;
-          end
-          3'b010: begin
-            if (BusWidth == 32'd64) be[int'({be_idx[$high(be_idx)], 2'h0}) +: 4] = '1;
-            else                    be = '1;
-          end
-          3'b011: be = '1;
-          default: ;
-        endcase
-        if (gnt) state_d = WaitWrite;
+        be = be_mask;
+        if (gnt) state_d = dm::WaitWrite;
       end
 
-      WaitRead: begin
+      dm::WaitRead: begin
         if (sbdata_valid_o) begin
-          state_d = Idle;
+          state_d = dm::Idle;
           // auto-increment address
           if (sbautoincrement_i) sbaddress_o = sbaddress_i + (32'h1 << sbaccess_i);
         end
       end
 
-      WaitWrite: begin
+      dm::WaitWrite: begin
         if (sbdata_valid_o) begin
-          state_d = Idle;
+          state_d = dm::Idle;
           // auto-increment address
           if (sbautoincrement_i) sbaddress_o = sbaddress_i + (32'h1 << sbaccess_i);
         end
       end
 
-      default: state_d = Idle; // catch parasitic state
+      default: state_d = dm::Idle; // catch parasitic state
     endcase
 
     // handle error case
-    if (sbaccess_i > 3 && state_q != Idle) begin
+    if (sbaccess_i > 3 && state_q != dm::Idle) begin
       req             = 1'b0;
-      state_d         = Idle;
+      state_d         = dm::Idle;
       sberror_valid_o = 1'b1;
       sberror_o       = 3'd3;
     end
@@ -20594,7 +20624,7 @@ module dm_sba #(
 
   always_ff @(posedge clk_i or negedge rst_ni) begin : p_regs
     if (!rst_ni) begin
-      state_q <= Idle;
+      state_q <= dm::Idle;
     end else begin
       state_q <= state_d;
     end
@@ -20609,17 +20639,208 @@ module dm_sba #(
   assign sbdata_valid_o  = master_r_valid_i;
   assign sbdata_o        = master_r_rdata_i[BusWidth-1:0];
 
-
-  //pragma translate_off
-  // `ifndef VERILATOR
-  //   // maybe bump severity to $error if not handled at runtime
-  //   dm_sba_access_size: assert property(@(posedge clk_i) disable iff (dmactive_i !== 1'b0)
-  //       (state_d != Idle) |-> (sbaccess_i < 4))
-  //           else $warning ("accesses > 8 byte not supported at the moment");
-  // `endif
-  //pragma translate_on
-
 endmodule : dm_sba
+
+// Generic asynchronous fifo for use in a variety of devices.
+
+
+module fifo_async #(
+  parameter  int unsigned Width  = 16,
+  parameter  int unsigned Depth  = 3,
+  localparam int unsigned DepthW = $clog2(Depth+1) // derived parameter representing [0..Depth]
+) (
+  // write port
+  input    logic              clk_wr_i,
+  input    logic              rst_wr_ni,
+  input    logic              wvalid_i,
+  output   logic              wready_o,
+  input    logic [Width-1:0]  wdata_i,
+  output   logic [DepthW-1:0] wdepth_o,
+
+  // read port
+  input    logic              clk_rd_i,
+  input    logic              rst_rd_ni,
+  output   logic              rvalid_o,
+  input    logic              rready_i,
+  output   logic [Width-1:0]  rdata_o,
+  output   logic [DepthW-1:0] rdepth_o
+);
+
+
+  localparam int unsigned PTRV_W = $clog2(Depth);
+  localparam logic [PTRV_W-1:0] DepthMinus1 = PTRV_W'(Depth - 1);
+  localparam int unsigned PTR_WIDTH = PTRV_W+1;
+
+  logic [PTR_WIDTH-1:0]    fifo_wptr, fifo_rptr;
+  logic [PTR_WIDTH-1:0]    fifo_wptr_sync_combi,   fifo_rptr_sync;
+  logic [PTR_WIDTH-1:0]    fifo_wptr_gray_sync,    fifo_rptr_gray_sync;
+  logic [PTR_WIDTH-1:0]    fifo_wptr_gray,         fifo_rptr_gray;
+  logic                    fifo_incr_wptr, fifo_incr_rptr, empty;
+
+  logic full_wclk, full_rclk;
+
+  assign wready_o = !full_wclk;
+  assign rvalid_o = !empty;
+
+  // create the write and read pointers
+
+  assign fifo_incr_wptr = wvalid_i & wready_o;
+  assign fifo_incr_rptr = rvalid_o & rready_i;
+
+  ///////////////////
+  // write pointer //
+  ///////////////////
+
+  always_ff @(posedge clk_wr_i or negedge rst_wr_ni)
+    if (!rst_wr_ni) begin
+      fifo_wptr <= {(PTR_WIDTH){1'b0}};
+    end else if (fifo_incr_wptr) begin
+      if (fifo_wptr[PTR_WIDTH-2:0] == DepthMinus1) begin
+        fifo_wptr <= {~fifo_wptr[PTR_WIDTH-1],{(PTR_WIDTH-1){1'b0}}};
+      end else begin
+        fifo_wptr <= fifo_wptr + {{(PTR_WIDTH-1){1'b0}},1'b1};
+    end
+  end
+
+  // gray-coded version
+  always_ff @(posedge clk_wr_i or negedge rst_wr_ni)
+    if (!rst_wr_ni) begin
+      fifo_wptr_gray <= {(PTR_WIDTH){1'b0}};
+    end else if (fifo_incr_wptr) begin
+      if (fifo_wptr[PTR_WIDTH-2:0] == DepthMinus1) begin
+        fifo_wptr_gray <= dec2gray({~fifo_wptr[PTR_WIDTH-1],{(PTR_WIDTH-1){1'b0}}});
+      end else begin
+        fifo_wptr_gray <= dec2gray(fifo_wptr + {{(PTR_WIDTH-1){1'b0}},1'b1});
+      end
+    end
+
+  prim_generic_flop_2sync #(.Width(PTR_WIDTH)) sync_wptr (
+    .clk_i    (clk_rd_i),
+    .rst_ni   (rst_rd_ni),
+    .d_i      (fifo_wptr_gray),
+    .q_o      (fifo_wptr_gray_sync));
+
+  assign fifo_wptr_sync_combi = gray2dec(fifo_wptr_gray_sync);
+
+  //////////////////
+  // read pointer //
+  //////////////////
+
+  always_ff @(posedge clk_rd_i or negedge rst_rd_ni)
+    if (!rst_rd_ni) begin
+      fifo_rptr <= {(PTR_WIDTH){1'b0}};
+    end else if (fifo_incr_rptr) begin
+      if (fifo_rptr[PTR_WIDTH-2:0] == DepthMinus1) begin
+        fifo_rptr <= {~fifo_rptr[PTR_WIDTH-1],{(PTR_WIDTH-1){1'b0}}};
+      end else begin
+        fifo_rptr <= fifo_rptr + {{(PTR_WIDTH-1){1'b0}},1'b1};
+    end
+  end
+
+  // gray-coded version
+  always_ff @(posedge clk_rd_i or negedge rst_rd_ni)
+    if (!rst_rd_ni) begin
+      fifo_rptr_gray <= {(PTR_WIDTH){1'b0}};
+    end else if (fifo_incr_rptr) begin
+      if (fifo_rptr[PTR_WIDTH-2:0] == DepthMinus1) begin
+        fifo_rptr_gray <= dec2gray({~fifo_rptr[PTR_WIDTH-1],{(PTR_WIDTH-1){1'b0}}});
+      end else begin
+        fifo_rptr_gray <= dec2gray(fifo_rptr + {{(PTR_WIDTH-1){1'b0}},1'b1});
+      end
+    end
+
+  prim_generic_flop_2sync #(.Width(PTR_WIDTH)) sync_rptr (
+    .clk_i    (clk_wr_i),
+    .rst_ni   (rst_wr_ni),
+    .d_i      (fifo_rptr_gray),
+    .q_o      (fifo_rptr_gray_sync));
+
+  always_ff @(posedge clk_wr_i or negedge rst_wr_ni)
+    if (!rst_wr_ni) begin
+      fifo_rptr_sync <= {PTR_WIDTH{1'b0}};
+    end else begin
+      fifo_rptr_sync <= gray2dec(fifo_rptr_gray_sync);
+    end
+
+  //////////////////
+  // empty / full //
+  //////////////////
+
+  assign  full_wclk = (fifo_wptr == (fifo_rptr_sync ^ {1'b1,{(PTR_WIDTH-1){1'b0}}}));
+  assign  full_rclk = (fifo_wptr_sync_combi == (fifo_rptr ^ {1'b1,{(PTR_WIDTH-1){1'b0}}}));
+
+  // Current depth in the write clock side
+  logic  wptr_msb;
+  logic  rptr_sync_msb;
+  logic  [PTRV_W-1:0] wptr_value;
+  logic  [PTRV_W-1:0] rptr_sync_value;
+  assign wptr_msb = fifo_wptr[PTR_WIDTH-1];
+  assign rptr_sync_msb = fifo_rptr_sync[PTR_WIDTH-1];
+  assign wptr_value = fifo_wptr[0+:PTRV_W];
+  assign rptr_sync_value = fifo_rptr_sync[0+:PTRV_W];
+  assign wdepth_o = (full_wclk) ? DepthW'(Depth) :
+                    (wptr_msb == rptr_sync_msb) ? DepthW'(wptr_value) - DepthW'(rptr_sync_value) :
+                    (DepthW'(Depth) - DepthW'(rptr_sync_value) + DepthW'(wptr_value)) ;
+
+  // Same again in the read clock side
+  assign empty = (fifo_wptr_sync_combi ==  fifo_rptr);
+  logic  rptr_msb;
+  logic  wptr_sync_msb;
+  logic  [PTRV_W-1:0] rptr_value;
+  logic  [PTRV_W-1:0] wptr_sync_value;
+  assign wptr_sync_msb = fifo_wptr_sync_combi[PTR_WIDTH-1];
+  assign rptr_msb = fifo_rptr[PTR_WIDTH-1];
+  assign wptr_sync_value = fifo_wptr_sync_combi[0+:PTRV_W];
+  assign rptr_value = fifo_rptr[0+:PTRV_W];
+  assign rdepth_o = (full_rclk) ? DepthW'(Depth) :
+                    (wptr_sync_msb == rptr_msb) ? DepthW'(wptr_sync_value) - DepthW'(rptr_value) :
+                    (DepthW'(Depth) - DepthW'(rptr_value) + DepthW'(wptr_sync_value)) ;
+
+  /////////////
+  // storage //
+  /////////////
+
+  logic [Width-1:0] storage [Depth];
+
+  always_ff @(posedge clk_wr_i)
+    if (fifo_incr_wptr) begin
+      storage[fifo_wptr[PTR_WIDTH-2:0]] <= wdata_i;
+    end
+
+  assign rdata_o = storage[fifo_rptr[PTR_WIDTH-2:0]];
+
+  // gray code conversion functions.  algorithm walks up from 0..N-1
+  // then flips the upper bit and walks down from N-1 to 0.
+
+  function automatic [PTR_WIDTH-1:0] dec2gray(input logic [PTR_WIDTH-1:0] decval);
+    logic [PTR_WIDTH-1:0] decval_sub;
+    logic [PTR_WIDTH-2:0] decval_in;
+    logic                 unused_decval_msb;
+
+    decval_sub = (PTR_WIDTH)'(Depth) - {1'b0, decval[PTR_WIDTH-2:0]} - 1'b1;
+
+    {unused_decval_msb, decval_in} = decval[PTR_WIDTH-1] ? decval_sub : decval;
+    // Was done in two assigns for low bits and top bit
+    // but that generates a (bogus) verilator warning, so do in one assign
+    dec2gray = {decval[PTR_WIDTH-1],
+                {1'b0,decval_in[PTR_WIDTH-2:1]} ^ decval_in[PTR_WIDTH-2:0]};
+  endfunction
+
+  function automatic [PTR_WIDTH-1:0] gray2dec(input logic [PTR_WIDTH-1:0] grayval);
+    logic [PTR_WIDTH-2:0] dec_tmp, dec_tmp_sub;
+    logic                 unused_decsub_msb;
+
+    dec_tmp[PTR_WIDTH-2] = grayval[PTR_WIDTH-2];
+    for (int i = PTR_WIDTH-3; i >= 0; i--)
+      dec_tmp[i] = dec_tmp[i+1]^grayval[i];
+    {unused_decsub_msb, dec_tmp_sub} = (PTR_WIDTH-1)'(Depth) - {1'b0, dec_tmp} - 1'b1;
+    if (grayval[PTR_WIDTH-1])
+      gray2dec = {1'b1,dec_tmp_sub};
+    else
+      gray2dec = {1'b0,dec_tmp};
+  endfunction
+
+endmodule
 
 // Generic asynchronous fifo for use in a variety of devices.
 
@@ -20833,26 +21054,29 @@ module fifo_sync #(
   parameter int unsigned Depth       = 4,
   parameter bit OutputZeroIfEmpty    = 1'b1, // if == 1 always output 0 when FIFO is empty
   // derived parameter
-  localparam int          DepthW     = tlul_pkg::vbits(Depth+1)
+  localparam int          DepthW     = prim_util_pkg::vbits(Depth+1)
 ) (
-  input  logic                 clk_i,
-  input  logic                 rst_ni,
+  input                   clk_i,
+  input                   rst_ni,
   // synchronous clear / flush port
-  input  logic                 clr_i,
+  input                   clr_i,
   // write port
-  input  logic                 wvalid_i,
-  output logic                 wready_o,
-  input  logic [Width-1:0]     wdata_i,
+  input                   wvalid_i,
+  output                  wready_o,
+  input   [Width-1:0]     wdata_i,
   // read port
-  output logic                 rvalid_o,
-  input  logic                 rready_i,
-  output logic [Width-1:0]     rdata_o,
+  output                  rvalid_o,
+  input                   rready_i,
+  output  [Width-1:0]     rdata_o,
   // occupancy
-  output logic [DepthW-1:0]    depth_o
+  output                  full_o,
+  output  [DepthW-1:0]    depth_o
 );
+
 
   // FIFO is in complete passthrough mode
   if (Depth == 0) begin : gen_passthru_fifo
+    
 
     assign depth_o = 1'b0; //output is meaningless
 
@@ -20862,6 +21086,7 @@ module fifo_sync #(
 
     // host facing
     assign wready_o = rready_i;
+    assign full_o = rready_i;
 
     // this avoids lint warnings
     logic unused_clr;
@@ -20870,11 +21095,21 @@ module fifo_sync #(
   // Normal FIFO construction
   end else begin : gen_normal_fifo
 
-    localparam int unsigned PTRV_W    = tlul_pkg::vbits(Depth);
+    localparam int unsigned PTRV_W    = prim_util_pkg::vbits(Depth);
     localparam int unsigned PTR_WIDTH = PTRV_W+1;
 
     logic [PTR_WIDTH-1:0] fifo_wptr, fifo_rptr;
     logic                 fifo_incr_wptr, fifo_incr_rptr, fifo_empty;
+
+    // module under reset flag
+    logic under_rst;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+      if (!rst_ni) begin
+        under_rst <= 1'b1;
+      end else if (under_rst) begin
+        under_rst <= ~under_rst;
+      end
+    end
 
     // create the write and read pointers
     logic  full, empty;
@@ -20891,11 +21126,15 @@ module fifo_sync #(
                      (wptr_msb == rptr_msb) ? DepthW'(wptr_value) - DepthW'(rptr_value) :
                      (DepthW'(Depth) - DepthW'(rptr_value) + DepthW'(wptr_value)) ;
 
-    assign fifo_incr_wptr = wvalid_i & wready_o;
-    assign fifo_incr_rptr = rvalid_o & rready_i;
+    assign fifo_incr_wptr = wvalid_i & wready_o & ~under_rst;
+    assign fifo_incr_rptr = rvalid_o & rready_i & ~under_rst;
 
-    assign wready_o = ~full;
-    assign rvalid_o = ~empty;
+    // full and not ready for write are two different concepts.
+    // The latter can be '0' when under reset, while the former is an indication that no more
+    // entries can be written.
+    assign wready_o = ~full & ~under_rst;
+    assign full_o   = full;
+    assign rvalid_o = ~empty & ~under_rst;
 
     always_ff @(posedge clk_i or negedge rst_ni) begin
       if (!rst_ni) begin
@@ -20966,10 +21205,8 @@ module fifo_sync #(
     end
 
   end // block: gen_normal_fifo
-
-
-
 endmodule
+
 // Copyright 2019 ETH Zurich and University of Bologna.
 //
 // Copyright and related rights are licensed under the Solderpad Hardware
@@ -28647,7 +28884,6 @@ module rr_arb_tree #(
 endmodule : rr_arb_tree
 
 // basic reset managemnet logic for azadi
-
 module rstmgr(
 
     input logic clk_i, //system clock
@@ -28657,46 +28893,21 @@ module rstmgr(
     input  logic  ndmreset, // non-debug module reset
     output logic  sys_rst_ni // reset for system except debug module
 );
-
-  logic rst_d, rst_q;
-  logic rst_fd, rst_fq; // follower flip flop
-  
   always_comb begin
     if(!rst_ni) begin
-      rst_d = 1'b0;
+      sys_rst_ni = 1'b0;
     end else begin 
     	if(!prog_rst_ni) begin
-      	   rst_d = 1'b0;
+      	sys_rst_ni = 1'b0;
     	end else begin
-	   if(ndmreset)begin
-      	     rst_d = 1'b0;
-    	   end else begin
-      	     rst_d = prog_rst_ni;
-    	   end
-	end
+	      if(ndmreset)begin
+      	  sys_rst_ni = 1'b0;
+    	  end else begin
+          sys_rst_ni = prog_rst_ni;
+    	  end
+	    end
     end
   end
-  
-  always_ff @(posedge clk_i ) begin
-   if(~rst_ni) begin
-      rst_q <= 1'b0;
-   end else begin
-      rst_q <= rst_d;
-   end
-    
-  end
-
-  assign rst_fd = rst_q;
-  always_ff @(posedge clk_i ) begin
-    if(~rst_ni) begin
-      rst_fq <= 1'b0;
-    end else begin
-      rst_fq <= rst_fd;
-    end 
-  end
-
-  assign sys_rst_ni = rst_fq;
-
 endmodule
 
 
@@ -35249,7 +35460,7 @@ endmodule
  
 // `include "/home/merl/github_repos/azadi/src/spi_host/rtl/spi_defines.v"
 //`include "/home/zeeshan/fyp/azadi/src/spi_host/rtl/spi_defines.v"
-// `include "spi_defines.v"
+//`include "spi_defines.v"
 module spi_core
 (
   // tlul signals
@@ -35448,7 +35659,7 @@ module spi_core
     );
 endmodule
   
-// `include "spi_defines.v"
+//`include "spi_defines.v"
 
 module spi_shift (
   input  wire                        clk_i,          // system clock
@@ -35553,7 +35764,7 @@ endmodule
 
 // `include "/home/merl/github_repos/azadi/src/spi_host/rtl/spi_defines.v"
 //`include "/home/zeeshan/fyp/azadi/src/spi_host/rtl/spi_defines.v"
-// `include "spi_defines.v"
+//`include "spi_defines.v"
 module spi_top(
 
   input logic clk_i,
@@ -35627,7 +35838,7 @@ tlul_adapter_reg #(
   .error_i (err)
 );
 
-endmodule// Copyright lowRISC contributors.
+endmodule
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 //
