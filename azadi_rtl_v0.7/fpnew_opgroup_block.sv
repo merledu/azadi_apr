@@ -150,7 +150,15 @@ module fpnew_opgroup_block #(
   // ----------------------
   // Generate Merged Slice
   // ----------------------
-  if (fpnew_pkg::any_enabled_multi(FmtUnitTypes, FpFmtMask)) begin : gen_merged_slice
+  import fpnew_pkg::opgroup_e;
+
+  opgroup_e  op_group_test;
+  assign op_group_test = fpnew_pkg::get_opgroup (op_i);
+  logic merge_en;
+  assign merge_en = ((op_group_test == DIVSQRT) || (op_group_test == CONV)) ? 1'b1 : 1'b0;
+  
+  // if (fpnew_pkg::any_enabled_multi(FmtUnitTypes, FpFmtMask)) begin : gen_merged_slice
+  if (merge_en) begin : gen_merged_slice
 
     localparam FMT = fpnew_pkg::get_first_enabled_multi(FmtUnitTypes, FpFmtMask);
     localparam REG = fpnew_pkg::get_num_regs_multi(FmtPipeRegs, FmtUnitTypes, FpFmtMask);
