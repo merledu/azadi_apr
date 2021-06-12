@@ -1064,26 +1064,54 @@ package fpnew_pkg;
     int unsigned man_bits;
   } fp_encoding_t;
 
-  localparam int unsigned NUM_FP_FORMATS = 5; // change me to add formats
+  // localparam int unsigned NUM_FP_FORMATS = 5; // change me to add formats
+  // localparam int unsigned FP_FORMAT_BITS = $clog2(NUM_FP_FORMATS);
+
+  // // FP formats
+  // typedef enum logic [FP_FORMAT_BITS-1:0] {
+  //   FP32    = 'd0,
+  //   FP64    = 'd1,
+  //   FP16    = 'd2,
+  //   FP8     = 'd3,
+  //   FP16ALT = 'd4
+  //   // add new formats here
+  // } fp_format_e;
+
+  // // Encodings for supported FP formats
+  // localparam fp_encoding_t [0:NUM_FP_FORMATS-1] FP_ENCODINGS  = '{
+  //   '{8,  23}, // IEEE binary32 (single)
+  //   '{11, 52}, // IEEE binary64 (double)
+  //   '{5,  10}, // IEEE binary16 (half)
+  //   '{5,  2},  // custom binary8
+  //   '{8,  7}   // custom binary16alt
+  //   // add new formats here
+  // };
+
+    // localparam int unsigned NUM_FP_FORMATS = 5; // change me to add formats
+  // localparam int unsigned FP_FORMAT_BITS = $clog2(NUM_FP_FORMATS);
+
+  // // FP formats
+  // typedef enum logic [FP_FORMAT_BITS-1:0] {
+  //   FP32    = 'd0,
+  //   FP64    = 'd1,
+  //   FP16    = 'd2,
+  //   FP8     = 'd3,
+  //   FP16ALT = 'd4
+  //   // add new formats here
+  // } fp_format_e;
+
+    localparam int unsigned NUM_FP_FORMATS = 1; // change me to add formats
   localparam int unsigned FP_FORMAT_BITS = $clog2(NUM_FP_FORMATS);
 
   // FP formats
   typedef enum logic [FP_FORMAT_BITS-1:0] {
-    FP32    = 'd0,
-    FP64    = 'd1,
-    FP16    = 'd2,
-    FP8     = 'd3,
-    FP16ALT = 'd4
+    FP32    = 'd0
     // add new formats here
   } fp_format_e;
 
   // Encodings for supported FP formats
   localparam fp_encoding_t [0:NUM_FP_FORMATS-1] FP_ENCODINGS  = '{
-    '{8,  23}, // IEEE binary32 (single)
-    '{11, 52}, // IEEE binary64 (double)
-    '{5,  10}, // IEEE binary16 (half)
-    '{5,  2},  // custom binary8
-    '{8,  7}   // custom binary16alt
+    '{8,  23}
     // add new formats here
   };
 
@@ -1103,25 +1131,19 @@ package fpnew_pkg;
   // | INT64      | 64 bit |
   // *NOTE:* Add new formats only at the end of the enumeration for backwards compatibilty!
 
-  localparam int unsigned NUM_INT_FORMATS = 4; // change me to add formats
+  localparam int unsigned NUM_INT_FORMATS = 1; // change me to add formats
   localparam int unsigned INT_FORMAT_BITS = $clog2(NUM_INT_FORMATS);
 
   // Int formats
   typedef enum logic [INT_FORMAT_BITS-1:0] {
-    INT8,
-    INT16,
-    INT32,
-    INT64
+    INT32
     // add new formats here
   } int_format_e;
 
   // Returns the width of an INT format by index
   function automatic int unsigned int_width(int_format_e ifmt);
     unique case (ifmt)
-      INT8:  return 8;
-      INT16: return 16;
       INT32: return 32;
-      INT64: return 64;
      // default: begin
         // pragma translate_off
        // $fatal(1, "Invalid INT format supplied");
@@ -10584,7 +10606,7 @@ module brq_idu_decoder #(
         unique case(instr[14:12])
           3'b011: begin // FSD
             illegal_insn = (RVF == RV64FDouble) ? 1'b0 : 1'b1;
-            fp_src_fmt_o = FP64;
+            //fp_src_fmt_o = FP64;
           end
           3'b010: begin // FSW
             illegal_insn = (RVF == RV32FNone) ? 1'b1 : 1'b0;
@@ -10604,7 +10626,7 @@ module brq_idu_decoder #(
         unique case(instr[14:12])
           3'b011: begin // FLD
             illegal_insn = (RVF == RV64FDouble) ? 1'b0 : 1'b1;
-            fp_src_fmt_o = FP64;
+            //fp_src_fmt_o = FP64;
           end
           3'b010: begin // FLW
             illegal_insn = (RVF == RV32FNone) ? 1'b1 : 1'b0;
@@ -10630,7 +10652,7 @@ module brq_idu_decoder #(
         unique case (instr[26:25])
           01: begin
             illegal_insn = ((RVF == RV64FDouble) & (fp_invalid_rm)) ? 1'b0 : 1'b1;
-            fp_src_fmt_o = FP64;
+            //fp_src_fmt_o = FP64;
           end
           00: begin
             illegal_insn = ((RVF == RV32FNone) & (~fp_invalid_rm)) ? 1'b1 : 1'b0;
@@ -10653,7 +10675,7 @@ module brq_idu_decoder #(
             use_fp_rd_o        = 1'b1;
             fp_swap_oprnds_o   = 1'b1;
             illegal_insn = ((RVF == RV64FDouble) & (fp_invalid_rm)) ? 1'b0 : 1'b1;
-            fp_src_fmt_o = FP64;
+            //fp_src_fmt_o = FP64;
           end
           7'b0001001,      // FMUL.D
           7'b0001101:begin // FDIV.D
@@ -10662,7 +10684,7 @@ module brq_idu_decoder #(
             use_fp_rs2_o       = 1'b1;
             use_fp_rd_o        = 1'b1;
             illegal_insn = ((RVF == RV64FDouble) & (fp_invalid_rm)) ? 1'b0 : 1'b1;
-            fp_src_fmt_o = FP64;
+            //fp_src_fmt_o = FP64;
           end
           7'b0000000,       // FADD.S
           7'b0000100: begin // FSUB.S
@@ -10689,7 +10711,7 @@ module brq_idu_decoder #(
             use_fp_rd_o        = 1'b1;
             if (~|instr[24:20]) begin //FSQRT.D
               illegal_insn = ((RVF == RV64FDouble) & (fp_invalid_rm)) ? 1'b0 : 1'b1;
-              fp_src_fmt_o = FP64;
+              //fp_src_fmt_o = FP64;
             end
           end
           7'b0101100: begin // FSQRT.S
@@ -10728,7 +10750,7 @@ module brq_idu_decoder #(
             use_fp_rd_o        = 1'b1;
             if (~|instr[14:13]) begin
               illegal_insn  = ((RVF == RV64FDouble) & (fp_invalid_rm)) ? 1'b0 : 1'b1;
-              fp_src_fmt_o  = FP64;
+              // fp_src_fmt_o  = FP64;
             end
           end
           7'b0010100: begin // FMIN.S, FMAX.S
@@ -10747,7 +10769,7 @@ module brq_idu_decoder #(
             use_fp_rd_o        = 1'b1;
             if (~(|instr[24:21] | (~instr[20]))) begin
               illegal_insn = ((RVF == RV64FDouble) & (fp_invalid_rm)) ? 1'b0 : 1'b1;
-              fp_src_fmt_o = FP64;
+              //fp_src_fmt_o = FP64;
             end
           end
           7'b1100000: begin // FCVT.W.S, FCVT.WU.S
@@ -10764,7 +10786,7 @@ module brq_idu_decoder #(
             use_fp_rd_o        = 1'b1;
             if (~|instr[24:20]) begin 
               illegal_insn = ((RVF == RV64FDouble) & (fp_invalid_rm)) ? 1'b0 : 1'b1;
-              fp_src_fmt_o = FP64;
+              //fp_src_fmt_o = FP64;
             end
           end
           7'b1110000: begin // FMV.X.W , FCLASS.S
@@ -10792,7 +10814,7 @@ module brq_idu_decoder #(
             use_fp_rs2_o     = 1'b1;
             if (~(instr[14]) | (&instr[13:12])) begin
               illegal_insn = ((RVF == RV64FDouble) & (fp_invalid_rm)) ? 1'b0 : 1'b1;
-              fp_src_fmt_o = FP64;
+              //fp_src_fmt_o = FP64;
             end
           end
           7'b1010000: begin // FEQ.S, FLT.S, FLE.S
@@ -10810,7 +10832,7 @@ module brq_idu_decoder #(
             unique case ({instr[24:20],instr[14:12]}) 
               {5'b00000,3'b001}: begin  
                 illegal_insn = ((RVF == RV64FDouble) & (fp_invalid_rm)) ? 1'b0 : 1'b1;
-                fp_src_fmt_o = FP64;
+                //fp_src_fmt_o = FP64;
               end
               default: begin
                 illegal_insn =1'b1;
@@ -10822,7 +10844,7 @@ module brq_idu_decoder #(
             use_fp_rs1_o     = 1'b1;
             if (~|instr[24:21]) begin
               illegal_insn = ((RVF == RV64FDouble) & (fp_invalid_rm)) ? 1'b0 : 1'b1;
-              fp_src_fmt_o = FP64;
+              //fp_src_fmt_o = FP64;
             end
           end
           7'b1101000: begin // FCVT.S.W, FCVT.S.WU
@@ -10838,7 +10860,7 @@ module brq_idu_decoder #(
             use_fp_rd_o      = 1'b1;
             if (~|instr[24:21]) begin
               illegal_insn = ((RVF == RV64FDouble) & (fp_invalid_rm)) ? 1'b0 : 1'b1;
-              fp_src_fmt_o = FP64;
+              //fp_src_fmt_o = FP64;
             end
           end
           7'b1111000: begin // FMV.W.X
@@ -20643,208 +20665,6 @@ endmodule : dm_sba
 
 // Generic asynchronous fifo for use in a variety of devices.
 
-
-module fifo_async #(
-  parameter  int unsigned Width  = 16,
-  parameter  int unsigned Depth  = 3,
-  localparam int unsigned DepthW = $clog2(Depth+1) // derived parameter representing [0..Depth]
-) (
-  // write port
-  input    logic              clk_wr_i,
-  input    logic              rst_wr_ni,
-  input    logic              wvalid_i,
-  output   logic              wready_o,
-  input    logic [Width-1:0]  wdata_i,
-  output   logic [DepthW-1:0] wdepth_o,
-
-  // read port
-  input    logic              clk_rd_i,
-  input    logic              rst_rd_ni,
-  output   logic              rvalid_o,
-  input    logic              rready_i,
-  output   logic [Width-1:0]  rdata_o,
-  output   logic [DepthW-1:0] rdepth_o
-);
-
-
-  localparam int unsigned PTRV_W = $clog2(Depth);
-  localparam logic [PTRV_W-1:0] DepthMinus1 = PTRV_W'(Depth - 1);
-  localparam int unsigned PTR_WIDTH = PTRV_W+1;
-
-  logic [PTR_WIDTH-1:0]    fifo_wptr, fifo_rptr;
-  logic [PTR_WIDTH-1:0]    fifo_wptr_sync_combi,   fifo_rptr_sync;
-  logic [PTR_WIDTH-1:0]    fifo_wptr_gray_sync,    fifo_rptr_gray_sync;
-  logic [PTR_WIDTH-1:0]    fifo_wptr_gray,         fifo_rptr_gray;
-  logic                    fifo_incr_wptr, fifo_incr_rptr, empty;
-
-  logic full_wclk, full_rclk;
-
-  assign wready_o = !full_wclk;
-  assign rvalid_o = !empty;
-
-  // create the write and read pointers
-
-  assign fifo_incr_wptr = wvalid_i & wready_o;
-  assign fifo_incr_rptr = rvalid_o & rready_i;
-
-  ///////////////////
-  // write pointer //
-  ///////////////////
-
-  always_ff @(posedge clk_wr_i or negedge rst_wr_ni)
-    if (!rst_wr_ni) begin
-      fifo_wptr <= {(PTR_WIDTH){1'b0}};
-    end else if (fifo_incr_wptr) begin
-      if (fifo_wptr[PTR_WIDTH-2:0] == DepthMinus1) begin
-        fifo_wptr <= {~fifo_wptr[PTR_WIDTH-1],{(PTR_WIDTH-1){1'b0}}};
-      end else begin
-        fifo_wptr <= fifo_wptr + {{(PTR_WIDTH-1){1'b0}},1'b1};
-    end
-  end
-
-  // gray-coded version
-  always_ff @(posedge clk_wr_i or negedge rst_wr_ni)
-    if (!rst_wr_ni) begin
-      fifo_wptr_gray <= {(PTR_WIDTH){1'b0}};
-    end else if (fifo_incr_wptr) begin
-      if (fifo_wptr[PTR_WIDTH-2:0] == DepthMinus1) begin
-        fifo_wptr_gray <= dec2gray({~fifo_wptr[PTR_WIDTH-1],{(PTR_WIDTH-1){1'b0}}});
-      end else begin
-        fifo_wptr_gray <= dec2gray(fifo_wptr + {{(PTR_WIDTH-1){1'b0}},1'b1});
-      end
-    end
-
-  prim_generic_flop_2sync #(.Width(PTR_WIDTH)) sync_wptr (
-    .clk_i    (clk_rd_i),
-    .rst_ni   (rst_rd_ni),
-    .d_i      (fifo_wptr_gray),
-    .q_o      (fifo_wptr_gray_sync));
-
-  assign fifo_wptr_sync_combi = gray2dec(fifo_wptr_gray_sync);
-
-  //////////////////
-  // read pointer //
-  //////////////////
-
-  always_ff @(posedge clk_rd_i or negedge rst_rd_ni)
-    if (!rst_rd_ni) begin
-      fifo_rptr <= {(PTR_WIDTH){1'b0}};
-    end else if (fifo_incr_rptr) begin
-      if (fifo_rptr[PTR_WIDTH-2:0] == DepthMinus1) begin
-        fifo_rptr <= {~fifo_rptr[PTR_WIDTH-1],{(PTR_WIDTH-1){1'b0}}};
-      end else begin
-        fifo_rptr <= fifo_rptr + {{(PTR_WIDTH-1){1'b0}},1'b1};
-    end
-  end
-
-  // gray-coded version
-  always_ff @(posedge clk_rd_i or negedge rst_rd_ni)
-    if (!rst_rd_ni) begin
-      fifo_rptr_gray <= {(PTR_WIDTH){1'b0}};
-    end else if (fifo_incr_rptr) begin
-      if (fifo_rptr[PTR_WIDTH-2:0] == DepthMinus1) begin
-        fifo_rptr_gray <= dec2gray({~fifo_rptr[PTR_WIDTH-1],{(PTR_WIDTH-1){1'b0}}});
-      end else begin
-        fifo_rptr_gray <= dec2gray(fifo_rptr + {{(PTR_WIDTH-1){1'b0}},1'b1});
-      end
-    end
-
-  prim_generic_flop_2sync #(.Width(PTR_WIDTH)) sync_rptr (
-    .clk_i    (clk_wr_i),
-    .rst_ni   (rst_wr_ni),
-    .d_i      (fifo_rptr_gray),
-    .q_o      (fifo_rptr_gray_sync));
-
-  always_ff @(posedge clk_wr_i or negedge rst_wr_ni)
-    if (!rst_wr_ni) begin
-      fifo_rptr_sync <= {PTR_WIDTH{1'b0}};
-    end else begin
-      fifo_rptr_sync <= gray2dec(fifo_rptr_gray_sync);
-    end
-
-  //////////////////
-  // empty / full //
-  //////////////////
-
-  assign  full_wclk = (fifo_wptr == (fifo_rptr_sync ^ {1'b1,{(PTR_WIDTH-1){1'b0}}}));
-  assign  full_rclk = (fifo_wptr_sync_combi == (fifo_rptr ^ {1'b1,{(PTR_WIDTH-1){1'b0}}}));
-
-  // Current depth in the write clock side
-  logic  wptr_msb;
-  logic  rptr_sync_msb;
-  logic  [PTRV_W-1:0] wptr_value;
-  logic  [PTRV_W-1:0] rptr_sync_value;
-  assign wptr_msb = fifo_wptr[PTR_WIDTH-1];
-  assign rptr_sync_msb = fifo_rptr_sync[PTR_WIDTH-1];
-  assign wptr_value = fifo_wptr[0+:PTRV_W];
-  assign rptr_sync_value = fifo_rptr_sync[0+:PTRV_W];
-  assign wdepth_o = (full_wclk) ? DepthW'(Depth) :
-                    (wptr_msb == rptr_sync_msb) ? DepthW'(wptr_value) - DepthW'(rptr_sync_value) :
-                    (DepthW'(Depth) - DepthW'(rptr_sync_value) + DepthW'(wptr_value)) ;
-
-  // Same again in the read clock side
-  assign empty = (fifo_wptr_sync_combi ==  fifo_rptr);
-  logic  rptr_msb;
-  logic  wptr_sync_msb;
-  logic  [PTRV_W-1:0] rptr_value;
-  logic  [PTRV_W-1:0] wptr_sync_value;
-  assign wptr_sync_msb = fifo_wptr_sync_combi[PTR_WIDTH-1];
-  assign rptr_msb = fifo_rptr[PTR_WIDTH-1];
-  assign wptr_sync_value = fifo_wptr_sync_combi[0+:PTRV_W];
-  assign rptr_value = fifo_rptr[0+:PTRV_W];
-  assign rdepth_o = (full_rclk) ? DepthW'(Depth) :
-                    (wptr_sync_msb == rptr_msb) ? DepthW'(wptr_sync_value) - DepthW'(rptr_value) :
-                    (DepthW'(Depth) - DepthW'(rptr_value) + DepthW'(wptr_sync_value)) ;
-
-  /////////////
-  // storage //
-  /////////////
-
-  logic [Width-1:0] storage [Depth];
-
-  always_ff @(posedge clk_wr_i)
-    if (fifo_incr_wptr) begin
-      storage[fifo_wptr[PTR_WIDTH-2:0]] <= wdata_i;
-    end
-
-  assign rdata_o = storage[fifo_rptr[PTR_WIDTH-2:0]];
-
-  // gray code conversion functions.  algorithm walks up from 0..N-1
-  // then flips the upper bit and walks down from N-1 to 0.
-
-  function automatic [PTR_WIDTH-1:0] dec2gray(input logic [PTR_WIDTH-1:0] decval);
-    logic [PTR_WIDTH-1:0] decval_sub;
-    logic [PTR_WIDTH-2:0] decval_in;
-    logic                 unused_decval_msb;
-
-    decval_sub = (PTR_WIDTH)'(Depth) - {1'b0, decval[PTR_WIDTH-2:0]} - 1'b1;
-
-    {unused_decval_msb, decval_in} = decval[PTR_WIDTH-1] ? decval_sub : decval;
-    // Was done in two assigns for low bits and top bit
-    // but that generates a (bogus) verilator warning, so do in one assign
-    dec2gray = {decval[PTR_WIDTH-1],
-                {1'b0,decval_in[PTR_WIDTH-2:1]} ^ decval_in[PTR_WIDTH-2:0]};
-  endfunction
-
-  function automatic [PTR_WIDTH-1:0] gray2dec(input logic [PTR_WIDTH-1:0] grayval);
-    logic [PTR_WIDTH-2:0] dec_tmp, dec_tmp_sub;
-    logic                 unused_decsub_msb;
-
-    dec_tmp[PTR_WIDTH-2] = grayval[PTR_WIDTH-2];
-    for (int i = PTR_WIDTH-3; i >= 0; i--)
-      dec_tmp[i] = dec_tmp[i+1]^grayval[i];
-    {unused_decsub_msb, dec_tmp_sub} = (PTR_WIDTH-1)'(Depth) - {1'b0, dec_tmp} - 1'b1;
-    if (grayval[PTR_WIDTH-1])
-      gray2dec = {1'b1,dec_tmp_sub};
-    else
-      gray2dec = {1'b0,dec_tmp};
-  endfunction
-
-endmodule
-
-// Generic asynchronous fifo for use in a variety of devices.
-
-
 module fifo_async #(
   parameter  int unsigned Width  = 16,
   parameter  int unsigned Depth  = 3,
@@ -22192,18 +22012,18 @@ module fpnew_divsqrt_multi #(
   always_comb begin : translate_fmt
     unique case (dst_fmt_q)
       fpnew_pkg::FP32:    divsqrt_fmt = 2'b00;
-      fpnew_pkg::FP64:    divsqrt_fmt = 2'b01;
-      fpnew_pkg::FP16:    divsqrt_fmt = 2'b10;
-      fpnew_pkg::FP16ALT: divsqrt_fmt = 2'b11;
+      // fpnew_pkg::FP64:    divsqrt_fmt = 2'b01;
+      // fpnew_pkg::FP16:    divsqrt_fmt = 2'b10;
+      // fpnew_pkg::FP16ALT: divsqrt_fmt = 2'b11;
       default:            divsqrt_fmt = 2'b10; // maps also FP8 to FP16
     endcase
 
     // Only if FP8 is enabled
-    input_is_fp8 = FpFmtConfig[fpnew_pkg::FP8] & (dst_fmt_q == fpnew_pkg::FP8);
+    input_is_fp8 = 1'b0;// FpFmtConfig[fpnew_pkg::FP8] & (dst_fmt_q == fpnew_pkg::FP8);
 
     // If FP8 is supported, map it to an FP16 value
-    divsqrt_operands[0] = input_is_fp8 ? operands_q[0] << 8 : operands_q[0];
-    divsqrt_operands[1] = input_is_fp8 ? operands_q[1] << 8 : operands_q[1];
+    divsqrt_operands[0] = operands_q[0];
+    divsqrt_operands[1] = operands_q[1];
   end
 
   // ------------
@@ -24461,7 +24281,6 @@ module fpnew_opgroup_block #(
   // Generate Merged Slice
   // ----------------------
   if (fpnew_pkg::any_enabled_multi(FmtUnitTypes, FpFmtMask)) begin : gen_merged_slice
-
     localparam FMT = fpnew_pkg::get_first_enabled_multi(FmtUnitTypes, FpFmtMask);
     localparam REG = fpnew_pkg::get_num_regs_multi(FmtPipeRegs, FmtUnitTypes, FpFmtMask);
 
@@ -24538,6 +24357,7 @@ module fpnew_opgroup_block #(
   assign busy_o = (| fmt_busy);
 
 endmodule
+
 // Copyright 2019 ETH Zurich and University of Bologna.
 //
 // Copyright and related rights are licensed under the Solderpad Hardware
