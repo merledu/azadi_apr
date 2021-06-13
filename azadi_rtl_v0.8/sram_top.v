@@ -10,10 +10,11 @@ module sram_top
      parameter BASIC_MODEL = 1024,
      parameter ADDR_WIDTH = 11,
      parameter DELAY = 3
-  )( /*`ifdef USE_POWER_PINS
-  inout vdd;
-  inout gnd;
-`endif*/
+  )(
+`ifdef USE_POWER_PINS
+  inout vccd1,
+  inout vssd1,
+`endif
   input  clk, // clock
   input  csb, // active low chip select
   input  web, // active low write control
@@ -78,17 +79,22 @@ end
 genvar p;
 generate
 	for(p=0; p<NUM_OF_BANKS; p=p+1) begin
-		sky130_sram_4kbyte_1rw1r_32x1024_8 sram_i( .clk0(clk),
+		sky130_sram_4kbyte_1rw1r_32x1024_8 sram_i(
+        `ifdef USE_POWER_PINS
+            .vccd1(vccd1),
+            .vssd1(vssd1),
+        `endif
+            .clk0(clk),
 			.csb0(csb_i[p]),
 			.web0(wen[p]),
 			.wmask0(wmask),
 			.addr0(Addr[p]),
 			.din0(din),
 			.dout0(Rdata[p]),
-                        .clk1(clk1),
-                        .csb1(csb_i_1[p]),
-                        .addr1(Addr_1[p]),
-                        .dout1(Rdata_1[p]));
+            .clk1(clk1),
+            .csb1(csb_i_1[p]),
+            .addr1(Addr_1[p]),
+            .dout1(Rdata_1[p]));
 	end
 endgenerate
 

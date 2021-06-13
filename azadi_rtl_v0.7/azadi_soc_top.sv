@@ -1,8 +1,8 @@
 
 module azadi_soc_top (
 `ifdef USE_POWER_PINS
-   inout vccd1,
-   inout vssd1,
+   inout VPWR,
+   inout VGND,
 `endif
   input logic clk_i,
   input logic rst_ni,

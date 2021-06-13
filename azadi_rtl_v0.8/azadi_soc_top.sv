@@ -1,8 +1,8 @@
 
 module azadi_soc_top (
 `ifdef USE_POWER_PINS
-   inout vccd1,
-   inout vssd1,
+   inout VPWR,
+   inout VGND,
 `endif
   input logic clk_i,
   input logic rst_ni,
@@ -445,10 +445,11 @@ instr_mem_top iccm_adapter(
      .IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
      .BASIC_MODEL (1024),
      .ADDR_WIDTH  (11)
-    ) u_iccm ( /*`ifdef USE_POWER_PINS
-    inout vdd;
-    inout gnd;
-  `endif*/
+    ) u_iccm (
+`ifdef USE_POWER_PINS
+    .vccd1 (VPWR),
+    .vssd1 (VGND),
+`endif
     .clk      (clk_i), // clock
     .csb      (instr_csb), // active low chip select
     .web      (instr_we), // active low write control
@@ -490,10 +491,11 @@ sram_top #(
    .IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
    .BASIC_MODEL (1024),
    .ADDR_WIDTH  (11)
-  ) u_dccm ( /*`ifdef USE_POWER_PINS
-  inout vdd;
-  inout gnd;
-`endif*/
+  ) u_dccm (
+`ifdef USE_POWER_PINS
+  .vccd1 (VPWR),
+  .vssd1 (VGND),
+`endif
   .clk      (clk_i), // clock
   .csb      (data_csb), // active low chip select
   .web      (data_we), // active low write control
