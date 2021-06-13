@@ -19,11 +19,11 @@ module rstmgr(
     	if(!prog_rst_ni) begin
       	   sys_rst_ni = 1'b0;
     	end else begin
-	   if(ndmreset)begin
-      	     sys_rst_ni = 1'b0;
-    	   end else begin
+	  // if(ndmreset)begin
+      	//     sys_rst_ni = 1'b0;
+    	 //  end else begin
       	     sys_rst_ni = prog_rst_ni;
-    	   end
+    	//   end
 	end
     end
   end
