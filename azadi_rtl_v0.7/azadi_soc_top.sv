@@ -1,8 +1,8 @@
 
 module azadi_soc_top (
 `ifdef USE_POWER_PINS
-   inout vccd1,
-   inout vssd1,
+   inout VPWR,
+   inout VGND,
 `endif
   input logic clk_i,
   input logic rst_ni,
@@ -435,14 +435,11 @@ instr_mem_top iccm_adapter(
   .rdata_i          (instr_rdata)
 );
 
-    logic [31:0] unused_data1;
-    logic [31:0] unused_data2;
 
-  sky130_sram_4kbyte_1rw1r_32x1024_8 u_iccm (
-  `ifdef USE_POWER_PINS
-    .vccd1(vccd1),
-    .vssd1(vssd1),
-  `endif
+  sky130_sram_4kbyte_1rw1r_32x1024_8  u_iccm ( /*`ifdef USE_POWER_PINS
+    inout vdd;
+    inout gnd;
+  `endif*/
     .clk0      (clk_i), // clock
     .csb0      (instr_csb), // active low chip select
     .web0      (instr_we), // active low write control
@@ -452,8 +449,8 @@ instr_mem_top iccm_adapter(
     .dout0     (instr_rdata),
     .clk1     (1'b0),
     .csb1     (1'b1),
-    .addr1    (10'b0),
-    .dout1    (unused_data1)
+    .addr1    ('0),
+    .dout1    ()
     );
 // dummy data memory
 
@@ -475,11 +472,10 @@ data_mem_top dccm_adapter(
 );
 
 
-sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm (
-`ifdef USE_POWER_PINS
-    .vccd1(vccd1),
-    .vssd1(vssd1),
-`endif
+sky130_sram_4kbyte_1rw1r_32x1024_8  u_dccm ( /*`ifdef USE_POWER_PINS
+  inout vdd;
+  inout gnd;
+`endif*/
   .clk0      (clk_i), // clock
   .csb0      (data_csb), // active low chip select
   .web0      (data_we), // active low write control
@@ -489,7 +485,7 @@ sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm (
   .dout0     (data_rdata),
   .clk1      (1'b0),
   .csb1      (1'b1),
-  .addr1     (10'b0),
-  .dout1     (unused_data2)
+  .addr1     ('0),
+  .dout1     ()
   );
 endmodule
