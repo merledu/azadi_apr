@@ -436,7 +436,7 @@ instr_mem_top iccm_adapter(
 );
 
 
-  sram_top #(  
+/*  sram_top #(  
      .NUM_WMASKS  (4),
      .MEMD        (2048),
      .DATA_WIDTH  (32), // data width
@@ -461,7 +461,22 @@ instr_mem_top iccm_adapter(
     .csb1     (1'b1),
     .addr1    ('0),
     .dout1    ()
-    );
+    ); */
+
+
+sram_top u_iccm(
+`ifdef USE_POWER_PINS
+    .VPWR   (VPWR),
+    .VGND   (VGND),
+`endif
+   .clk_i   (clk_i),
+   .web_i   (instr_we),
+   .wmask_i (instr_wmask),
+   .addr_i  (instr_addr[10:0]),
+   .din_i   (instr_wdata),
+   .dout_o  (instr_rdata)
+  );
+
 // dummy data memory
 
 data_mem_top dccm_adapter(
@@ -482,15 +497,15 @@ data_mem_top dccm_adapter(
 );
 
 
-sram_top #(  
-   .NUM_WMASKS  (4),
-   .MEMD        (2048),
-   .DATA_WIDTH  (32), // data width
-   .nRPORTS     (1) , // number of reading ports
-   .nWPORTS     (1), // number of write ports
-   .IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
-   .BASIC_MODEL (1024),
-   .ADDR_WIDTH  (11)
+//sram_top #(  
+//   .NUM_WMASKS  (4),
+//   .MEMD        (2048),
+//   .DATA_WIDTH  (32), // data width
+//   .nRPORTS     (1) , // number of reading ports
+//   .nWPORTS     (1), // number of write ports
+//   .IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
+//   .BASIC_MODEL (1024),
+/*   .ADDR_WIDTH  (11)
   ) u_dccm (
 `ifdef USE_POWER_PINS
   .vccd1 (VPWR),
@@ -507,5 +522,18 @@ sram_top #(
   .csb1      (1'b1),
   .addr1     ('0),
   .dout1     ()
+  );*/
+
+sram_top u_dccm(
+`ifdef USE_POWER_PINS
+    .VPWR   (VPWR),
+    .VGND   (VGND),
+`endif
+   .clk_i   (clk_i),
+   .web_i   (data_we),
+   .wmask_i (data_wmask),
+   .addr_i  (data_addr[10:0]),
+   .din_i   (data_wdata),
+   .dout_o  (data_rdata)
   );
 endmodule
