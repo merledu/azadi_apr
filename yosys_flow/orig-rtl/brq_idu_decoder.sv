@@ -149,7 +149,7 @@ module brq_idu_decoder #(
   // To help timing the flops containing the current instruction are replicated to reduce fan-out.
   // instr_alu is used to determine the ALU control logic and associated operand/imm select signals
   // as the ALU is often on the more critical timing paths. instr is used for everything else.
-  assign instr     = instr_rdata_i;
+  assign instr     = instr_rdata_alu_i;
   assign instr_alu = instr_rdata_alu_i;
 
   //////////////////////////////////////

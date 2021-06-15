@@ -96,7 +96,7 @@ module fifo_sync #(
 
     always_ff @(posedge clk_i or negedge rst_ni) begin
       if (!rst_ni) begin
-        fifo_wptr <= {(PTR_WIDTH){1'b0}};
+        fifo_wptr <= '0;
       end else if (clr_i) begin
         fifo_wptr <= {(PTR_WIDTH){1'b0}};
       end else if (fifo_incr_wptr) begin
@@ -110,7 +110,7 @@ module fifo_sync #(
 
     always_ff @(posedge clk_i or negedge rst_ni) begin
       if (!rst_ni) begin
-        fifo_rptr <= {(PTR_WIDTH){1'b0}};
+        fifo_rptr <= '0;
       end else if (clr_i) begin
         fifo_rptr <= {(PTR_WIDTH){1'b0}};
       end else if (fifo_incr_rptr) begin
@@ -134,17 +134,27 @@ module fifo_sync #(
       assign storage_rdata = storage[0];
 
       always_ff @(posedge clk_i)
-        if (fifo_incr_wptr) begin
-          storage[0] <= wdata_i;
-        end
+       // if (fifo_incr_wptr) begin
+	  if(~rst_ni) begin
+	    storage[0] <= '0;
+          end else if (fifo_incr_wptr) begin
+	    storage[0] <= wdata_i;
+	  end
+          
+       // end
     // fifo with more than one storage element
     end else begin : gen_depth_gt1
       assign storage_rdata = storage[fifo_rptr[PTR_WIDTH-2:0]];
 
       always_ff @(posedge clk_i)
-        if (fifo_incr_wptr) begin
-          storage[fifo_wptr[PTR_WIDTH-2:0]] <= wdata_i;
-        end
+      //  if (fifo_incr_wptr) begin
+	   if(~rst_ni) begin
+	     storage[fifo_wptr[PTR_WIDTH-2:0]] <='0;
+	   end else   if (fifo_incr_wptr) begin
+             storage[fifo_wptr[PTR_WIDTH-2:0]] <= wdata_i;
+	   end
+          
+       // end
     end
 
     logic [Width-1:0] rdata_int;

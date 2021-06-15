@@ -9,7 +9,7 @@
 module brq_core #(
     parameter bit                 PMPEnable        = 1'b0,
     parameter int unsigned        PMPGranularity   = 0,
-    parameter int unsigned        PMPNumRegions    = 0,
+    parameter int unsigned        PMPNumRegions    = 4,
     parameter int unsigned        MHPMCounterNum   = 0,
     parameter int unsigned        MHPMCounterWidth = 40,
     parameter bit                 RV32E            = 1'b0,
@@ -431,7 +431,7 @@ assign       test_en_i = 1'b0;
   // independent
   prim_clock_gating core_clock_gate_i (
       .clk_i     ( clk_i           ),
-      .en_i      ( clock_en        ),
+      .en_i      ( 1'b1        ),
       .test_en_i ( test_en_i       ),
       .clk_o     ( clk            )
   );

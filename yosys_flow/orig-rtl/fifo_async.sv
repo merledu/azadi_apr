@@ -51,7 +51,7 @@ module fifo_async #(
 
   always_ff @(posedge clk_wr_i or negedge rst_wr_ni)
     if (!rst_wr_ni) begin
-      fifo_wptr <= {(PTR_WIDTH){1'b0}};
+      fifo_wptr <= '0;
     end else if (fifo_incr_wptr) begin
       if (fifo_wptr[PTR_WIDTH-2:0] == DepthMinus1) begin
         fifo_wptr <= {~fifo_wptr[PTR_WIDTH-1],{(PTR_WIDTH-1){1'b0}}};
@@ -63,7 +63,7 @@ module fifo_async #(
   // gray-coded version
   always_ff @(posedge clk_wr_i or negedge rst_wr_ni)
     if (!rst_wr_ni) begin
-      fifo_wptr_gray <= {(PTR_WIDTH){1'b0}};
+      fifo_wptr_gray <= '0;
     end else if (fifo_incr_wptr) begin
       if (fifo_wptr[PTR_WIDTH-2:0] == DepthMinus1) begin
         fifo_wptr_gray <= dec2gray({~fifo_wptr[PTR_WIDTH-1],{(PTR_WIDTH-1){1'b0}}});
@@ -86,7 +86,7 @@ module fifo_async #(
 
   always_ff @(posedge clk_rd_i or negedge rst_rd_ni)
     if (!rst_rd_ni) begin
-      fifo_rptr <= {(PTR_WIDTH){1'b0}};
+      fifo_rptr <= '0;
     end else if (fifo_incr_rptr) begin
       if (fifo_rptr[PTR_WIDTH-2:0] == DepthMinus1) begin
         fifo_rptr <= {~fifo_rptr[PTR_WIDTH-1],{(PTR_WIDTH-1){1'b0}}};
@@ -98,7 +98,7 @@ module fifo_async #(
   // gray-coded version
   always_ff @(posedge clk_rd_i or negedge rst_rd_ni)
     if (!rst_rd_ni) begin
-      fifo_rptr_gray <= {(PTR_WIDTH){1'b0}};
+      fifo_rptr_gray <= '0;
     end else if (fifo_incr_rptr) begin
       if (fifo_rptr[PTR_WIDTH-2:0] == DepthMinus1) begin
         fifo_rptr_gray <= dec2gray({~fifo_rptr[PTR_WIDTH-1],{(PTR_WIDTH-1){1'b0}}});
@@ -115,7 +115,7 @@ module fifo_async #(
 
   always_ff @(posedge clk_wr_i or negedge rst_wr_ni)
     if (!rst_wr_ni) begin
-      fifo_rptr_sync <= {PTR_WIDTH{1'b0}};
+      fifo_rptr_sync <= '0;
     end else begin
       fifo_rptr_sync <= gray2dec(fifo_rptr_gray_sync);
     end
@@ -161,9 +161,14 @@ module fifo_async #(
   logic [Width-1:0] storage [Depth];
 
   always_ff @(posedge clk_wr_i)
-    if (fifo_incr_wptr) begin
-      storage[fifo_wptr[PTR_WIDTH-2:0]] <= wdata_i;
-    end
+   // if (fifo_incr_wptr) begin
+       if(~rst_wr_ni) begin
+	storage[fifo_wptr[PTR_WIDTH-2:0]] <= '0;
+       end else     if (fifo_incr_wptr) begin
+	storage[fifo_wptr[PTR_WIDTH-2:0]] <= wdata_i;
+       end
+      
+   // end
 
   assign rdata_o = storage[fifo_rptr[PTR_WIDTH-2:0]];
 

@@ -1,8 +1,8 @@
 
 module azadi_soc_top (
 `ifdef USE_POWER_PINS
-   inout vccd1,
-   inout vssd1,
+   inout VPWR,
+   inout VGND,
 `endif
   input logic clk_i,
   input logic rst_ni,
@@ -435,26 +435,48 @@ instr_mem_top iccm_adapter(
   .rdata_i          (instr_rdata)
 );
 
-    logic [31:0] unused_data1;
-    logic [31:0] unused_data2;
 
-  sky130_sram_4kbyte_1rw1r_32x1024_8 u_iccm (
-  `ifdef USE_POWER_PINS
-    .vccd1(vccd1),
-    .vssd1(vssd1),
-  `endif
-    .clk0      (clk_i), // clock
-    .csb0      (instr_csb), // active low chip select
-    .web0      (instr_we), // active low write control
-    .wmask0    (instr_wmask), // write mask
-    .addr0     (instr_addr[9:0]),
-    .din0      (instr_wdata),
-    .dout0     (instr_rdata),
+/*  sram_top #(  
+     .NUM_WMASKS  (4),
+     .MEMD        (2048),
+     .DATA_WIDTH  (32), // data width
+     .nRPORTS     (1) , // number of reading ports
+     .nWPORTS     (1), // number of write ports
+     .IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
+     .BASIC_MODEL (1024),
+     .ADDR_WIDTH  (11)
+    ) u_iccm (
+`ifdef USE_POWER_PINS
+    .vccd1 (VPWR),
+    .vssd1 (VGND),
+`endif
+    .clk      (clk_i), // clock
+    .csb      (instr_csb), // active low chip select  intentionally kept enabled
+    .web      (instr_we), // active low write control
+    .wmask    (instr_wmask), // write mask
+    .addr     (instr_addr[10:0]),
+    .din      (instr_wdata),
+    .dout     (instr_rdata),
     .clk1     (1'b0),
     .csb1     (1'b1),
-    .addr1    (10'b0),
-    .dout1    (unused_data1)
-    );
+    .addr1    ('0),
+    .dout1    ()
+    ); */
+
+
+sram_top u_iccm(
+`ifdef USE_POWER_PINS
+    .VPWR   (VPWR),
+    .VGND   (VGND),
+`endif
+   .clk_i   (clk_i),
+   .web_i   (instr_we),
+   .wmask_i (instr_wmask),
+   .addr_i  (instr_addr[10:0]),
+   .din_i   (instr_wdata),
+   .dout_o  (instr_rdata)
+  );
+
 // dummy data memory
 
 data_mem_top dccm_adapter(
@@ -475,21 +497,43 @@ data_mem_top dccm_adapter(
 );
 
 
-sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm (
+//sram_top #(  
+//   .NUM_WMASKS  (4),
+//   .MEMD        (2048),
+//   .DATA_WIDTH  (32), // data width
+//   .nRPORTS     (1) , // number of reading ports
+//   .nWPORTS     (1), // number of write ports
+//   .IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
+//   .BASIC_MODEL (1024),
+/*   .ADDR_WIDTH  (11)
+  ) u_dccm (
 `ifdef USE_POWER_PINS
-    .vccd1(vccd1),
-    .vssd1(vssd1),
+  .vccd1 (VPWR),
+  .vssd1 (VGND),
 `endif
-  .clk0      (clk_i), // clock
-  .csb0      (data_csb), // active low chip select
-  .web0      (data_we), // active low write control
-  .wmask0    (data_wmask), // write mask
-  .addr0     (data_addr[9:0]),
-  .din0      (data_wdata),
-  .dout0     (data_rdata),
+  .clk      (clk_i), // clock
+  .csb      (instr_csb), // active low chip select  intentionally kept enabled
+  .web      (data_we), // active low write control
+  .wmask    (data_wmask), // write mask
+  .addr     (data_addr[10:0]),
+  .din      (data_wdata),
+  .dout     (data_rdata),
   .clk1      (1'b0),
   .csb1      (1'b1),
-  .addr1     (10'b0),
-  .dout1     (unused_data2)
+  .addr1     ('0),
+  .dout1     ()
+  );*/
+
+sram_top u_dccm(
+`ifdef USE_POWER_PINS
+    .VPWR   (VPWR),
+    .VGND   (VGND),
+`endif
+   .clk_i   (clk_i),
+   .web_i   (data_we),
+   .wmask_i (data_wmask),
+   .addr_i  (data_addr[10:0]),
+   .din_i   (data_wdata),
+   .dout_o  (data_rdata)
   );
 endmodule

@@ -106,7 +106,19 @@ module brq_wbu #(
     end
 
     always_ff @(posedge clk_i) begin
-      if(en_wb_i) begin
+      if(~rst_ni) begin
+	rf_we_wb_q       <= '0;
+        rf_waddr_wb_q    <= '0;
+        rf_wdata_wb_q    <= '0;
+        wb_instr_type_q  <= '0;
+        wb_pc_q          <= '0;
+        wb_compressed_q  <= '0;
+        wb_count_q       <= '0;
+
+        // added for floating point registers for wb stage
+        fp_rf_we_wb_q    <= '0;
+        fp_load_q        <= '0;
+      end else if(en_wb_i) begin
         rf_we_wb_q       <= rf_we_id_i;
         rf_waddr_wb_q    <= rf_waddr_id_i;
         rf_wdata_wb_q    <= rf_wdata_id_i;
@@ -117,8 +129,6 @@ module brq_wbu #(
 
         // added for floating point registers for wb stage
         fp_rf_we_wb_q    <= fp_rf_wen_id_i;
-      //  fp_rf_waddr_wb_q <= rf_waddr_id_i;
-        //fp_rf_wdata_wb_q <= rf_wdata_id_i;
         fp_load_q        <= fp_load_i;
       end
     end

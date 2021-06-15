@@ -946,7 +946,7 @@ module brq_cs_registers #(
   brq_csr #(
     .Width      (32),
     .ShadowCopy (ShadowCSR),
-    .ResetValue (32'd1)
+    .ResetValue (32'd0)
   ) u_mtvec_csr (
     .clk_i      (clk_i),
     .rst_ni     (rst_ni),

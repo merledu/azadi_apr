@@ -180,9 +180,14 @@ module brq_ifu_prefetch_buffer #(
 
   // CPU resets with a branch, so no need to reset these addresses
   always_ff @(posedge clk_i) begin
-    if (stored_addr_en) begin
-      stored_addr_q <= stored_addr_d;
-    end
+   // if (stored_addr_en) begin
+	if(~rst_ni) begin
+	  stored_addr_q <= '0;
+	end else if (stored_addr_en) begin
+	  stored_addr_q <= stored_addr_d;
+	end
+      
+   // end
   end
 
   if (BranchPredictor) begin : g_branch_predictor
@@ -195,9 +200,14 @@ module brq_ifu_prefetch_buffer #(
     assign branch_mispredict_addr_en = branch_i & predicted_branch_i;
 
     always_ff @(posedge clk_i) begin
-      if (branch_mispredict_addr_en) begin
-        branch_mispredict_addr_q <= addr_next;
-      end
+     // if (branch_mispredict_addr_en) begin
+	if(~rst_ni) begin
+	  branch_mispredict_addr_q <= '0;
+	end else if (branch_mispredict_addr_en) begin
+	  branch_mispredict_addr_q <= addr_next;
+	end
+        
+     // end
     end
 
     assign branch_mispredict_addr = branch_mispredict_addr_q;
@@ -223,9 +233,14 @@ module brq_ifu_prefetch_buffer #(
                         {{29{1'b0}},(valid_new_req & ~valid_req_q),2'b00};
 
   always_ff @(posedge clk_i) begin
-    if (fetch_addr_en) begin
-      fetch_addr_q <= fetch_addr_d;
-    end
+   // if (fetch_addr_en) begin
+	if(~rst_ni) begin 
+	  fetch_addr_q <= '0;
+	end else if (fetch_addr_en) begin
+	  fetch_addr_q <= fetch_addr_d;
+	end 
+      
+   // end
   end
 
   // Address mux
@@ -292,11 +307,11 @@ module brq_ifu_prefetch_buffer #(
 
   always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
-      valid_req_q          <= 1'b0;
-      discard_req_q        <= 1'b0;
-      rdata_outstanding_q  <= 'b0;
-      branch_discard_q     <= 'b0;
-      rdata_pmp_err_q      <= 'b0;
+      valid_req_q          <= '0;
+      discard_req_q        <= '0;
+      rdata_outstanding_q  <= '0;
+      branch_discard_q     <= '0;
+      rdata_pmp_err_q      <= '0;
     end else begin
       valid_req_q          <= valid_req_d;
       discard_req_q        <= discard_req_d;

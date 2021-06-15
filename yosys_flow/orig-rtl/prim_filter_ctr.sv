@@ -44,7 +44,7 @@ module prim_filter_ctr #(parameter int unsigned Cycles = 4) (
 
   always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
-      diff_ctr_q <= {CTR_WIDTH{1'b0}};
+      diff_ctr_q <= '0;
     end else begin
       diff_ctr_q <= diff_ctr_d;
     end

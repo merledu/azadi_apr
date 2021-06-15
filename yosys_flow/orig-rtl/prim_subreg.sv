@@ -30,13 +30,13 @@ module prim_subreg #(
     .DW       ( DW       ),
     .SWACCESS ( SWACCESS )
   ) wr_en_data_arb (
-    .we,
-    .wd,
-    .de,
-    .d,
-    .q,
-    .wr_en,
-    .wr_data
+    .we	    (we),
+    .wd	    (wd),
+    .de	    (de),
+    .d	    (d),
+    .q	    (q),
+    .wr_en  (wr_en),
+    .wr_data(wr_data)
   );
 
   always_ff @(posedge clk_i or negedge rst_ni) begin
