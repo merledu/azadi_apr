@@ -50,11 +50,13 @@ always_comb begin : comb_part
     end
     RUN: begin
       sys_rst_ni  = 1'b1;
-      rst_run_d   = 1'b1;
+      
       if (!prog_rst_ni) begin
-        rst_fsm_ns = PROG;
+	rst_run_d   = 1'b0;
+	rst_fsm_ns = PROG;
       end else begin
-        rst_fsm_ns = RUN;
+	rst_run_d   = 1'b1;
+	rst_fsm_ns = RUN;
       end
     end
     default: begin
