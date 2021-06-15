@@ -147,14 +147,14 @@ module brq_ifu_fifo #(
                                   instr_addr_next;
 
   always_ff @(posedge clk_i) begin
-    if (instr_addr_en) begin
+   // if (instr_addr_en) begin
 	if(~rst_ni) begin
 	  instr_addr_q <= '0;
-	end else begin
+	end else if (instr_addr_en)begin
 	  instr_addr_q <= instr_addr_d;
 	end
       
-    end
+   // end
   end
 
   // Output both PC of current instruction and instruction following. PC of instruction following is
@@ -230,16 +230,16 @@ module brq_ifu_fifo #(
 
   for (genvar i = 0; i < DEPTH; i++) begin : g_fifo_regs
     always_ff @(posedge clk_i) begin
-      if (entry_en[i]) begin
+     // if (entry_en[i]) begin
 	if(~rst_ni) begin
 	  rdata_q[i]   <= '0;
           err_q[i]     <= '0;
-	end else begin
+	end else if (entry_en[i]) begin
           rdata_q[i]   <= rdata_d[i];
           err_q[i]     <= err_d[i];
 	end
 
-      end
+     // end
     end
   end
 

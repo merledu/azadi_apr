@@ -161,14 +161,14 @@ module fifo_async #(
   logic [Width-1:0] storage [Depth];
 
   always_ff @(posedge clk_wr_i)
-    if (fifo_incr_wptr) begin
+   // if (fifo_incr_wptr) begin
        if(~rst_wr_ni) begin
 	storage[fifo_wptr[PTR_WIDTH-2:0]] <= '0;
-       end else begin
+       end else     if (fifo_incr_wptr) begin
 	storage[fifo_wptr[PTR_WIDTH-2:0]] <= wdata_i;
        end
       
-    end
+   // end
 
   assign rdata_o = storage[fifo_rptr[PTR_WIDTH-2:0]];
 
