@@ -3162,47 +3162,38 @@ instr_mem_top iccm_adapter(
   .rdata_i          (instr_rdata)
 );
 
-
-/*  sram_top #(  
-     .NUM_WMASKS  (4),
-     .MEMD        (2048),
-     .DATA_WIDTH  (32), // data width
-     .nRPORTS     (1) , // number of reading ports
-     .nWPORTS     (1), // number of write ports
-     .IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
-     .BASIC_MODEL (1024),
-     .ADDR_WIDTH  (11)
-    ) u_iccm (
+ wire [31:0] un_conn1;
+  sky130_sram_4kbyte_1rw1r_32x1024_8 u_iccm (
 `ifdef USE_POWER_PINS
     .vccd1 (VPWR),
     .vssd1 (VGND),
 `endif
-    .clk      (clk_i), // clock
-    .csb      (instr_csb), // active low chip select  intentionally kept enabled
-    .web      (instr_we), // active low write control
-    .wmask    (instr_wmask), // write mask
-    .addr     (instr_addr[10:0]),
-    .din      (instr_wdata),
-    .dout     (instr_rdata),
+    .clk0      (clk_i), // clock
+    .csb0      (instr_csb), // active low chip select  intentionally kept enabled
+    .web0      (instr_we), // active low write control
+    .wmask0    (instr_wmask), // write mask
+    .addr0     (instr_addr[9:0]),
+    .din0      (instr_wdata),
+    .dout0     (instr_rdata),
     .clk1     (1'b0),
     .csb1     (1'b1),
     .addr1    ('0),
-    .dout1    ()
-    ); */
+    .dout1    (un_conn1)
+    ); 
 
 
-sram_top u_iccm(
-`ifdef USE_POWER_PINS
-    .VPWR   (VPWR),
-    .VGND   (VGND),
-`endif
-   .clk_i   (clk_i),
-   .web_i   (instr_we),
-   .wmask_i (instr_wmask),
-   .addr_i  (instr_addr[10:0]),
-   .din_i   (instr_wdata),
-   .dout_o  (instr_rdata)
-  );
+// sram_top u_iccm(
+// `ifdef USE_POWER_PINS
+//     .VPWR   (VPWR),
+//     .VGND   (VGND),
+// `endif
+//    .clk_i   (clk_i),
+//    .web_i   (instr_we),
+//    .wmask_i (instr_wmask),
+//    .addr_i  (instr_addr[10:0]),
+//    .din_i   (instr_wdata),
+//    .dout_o  (instr_rdata)
+//   );
 
 // dummy data memory
 
@@ -3223,46 +3214,37 @@ data_mem_top dccm_adapter(
    .rdata_i (data_rdata)
 );
 
-
-//sram_top #(  
-//   .NUM_WMASKS  (4),
-//   .MEMD        (2048),
-//   .DATA_WIDTH  (32), // data width
-//   .nRPORTS     (1) , // number of reading ports
-//   .nWPORTS     (1), // number of write ports
-//   .IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
-//   .BASIC_MODEL (1024),
-/*   .ADDR_WIDTH  (11)
-  ) u_dccm (
+wire [31:0] un_conn2;
+sky130_sram_4kbyte_1rw1r_32x1024_8  u_dccm (
 `ifdef USE_POWER_PINS
   .vccd1 (VPWR),
   .vssd1 (VGND),
 `endif
-  .clk      (clk_i), // clock
-  .csb      (instr_csb), // active low chip select  intentionally kept enabled
-  .web      (data_we), // active low write control
-  .wmask    (data_wmask), // write mask
-  .addr     (data_addr[10:0]),
-  .din      (data_wdata),
-  .dout     (data_rdata),
-  .clk1      (1'b0),
-  .csb1      (1'b1),
-  .addr1     ('0),
-  .dout1     ()
-  );*/
-
-sram_top u_dccm(
-`ifdef USE_POWER_PINS
-    .VPWR   (VPWR),
-    .VGND   (VGND),
-`endif
-   .clk_i   (clk_i),
-   .web_i   (data_we),
-   .wmask_i (data_wmask),
-   .addr_i  (data_addr[10:0]),
-   .din_i   (data_wdata),
-   .dout_o  (data_rdata)
+  .clk0      (clk_i), // clock
+  .csb0      (instr_csb), // active low chip select  intentionally kept enabled
+  .web0      (data_we), // active low write control
+  .wmask0    (data_wmask), // write mask
+  .addr0     (data_addr[9:0]),
+  .din0      (data_wdata),
+  .dout0     (data_rdata),
+  .clk1     (1'b0),
+  .csb1     (1'b1),
+  .addr1    ('0),
+  .dout1    (un_conn2)
   );
+
+// sram_top u_dccm(
+// `ifdef USE_POWER_PINS
+//     .VPWR   (VPWR),
+//     .VGND   (VGND),
+// `endif
+//    .clk_i   (clk_i),
+//    .web_i   (data_we),
+//    .wmask_i (data_wmask),
+//    .addr_i  (data_addr[10:0]),
+//    .din_i   (data_wdata),
+//    .dout_o  (data_rdata)
+//   );
 endmodule
 `ifdef RISCV_FORMAL
   `define RVFI
@@ -35809,72 +35791,72 @@ tlul_adapter_reg #(
 );
 
 endmodule
-module sram_top(
-  `ifdef USE_POWER_PINS
-      inout VPWR,
-      inout VGND,
-  `endif
-    clk_i,web_i,wmask_i,addr_i,din_i,dout_o
-  );
+// module sram_top(
+//   `ifdef USE_POWER_PINS
+//       inout VPWR,
+//       inout VGND,
+//   `endif
+//     clk_i,web_i,wmask_i,addr_i,din_i,dout_o
+//   );
 
-  input       clk_i;
-  input       web_i;
-  input [3:0] wmask_i;
-  input [10:0]addr_i;
-  input [31:0]din_i;
-  output[31:0]dout_o;
+//   input       clk_i;
+//   input       web_i;
+//   input [3:0] wmask_i;
+//   input [10:0]addr_i;
+//   input [31:0]din_i;
+//   output[31:0]dout_o;
 
-  wire csb;
-  assign csb = addr_i[10];
+//   wire csb;
+//   assign csb = addr_i[10];
 
-  wire [9:0]addr;
-  assign addr = addr_i[9:0];
+//   wire [9:0]addr;
+//   assign addr = addr_i[9:0];
 
-  wire [31:0] dout_1, dout_2;
+//   wire [31:0] dout_1, dout_2;
 
-  sky130_sram_4kbyte_1rw1r_32x1024_8 SRAM1(
-  `ifdef USE_POWER_PINS
-      .vccd1(VPWR),
-      .vssd1(VGND),
-  `endif
-    // Port 0: RW
-    .clk0(clk_i),
-    .csb0(csb),
-    .web0(web_i),
-    .wmask0(wmask_i),
-    .addr0(addr),
-    .din0(din_i),
-    .dout0(dout_1),
-    // Port 1: R
-    .clk1(1'b0),
-    .csb1(1'b1),
-    .addr1(11'b0),
-    .dout1()
-  );
+//   sky130_sram_4kbyte_1rw1r_32x1024_8 SRAM1(
+//   `ifdef USE_POWER_PINS
+//       .vccd1(VPWR),
+//       .vssd1(VGND),
+//   `endif
+//     // Port 0: RW
+//     .clk0(clk_i),
+//     .csb0(csb),
+//     .web0(web_i),
+//     .wmask0(wmask_i),
+//     .addr0(addr),
+//     .din0(din_i),
+//     .dout0(dout_1),
+//     // Port 1: R
+//     .clk1(1'b0),
+//     .csb1(1'b1),
+//     .addr1(11'b0),
+//     .dout1()
+//   );
 
-  assign dout_o = csb ? dout_2 : dout_1;
+//   assign dout_o = csb ? dout_2 : dout_1;
 
-  sky130_sram_4kbyte_1rw1r_32x1024_8 SRAM2(
-  `ifdef USE_POWER_PINS
-      .vccd1(VPWR),
-      .vssd1(VGND),
-  `endif
-    // Port 0: RW
-    .clk0(clk_i),
-    .csb0(~csb),
-    .web0(web_i),
-    .wmask0(wmask_i),
-    .addr0(addr),
-    .din0(din_i),
-    .dout0(dout_2),
-    // Port 1: R
-    .clk1(1'b0),
-    .csb1(1'b1),
-    .addr1(11'b0),
-    .dout1()
-  );
+//   sky130_sram_4kbyte_1rw1r_32x1024_8 SRAM2(
+//   `ifdef USE_POWER_PINS
+//       .vccd1(VPWR),
+//       .vssd1(VGND),
+//   `endif
+//     // Port 0: RW
+//     .clk0(clk_i),
+//     .csb0(~csb),
+//     .web0(web_i),
+//     .wmask0(wmask_i),
+//     .addr0(addr),
+//     .din0(din_i),
+//     .dout0(dout_2),
+//     // Port 1: R
+//     .clk1(1'b0),
+//     .csb1(1'b1),
+//     .addr1(11'b0),
+//     .dout1()
+//   );
 
-endmodule
+// endmodule
 // Copyright lowRISC contributors.
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0

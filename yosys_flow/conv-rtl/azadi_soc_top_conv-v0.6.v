@@ -325,13 +325,19 @@ module azadi_soc_top (
 		.we_o(instr_we),
 		.rdata_i(instr_rdata)
 	);
-	sram_top u_iccm(
-		.clk_i(clk_i),
-		.web_i(instr_we),
-		.wmask_i(instr_wmask),
-		.addr_i(instr_addr[10:0]),
-		.din_i(instr_wdata),
-		.dout_o(instr_rdata)
+	wire [31:0] un_conn1;
+	sky130_sram_4kbyte_1rw1r_32x1024_8 u_iccm(
+		.clk0(clk_i),
+		.csb0(instr_csb),
+		.web0(instr_we),
+		.wmask0(instr_wmask),
+		.addr0(instr_addr[9:0]),
+		.din0(instr_wdata),
+		.dout0(instr_rdata),
+		.clk1(1'b0),
+		.csb1(1'b1),
+		.addr1({10 {1'sb0}}),
+		.dout1(un_conn1)
 	);
 	data_mem_top dccm_adapter(
 		.clk_i(clk_i),
@@ -345,13 +351,19 @@ module azadi_soc_top (
 		.we_o(data_we),
 		.rdata_i(data_rdata)
 	);
-	sram_top u_dccm(
-		.clk_i(clk_i),
-		.web_i(data_we),
-		.wmask_i(data_wmask),
-		.addr_i(data_addr[10:0]),
-		.din_i(data_wdata),
-		.dout_o(data_rdata)
+	wire [31:0] un_conn2;
+	sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm(
+		.clk0(clk_i),
+		.csb0(instr_csb),
+		.web0(data_we),
+		.wmask0(data_wmask),
+		.addr0(data_addr[9:0]),
+		.din0(data_wdata),
+		.dout0(data_rdata),
+		.clk1(1'b0),
+		.csb1(1'b1),
+		.addr1({10 {1'sb0}}),
+		.dout1(un_conn2)
 	);
 endmodule
 module brq_core (
@@ -24239,54 +24251,6 @@ module spi_top (
 		.be_o(be),
 		.rdata_i(rdata),
 		.error_i(err)
-	);
-endmodule
-module sram_top (
-	clk_i,
-	web_i,
-	wmask_i,
-	addr_i,
-	din_i,
-	dout_o
-);
-	input clk_i;
-	input web_i;
-	input [3:0] wmask_i;
-	input [10:0] addr_i;
-	input [31:0] din_i;
-	output [31:0] dout_o;
-	wire csb;
-	assign csb = addr_i[10];
-	wire [9:0] addr;
-	assign addr = addr_i[9:0];
-	wire [31:0] dout_1;
-	wire [31:0] dout_2;
-	sky130_sram_4kbyte_1rw1r_32x1024_8 SRAM1(
-		.clk0(clk_i),
-		.csb0(csb),
-		.web0(web_i),
-		.wmask0(wmask_i),
-		.addr0(addr),
-		.din0(din_i),
-		.dout0(dout_1),
-		.clk1(1'b0),
-		.csb1(1'b1),
-		.addr1(11'b00000000000),
-		.dout1()
-	);
-	assign dout_o = (csb ? dout_2 : dout_1);
-	sky130_sram_4kbyte_1rw1r_32x1024_8 SRAM2(
-		.clk0(clk_i),
-		.csb0(~csb),
-		.web0(web_i),
-		.wmask0(wmask_i),
-		.addr0(addr),
-		.din0(din_i),
-		.dout0(dout_2),
-		.clk1(1'b0),
-		.csb1(1'b1),
-		.addr1(11'b00000000000),
-		.dout1()
 	);
 endmodule
 module timer_core (
