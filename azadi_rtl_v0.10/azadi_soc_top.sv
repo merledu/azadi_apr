@@ -282,7 +282,6 @@ gpio GPIO (
 rstmgr reset_manager(
   .clk_i(clk_i),
   .rst_ni(rst_ni),
-  .ndmreset (dbg_rst),
   .prog_rst_ni(prog_rst_ni),
   .sys_rst_ni(system_rst_ni)
 );
