@@ -14,14 +14,6 @@ module azadi_soc_top (
   output logic [31:0] gpio_o,
   output logic [31:0] gpio_oe,
 
-  // jtag interface 
-  input  logic       jtag_tck_i,
-  input  logic       jtag_tms_i,
-  input  logic       jtag_trst_ni,
-  input  logic       jtag_tdi_i,
-  output logic       jtag_tdo_o,
-  output logic       jtag_tdo_oe_o,
-
   // uart-periph interface
   output logic       uart_tx,
   input  logic       uart_rx,
@@ -42,15 +34,6 @@ module azadi_soc_top (
   input  logic                     sd_i
 );
 
-localparam logic [31:0] JTAG_ID = {
-  4'h0,     // Version
-  16'h4F54, // Part Number: "OT"
-  11'h426,  // Manufacturer Identity: Google
-  1'b1      // (fixed)
-};
-
-//  logic clk_ni;
-//  assign clk_ni = ~clk_i;
   logic prog_rst_n;
   logic system_rst_ni;
   logic [31:0] gpio_in;
@@ -63,8 +46,7 @@ localparam logic [31:0] JTAG_ID = {
   logic [11:0]  tlul_addr;
   logic         req_i;
   logic [31:0]  tlul_data;
-  logic dbg_req;
-  logic dbg_rst;
+
 
 
  // instruction sram interface 
@@ -101,12 +83,6 @@ localparam logic [31:0] JTAG_ID = {
 
   tlul_pkg::tl_h2d_t xbarp_to_gpio;
   tlul_pkg::tl_d2h_t gpio_to_xbarp;
-
-  tlul_pkg::tl_h2d_t dm_to_xbar;
-  tlul_pkg::tl_d2h_t xbar_to_dm;
-
-  tlul_pkg::tl_h2d_t dbgrom_to_xbar;
-  tlul_pkg::tl_d2h_t xbar_to_dbgrom;
 
   tlul_pkg::tl_h2d_t plic_req;
   tlul_pkg::tl_d2h_t plic_resp;
@@ -150,19 +126,6 @@ localparam logic [31:0] JTAG_ID = {
       1'b0
   };
 
-// jtag interface 
-
-  jtag_pkg::jtag_req_t jtag_req;
-  jtag_pkg::jtag_rsp_t jtag_rsp;
-  
-
-  assign jtag_req.tck    = jtag_tck_i;
-  assign jtag_req.tms    = jtag_tms_i;
-  assign jtag_req.trst_n = jtag_trst_ni;
-  assign jtag_req.tdi    = jtag_tdi_i;
-  assign jtag_tdo_o      = jtag_rsp.tdo;
-  assign jtag_tdo_oe_o = jtag_rsp.tdo_oe;
-
 
 brq_core_top #(
     .PMPEnable        (1'b0),
@@ -182,8 +145,8 @@ brq_core_top #(
     .DbgTriggerEn     (1'b1), 
     .DbgHwBreakNum    (1), 
     .Securebrq        (1'b0),
-    .DmHaltAddr       (tl_main_pkg::ADDR_SPACE_DEBUG_ROM + 32'h 800), 
-    .DmExceptionAddr  (tl_main_pkg::ADDR_SPACE_DEBUG_ROM + dm::ExceptionAddress) 
+    .DmHaltAddr       ('0), 
+    .DmExceptionAddr  ('0) 
 ) u_top (
     .clk_i (clk_i),
     .rst_ni (system_rst_ni),
@@ -209,42 +172,13 @@ brq_core_top #(
     .irq_nm_i       (1'b0),       // non-maskeable interrupt
 
     // Debug Interface
-    .debug_req_i    (dbg_req),
-        // CPU Control Signals
+    .debug_req_i    ('0),
+    // CPU Control Signals
     .fetch_enable_i (1'b1),
     .alert_minor_o  (),
     .alert_major_o  (),
     .core_sleep_o   ()
 );
-
-// Debug module
-rv_dm #(
-  .NrHarts(1),
-  .IdcodeValue(JTAG_ID)
- // .DirectDmiTap (DirectDmiTap)
-) debug_module (
-  .clk_i(clk_i),       // clk_i
-  .rst_ni(rst_ni),      // asynchronous reset active low, connect PoR
-                                          // here, not the system reset
-  .testmode_i('0),
-  .ndmreset_o(dbg_rst),  // non-debug module reset
-  .dmactive_o(),  // debug module is active
-  .debug_req_o(dbg_req), // async debug request
-  .unavailable_i(1'b0), // communicate whether the hart is unavailable
-                                            // (e.g.: power down)
-
-  // bus device with debug memory, for an execution based technique
-  .tl_d_i(dbgrom_to_xbar),
-  .tl_d_o(xbar_to_dbgrom),
-
-  // bus host, for system bus accesses
-  .tl_h_o(dm_to_xbar),
-  .tl_h_i(xbar_to_dm),
-
-  .jtag_req_i(jtag_req),
-  .jtag_rsp_o(jtag_rsp)
-);
-
 
 
 // main xbar module
@@ -257,14 +191,10 @@ rv_dm #(
   .tl_brqif_o         (xbar_to_ifu),
   .tl_brqlsu_i        (lsu_to_xbar),
   .tl_brqlsu_o        (xbar_to_lsu),
-  .tl_dm_sba_i        (dm_to_xbar),
-  .tl_dm_sba_o        (xbar_to_dm),
 
   // Device interfaces
   .tl_iccm_o          (xbar_to_iccm),
   .tl_iccm_i          (iccm_to_xbar),
-  .tl_debug_rom_o     (dbgrom_to_xbar),
-  .tl_debug_rom_i     (xbar_to_dbgrom),
   .tl_dccm_o          (xbar_to_dccm),
   .tl_dccm_i          (dccm_to_xbar),
   .tl_timer0_o        (xbar_to_timer),
