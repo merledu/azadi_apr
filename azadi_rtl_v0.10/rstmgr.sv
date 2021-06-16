@@ -7,7 +7,6 @@ module rstmgr(
     input rst_ni, // system reset
     input prog_rst_ni,
   
-    input  logic  ndmreset, // non-debug module reset
     output logic  sys_rst_ni // reset for system except debug module
 );
   typedef enum logic [1:0] {

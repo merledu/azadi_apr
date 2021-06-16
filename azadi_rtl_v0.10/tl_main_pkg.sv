@@ -7,7 +7,6 @@
 package tl_main_pkg;
 
   localparam logic [31:0] ADDR_SPACE_ICCM       = 32'h 20000000;
-  localparam logic [31:0] ADDR_SPACE_DEBUG_ROM  = 32'h 10040000;
   localparam logic [31:0] ADDR_SPACE_DCCM       = 32'h 10000000;
   localparam logic [31:0] ADDR_SPACE_TIMER0     = 32'h 40000000;
   localparam logic [31:0] ADDR_SPACE_UART0      = 32'h 40060000;
@@ -17,7 +16,6 @@ package tl_main_pkg;
   localparam logic [31:0] ADDR_SPACE_PLIC       = 32'h 40050000;
 
   localparam logic [31:0] ADDR_MASK_ICCM       = 32'h 0000ffff;
-  localparam logic [31:0] ADDR_MASK_DEBUG_ROM  = 32'h 0000ffff;
   localparam logic [31:0] ADDR_MASK_DCCM       = 32'h 0000ffff;
   localparam logic [31:0] ADDR_MASK_TIMER0     = 32'h 0000ffff;
   localparam logic [31:0] ADDR_MASK_UART0      = 32'h 0000ffff;
@@ -26,25 +24,23 @@ package tl_main_pkg;
   localparam logic [31:0] ADDR_MASK_GPIO       = 32'h 0000ffff;
   localparam logic [31:0] ADDR_MASK_PLIC       = 32'h 0000ffff;
 
-  localparam int N_HOST   = 3;
-  localparam int N_DEVICE = 9;
+  localparam int N_HOST   = 2;
+  localparam int N_DEVICE = 8;
 
   typedef enum int {
     TlIccm = 0,
-    TlDebugRom = 1,
-    TlDccm = 2,
-    TlTimer0 = 3,
-    TlUart0 = 4,
-    TlSpi0 = 5,
-    TlPwm = 6,
-    TlGpio = 7,
-    TlPlic = 8
+    TlDccm = 1,
+    TlTimer0 = 2,
+    TlUart0 = 3,
+    TlSpi0 = 4,
+    TlPwm = 5,
+    TlGpio = 6,
+    TlPlic = 7
   } tl_device_e;
 
   typedef enum int {
     TlBrqif = 0,
-    TlBrqlsu = 1,
-    TlDmSba = 2
+    TlBrqlsu = 1
   } tl_host_e;
 
 endpackage
