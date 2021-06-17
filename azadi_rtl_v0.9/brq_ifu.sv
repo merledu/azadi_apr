@@ -245,7 +245,7 @@ module brq_ifu #(
   assign if_id_pipe_reg_we = instr_new_id_d;
 
   always_ff @(posedge clk_i) begin
-   // if (if_id_pipe_reg_we) begin
+    if (if_id_pipe_reg_we) begin
 	if(~rst_ni) begin
 	  instr_rdata_id_o         <= '0;
       // To reduce fan-out and help timing from the instr_rdata_id flops they are replicated.
@@ -256,7 +256,7 @@ module brq_ifu #(
           instr_is_compressed_id_o <= '0;
           illegal_c_insn_id_o      <= '0;
           pc_id_o                  <= '0;
-	end else if (if_id_pipe_reg_we) begin
+	end else begin
 	  instr_rdata_id_o         <= instr_out;
       // To reduce fan-out and help timing from the instr_rdata_id flops they are replicated.
           instr_rdata_alu_id_o     <= instr_out;
@@ -268,7 +268,7 @@ module brq_ifu #(
           pc_id_o                  <= pc_if_o;
 	end
 
-   // end
+    end
   end
 
   
