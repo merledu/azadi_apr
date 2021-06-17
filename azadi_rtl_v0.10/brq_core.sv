@@ -431,7 +431,7 @@ assign       test_en_i = 1'b0;
   // independent
   prim_clock_gating core_clock_gate_i (
       .clk_i     ( clk_i           ),
-      .en_i      ( 1'b1        ),
+      .en_i      ( clock_en        ),
       .test_en_i ( test_en_i       ),
       .clk_o     ( clk            )
   );
