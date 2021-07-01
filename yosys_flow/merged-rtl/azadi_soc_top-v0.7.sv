@@ -2734,6 +2734,527 @@ function automatic integer _clog2(integer value);
 
 endpackage
 
+// module azadi_soc_top (
+// `ifdef USE_POWER_PINS
+//    inout VPWR,
+//    inout VGND,
+// `endif
+//   input logic clk_i,
+//   input logic rst_ni,
+//   input logic prog,
+//   //output system_rst_ni,
+//  // output prog_rst_ni,
+//   input  logic [15:0] clks_per_bit, 
+//   input  logic [31:0] gpio_i,
+//   output logic [31:0] gpio_o,
+//   output logic [31:0] gpio_oe,
+
+//   // jtag interface 
+//   input  logic       jtag_tck_i,
+//   input  logic       jtag_tms_i,
+//   input  logic       jtag_trst_ni,
+//   input  logic       jtag_tdi_i,
+//   output logic       jtag_tdo_o,
+//   output logic       jtag_tdo_oe_o,
+
+//   // uart-periph interface
+//   output logic       uart_tx,
+//   input  logic       uart_rx,
+
+//   // PWM interface  
+
+//   output logic       pwm_o,
+//   output logic       pwm_o_2,
+//   output logic       pwm1_oe,
+//   output logic       pwm2_oe,
+
+//   // SPI interface
+
+//   output logic    [`SPI_SS_NB-1:0] ss_o,        
+//   output logic                     sclk_o,      
+//   output logic                     sd_o,
+//   output logic                     sd_oe,       
+//   input  logic                     sd_i
+// );
+
+// localparam logic [31:0] JTAG_ID = {
+//   4'h0,     // Version
+//   16'h4F54, // Part Number: "OT"
+//   11'h426,  // Manufacturer Identity: Google
+//   1'b1      // (fixed)
+// };
+
+// //  logic clk_ni;
+// //  assign clk_ni = ~clk_i;
+//   logic prog_rst_n;
+//   logic system_rst_ni;
+//   logic [31:0] gpio_in;
+//   logic [31:0] gpio_out;
+  
+//   assign gpio_in = gpio_i;
+//   assign gpio_o  = gpio_out; 
+
+//   logic         instr_valid;
+//   logic [11:0]  tlul_addr;
+//   logic         req_i;
+//   logic [31:0]  tlul_data;
+//   logic dbg_req;
+//   logic dbg_rst;
+
+
+//  // instruction sram interface 
+//   logic        instr_csb;
+//   logic [11:0] instr_addr;
+//   logic [31:0] instr_wdata;
+//   logic [3:0]  instr_wmask;
+//   logic        instr_we;
+//   logic [31:0] instr_rdata;
+  
+//    // data sram interface
+//   logic        data_csb;
+//   logic [11:0] data_addr;
+//   logic [31:0] data_wdata;
+//   logic [3:0]  data_wmask;
+//   logic        data_we;
+//   logic [31:0] data_rdata;
+  
+//   logic [31:0] iccm_ctrl_data;
+//   logic        iccm_ctrl_we;
+//   logic [11:0] iccm_ctrl_addr_o;
+
+        
+//   tlul_pkg::tl_h2d_t ifu_to_xbar;
+//   tlul_pkg::tl_d2h_t xbar_to_ifu;
+//   tlul_pkg::tl_h2d_t xbar_to_iccm;
+//   tlul_pkg::tl_d2h_t iccm_to_xbar;
+
+//   tlul_pkg::tl_h2d_t lsu_to_xbar;
+//   tlul_pkg::tl_d2h_t xbar_to_lsu;
+
+//   tlul_pkg::tl_h2d_t xbar_to_dccm;
+//   tlul_pkg::tl_d2h_t dccm_to_xbar;
+
+//   tlul_pkg::tl_h2d_t xbarp_to_gpio;
+//   tlul_pkg::tl_d2h_t gpio_to_xbarp;
+
+//   tlul_pkg::tl_h2d_t dm_to_xbar;
+//   tlul_pkg::tl_d2h_t xbar_to_dm;
+
+//   tlul_pkg::tl_h2d_t dbgrom_to_xbar;
+//   tlul_pkg::tl_d2h_t xbar_to_dbgrom;
+
+//   tlul_pkg::tl_h2d_t plic_req;
+//   tlul_pkg::tl_d2h_t plic_resp;
+
+//   tlul_pkg::tl_h2d_t xbar_to_uart;
+//   tlul_pkg::tl_d2h_t uart_to_xbar;
+
+//   tlul_pkg::tl_h2d_t xbar_to_timer;
+//   tlul_pkg::tl_d2h_t timer_to_xbar;
+
+//   tlul_pkg::tl_h2d_t xbar_to_pwm;
+//   tlul_pkg::tl_d2h_t pwm_to_xbar;
+
+//   tlul_pkg::tl_h2d_t xbar_to_spi;
+//   tlul_pkg::tl_d2h_t spi_to_xbar;
+
+//   // interrupt vector
+//   logic [35:0] intr_vector;
+
+//   // Interrupt source list 
+//   logic [31:0] intr_gpio;
+//   logic        intr_uart0_tx_watermark;
+//   logic        intr_uart0_rx_watermark;
+//   logic        intr_uart0_tx_empty;
+//   logic        intr_uart0_rx_overflow;
+//   logic        intr_uart0_rx_frame_err;
+//   logic        intr_uart0_rx_break_err;
+//   logic        intr_uart0_rx_timeout;
+//   logic        intr_uart0_rx_parity_err;
+//   logic        intr_req;
+//   logic        intr_srx;
+//   logic        intr_stx;
+//   logic        intr_timer;
+//   logic        intr_u_tx;
+
+//   assign intr_vector = { 
+//       intr_srx,
+//       intr_stx,
+//       intr_u_tx,
+//       intr_gpio,
+//       1'b0
+//   };
+
+// // jtag interface 
+
+//   jtag_pkg::jtag_req_t jtag_req;
+//   jtag_pkg::jtag_rsp_t jtag_rsp;
+  
+
+//   assign jtag_req.tck    = jtag_tck_i;
+//   assign jtag_req.tms    = jtag_tms_i;
+//   assign jtag_req.trst_n = jtag_trst_ni;
+//   assign jtag_req.tdi    = jtag_tdi_i;
+//   assign jtag_tdo_o      = jtag_rsp.tdo;
+//   assign jtag_tdo_oe_o = jtag_rsp.tdo_oe;
+
+
+// brq_core_top #(
+//     .PMPEnable        (1'b0),
+//     .PMPGranularity   (0), 
+//     .PMPNumRegions    (4), 
+//     .MHPMCounterNum   (0), 
+//     .MHPMCounterWidth (40), 
+//     .RV32E            (1'b0), 
+//     .RV32M            (brq_pkg::RV32MSlow), 
+//     .RV32B            (brq_pkg::RV32BNone), 
+//     .RegFile          (brq_pkg::RegFileFF), 
+//     .BranchTargetALU  (1'b0), 
+//     .WritebackStage   (1'b1), 
+//     .ICache           (1'b0), 
+//     .ICacheECC        (1'b0), 
+//     .BranchPredictor  (1'b0), 
+//     .DbgTriggerEn     (1'b1), 
+//     .DbgHwBreakNum    (1), 
+//     .Securebrq        (1'b0),
+//     .DmHaltAddr       (tl_main_pkg::ADDR_SPACE_DEBUG_ROM + 32'h 800), 
+//     .DmExceptionAddr  (tl_main_pkg::ADDR_SPACE_DEBUG_ROM + dm::ExceptionAddress) 
+// ) u_top (
+//     .clk_i (clk_i),
+//     .rst_ni (system_rst_ni),
+
+//   // instruction memory interface 
+//     .tl_i_i (xbar_to_ifu),
+//     .tl_i_o (ifu_to_xbar),
+
+//   // data memory interface 
+//     .tl_d_i (xbar_to_lsu),
+//     .tl_d_o (lsu_to_xbar),
+
+//     //.test_en_i   (1'b0),     // enable all clk_i gates for testing
+
+//     .hart_id_i   (32'b0), 
+//     .boot_addr_i (32'h20000000),
+
+//         // Interrupt inputs
+//     .irq_software_i (1'b0),
+//     .irq_timer_i    (intr_timer),
+//     .irq_external_i (intr_req),
+//     .irq_fast_i     ('0),
+//     .irq_nm_i       (1'b0),       // non-maskeable interrupt
+
+//     // Debug Interface
+//     .debug_req_i    (dbg_req),
+//         // CPU Control Signals
+//     .fetch_enable_i (1'b1),
+//     .alert_minor_o  (),
+//     .alert_major_o  (),
+//     .core_sleep_o   ()
+// );
+
+// // Debug module
+// rv_dm #(
+//   .NrHarts(1),
+//   .IdcodeValue(JTAG_ID)
+//  // .DirectDmiTap (DirectDmiTap)
+// ) debug_module (
+//   .clk_i(clk_i),       // clk_i
+//   .rst_ni(rst_ni),      // asynchronous reset active low, connect PoR
+//                                           // here, not the system reset
+//   .testmode_i('0),
+//   .ndmreset_o(dbg_rst),  // non-debug module reset
+//   .dmactive_o(),  // debug module is active
+//   .debug_req_o(dbg_req), // async debug request
+//   .unavailable_i(1'b0), // communicate whether the hart is unavailable
+//                                             // (e.g.: power down)
+
+//   // bus device with debug memory, for an execution based technique
+//   .tl_d_i(dbgrom_to_xbar),
+//   .tl_d_o(xbar_to_dbgrom),
+
+//   // bus host, for system bus accesses
+//   .tl_h_o(dm_to_xbar),
+//   .tl_h_i(xbar_to_dm),
+
+//   .jtag_req_i(jtag_req),
+//   .jtag_rsp_o(jtag_rsp)
+// );
+
+
+
+// // main xbar module
+//   tl_xbar_main main_swith (
+//   .clk_i         (clk_i),
+//   .rst_ni        (system_rst_ni),
+
+//   // Host interfaces
+//   .tl_brqif_i         (ifu_to_xbar),
+//   .tl_brqif_o         (xbar_to_ifu),
+//   .tl_brqlsu_i        (lsu_to_xbar),
+//   .tl_brqlsu_o        (xbar_to_lsu),
+//   .tl_dm_sba_i        (dm_to_xbar),
+//   .tl_dm_sba_o        (xbar_to_dm),
+
+//   // Device interfaces
+//   .tl_iccm_o          (xbar_to_iccm),
+//   .tl_iccm_i          (iccm_to_xbar),
+//   .tl_debug_rom_o     (dbgrom_to_xbar),
+//   .tl_debug_rom_i     (xbar_to_dbgrom),
+//   .tl_dccm_o          (xbar_to_dccm),
+//   .tl_dccm_i          (dccm_to_xbar),
+//   .tl_timer0_o        (xbar_to_timer),
+//   .tl_timer0_i        (timer_to_xbar),
+//   .tl_uart_o          (xbar_to_uart),
+//   .tl_uart_i          (uart_to_xbar),
+//   .tl_spi_o           (xbar_to_spi),
+//   .tl_spi_i           (spi_to_xbar),
+//   .tl_pwm_o           (xbar_to_pwm),
+//   .tl_pwm_i           (pwm_to_xbar),
+//   .tl_gpio_o          (xbarp_to_gpio),
+//   .tl_gpio_i          (gpio_to_xbarp),
+//   .tl_plic_o          (plic_req),
+//   .tl_plic_i          (plic_resp)
+// );
+
+
+// // timer
+// rv_timer timer0( 
+//   .clk_i  (clk_i),
+//   .rst_ni (system_rst_ni),
+
+//   .tl_i   (xbar_to_timer),
+//   .tl_o   (timer_to_xbar),
+
+//   .intr_timer_expired_0_0_o (intr_timer)
+// );
+
+// // PWM module
+
+// pwm_top u_pwm(
+
+//   .clk_i   (clk_i),
+//   .rst_ni  (system_rst_ni),
+
+//   .tl_i    (xbar_to_pwm),
+//   .tl_o    (pwm_to_xbar),
+
+
+//   .pwm_o   (pwm_o),
+//   .pwm_o_2 (pwm_o_2),
+//   .pwm1_oe (pwm1_oe),
+//   .pwm2_oe (pwm2_oe)
+// );
+
+
+// // spi module 
+
+// spi_top u_spi_host(
+
+//   .clk_i       (clk_i),
+//   .rst_ni      (system_rst_ni),
+
+//   .tl_i        (xbar_to_spi),
+//   .tl_o        (spi_to_xbar),
+
+//   // SPI signals                  
+//   .intr_rx_o   (intr_srx),
+//   .intr_tx_o   (intr_stx),                   
+//   .ss_o        (ss_o),         
+//   .sclk_o      (sclk_o),       
+//   .sd_o        (sd_o),
+//   .sd_oe       (sd_oe),       
+//   .sd_i        (sd_i)
+// );
+
+
+// //GPIO module
+// gpio GPIO (
+//   .clk_i          (clk_i),
+//   .rst_ni         (system_rst_ni),
+
+//   // Below Regster interface can be changed
+//   .tl_i           (xbarp_to_gpio),
+//   .tl_o           (gpio_to_xbarp),
+
+//   .cio_gpio_i     (gpio_in),
+//   .cio_gpio_o     (gpio_out),
+//   .cio_gpio_en_o  (gpio_oe),
+
+//   .intr_gpio_o    (intr_gpio )  
+// );
+
+
+// rstmgr reset_manager(
+//   .clk_i(clk_i),
+//   .rst_ni(rst_ni),
+//   .ndmreset (dbg_rst),
+//   .prog_rst_ni(prog_rst_ni),
+//   .sys_rst_ni(system_rst_ni)
+// );
+
+// rv_plic intr_controller (
+//   .clk_i(clk_i),
+//   .rst_ni(system_rst_ni),
+
+//   // Bus Interface (device)
+//   .tl_i (plic_req),
+//   .tl_o (plic_resp),
+
+//   // Interrupt Sources
+//   .intr_src_i (intr_vector),
+
+//   // Interrupt notification to targets
+//   .irq_o (intr_req),
+//   .msip_o()
+// );
+
+//  uart_top  u_uart(
+
+//     .clk_i  (clk_i),
+//     .rst_ni (system_rst_ni),
+    
+//     .tl_i   (xbar_to_uart),
+//     .tl_o   (uart_to_xbar),
+    
+//     .tx_o   (uart_tx),
+//     .rx_i   (uart_rx),
+    
+//     .intr_tx (intr_u_tx)
+// );
+
+// logic rx_dv_i;
+// logic [7:0] rx_byte_i;
+	
+// iccm_controller u_dut(
+//     .clk_i      (clk_i),
+// 	.rst_ni     (rst_ni),
+// 	.prog_i     (prog),
+// 	.rx_dv_i    (rx_dv_i),
+// 	.rx_byte_i  (rx_byte_i),
+// 	.we_o       (iccm_ctrl_we),
+// 	.addr_o     (iccm_ctrl_addr_o),
+// 	.wdata_o    (iccm_ctrl_data),
+// 	.reset_o    (prog_rst_ni)
+// );
+	
+// uart_rx_prog u_uart_rx_prog(
+// 	.clk_i         (clk_i),
+// 	.rst_ni        (rst_ni),
+// 	.i_Rx_Serial   (uart_rx),
+// 	.CLKS_PER_BIT  (clks_per_bit),
+// 	.o_Rx_DV       (rx_dv_i),
+// 	.o_Rx_Byte     (rx_byte_i)
+// );
+
+
+// // dummy instruction memory
+// instr_mem_top iccm_adapter(
+//   .clk_i            (clk_i),
+//   .rst_ni           (system_rst_ni),
+  
+//   .tl_i             (xbar_to_iccm),
+//   .tl_o             (iccm_to_xbar),
+// // iccm controller interface 
+//   .iccm_ctrl_addr   (iccm_ctrl_addr_o),
+//   .iccm_ctrl_wdata  (iccm_ctrl_data),
+//   .iccm_ctrl_we     (iccm_ctrl_we),
+//   .prog_rst_ni      (prog_rst_ni),
+    
+
+// // instruction sram interface 
+//   .csb              (instr_csb),
+//   .addr_o           (instr_addr),
+//   .wdata_o          (instr_wdata),
+//   .wmask_o          (instr_wmask),
+//   .we_o             (instr_we),
+//   .rdata_i          (instr_rdata)
+// );
+
+//  wire [31:0] un_conn1;
+//   sky130_sram_4kbyte_1rw1r_32x1024_8 u_iccm (
+// `ifdef USE_POWER_PINS
+//     .vccd1 (VPWR),
+//     .vssd1 (VGND),
+// `endif
+//     .clk0      (clk_i), // clock
+//     .csb0      (instr_csb), // active low chip select  intentionally kept enabled
+//     .web0      (instr_we), // active low write control
+//     .wmask0    (instr_wmask), // write mask
+//     .addr0     (instr_addr[9:0]),
+//     .din0      (instr_wdata),
+//     .dout0     (instr_rdata),
+//     .clk1     (1'b0),
+//     .csb1     (1'b1),
+//     .addr1    ('0),
+//     .dout1    (un_conn1)
+//     ); 
+
+
+// // sram_top u_iccm(
+// // `ifdef USE_POWER_PINS
+// //     .VPWR   (VPWR),
+// //     .VGND   (VGND),
+// // `endif
+// //    .clk_i   (clk_i),
+// //    .web_i   (instr_we),
+// //    .wmask_i (instr_wmask),
+// //    .addr_i  (instr_addr[10:0]),
+// //    .din_i   (instr_wdata),
+// //    .dout_o  (instr_rdata)
+// //   );
+
+// // dummy data memory
+
+// data_mem_top dccm_adapter(
+//   .clk_i    (clk_i),
+//   .rst_ni    (system_rst_ni),
+
+// // tl-ul insterface
+//   .tl_d_i   (xbar_to_dccm),
+//   .tl_d_o   (dccm_to_xbar),
+  
+//   // sram interface
+//    .csb     (data_csb),
+//    .addr_o  (data_addr),
+//    .wdata_o (data_wdata),
+//    .wmask_o (data_wmask),
+//    .we_o    (data_we),
+//    .rdata_i (data_rdata)
+// );
+
+// wire [31:0] un_conn2;
+// sky130_sram_4kbyte_1rw1r_32x1024_8  u_dccm (
+// `ifdef USE_POWER_PINS
+//   .vccd1 (VPWR),
+//   .vssd1 (VGND),
+// `endif
+//   .clk0      (clk_i), // clock
+//   .csb0      (instr_csb), // active low chip select  intentionally kept enabled
+//   .web0      (data_we), // active low write control
+//   .wmask0    (data_wmask), // write mask
+//   .addr0     (data_addr[9:0]),
+//   .din0      (data_wdata),
+//   .dout0     (data_rdata),
+//   .clk1     (1'b0),
+//   .csb1     (1'b1),
+//   .addr1    ('0),
+//   .dout1    (un_conn2)
+//   );
+
+// // sram_top u_dccm(
+// // `ifdef USE_POWER_PINS
+// //     .VPWR   (VPWR),
+// //     .VGND   (VGND),
+// // `endif
+// //    .clk_i   (clk_i),
+// //    .web_i   (data_we),
+// //    .wmask_i (data_wmask),
+// //    .addr_i  (data_addr[10:0]),
+// //    .din_i   (data_wdata),
+// //    .dout_o  (data_rdata)
+// //   );
+// endmodule
+
 module azadi_soc_top (
 `ifdef USE_POWER_PINS
    inout VPWR,
@@ -2748,14 +3269,6 @@ module azadi_soc_top (
   input  logic [31:0] gpio_i,
   output logic [31:0] gpio_o,
   output logic [31:0] gpio_oe,
-
-  // jtag interface 
-  input  logic       jtag_tck_i,
-  input  logic       jtag_tms_i,
-  input  logic       jtag_trst_ni,
-  input  logic       jtag_tdi_i,
-  output logic       jtag_tdo_o,
-  output logic       jtag_tdo_oe_o,
 
   // uart-periph interface
   output logic       uart_tx,
@@ -2777,15 +3290,6 @@ module azadi_soc_top (
   input  logic                     sd_i
 );
 
-localparam logic [31:0] JTAG_ID = {
-  4'h0,     // Version
-  16'h4F54, // Part Number: "OT"
-  11'h426,  // Manufacturer Identity: Google
-  1'b1      // (fixed)
-};
-
-//  logic clk_ni;
-//  assign clk_ni = ~clk_i;
   logic prog_rst_n;
   logic system_rst_ni;
   logic [31:0] gpio_in;
@@ -2798,8 +3302,7 @@ localparam logic [31:0] JTAG_ID = {
   logic [11:0]  tlul_addr;
   logic         req_i;
   logic [31:0]  tlul_data;
-  logic dbg_req;
-  logic dbg_rst;
+
 
 
  // instruction sram interface 
@@ -2836,12 +3339,6 @@ localparam logic [31:0] JTAG_ID = {
 
   tlul_pkg::tl_h2d_t xbarp_to_gpio;
   tlul_pkg::tl_d2h_t gpio_to_xbarp;
-
-  tlul_pkg::tl_h2d_t dm_to_xbar;
-  tlul_pkg::tl_d2h_t xbar_to_dm;
-
-  tlul_pkg::tl_h2d_t dbgrom_to_xbar;
-  tlul_pkg::tl_d2h_t xbar_to_dbgrom;
 
   tlul_pkg::tl_h2d_t plic_req;
   tlul_pkg::tl_d2h_t plic_resp;
@@ -2885,19 +3382,6 @@ localparam logic [31:0] JTAG_ID = {
       1'b0
   };
 
-// jtag interface 
-
-  jtag_pkg::jtag_req_t jtag_req;
-  jtag_pkg::jtag_rsp_t jtag_rsp;
-  
-
-  assign jtag_req.tck    = jtag_tck_i;
-  assign jtag_req.tms    = jtag_tms_i;
-  assign jtag_req.trst_n = jtag_trst_ni;
-  assign jtag_req.tdi    = jtag_tdi_i;
-  assign jtag_tdo_o      = jtag_rsp.tdo;
-  assign jtag_tdo_oe_o = jtag_rsp.tdo_oe;
-
 
 brq_core_top #(
     .PMPEnable        (1'b0),
@@ -2917,8 +3401,8 @@ brq_core_top #(
     .DbgTriggerEn     (1'b1), 
     .DbgHwBreakNum    (1), 
     .Securebrq        (1'b0),
-    .DmHaltAddr       (tl_main_pkg::ADDR_SPACE_DEBUG_ROM + 32'h 800), 
-    .DmExceptionAddr  (tl_main_pkg::ADDR_SPACE_DEBUG_ROM + dm::ExceptionAddress) 
+    .DmHaltAddr       ('0), 
+    .DmExceptionAddr  ('0) 
 ) u_top (
     .clk_i (clk_i),
     .rst_ni (system_rst_ni),
@@ -2944,42 +3428,13 @@ brq_core_top #(
     .irq_nm_i       (1'b0),       // non-maskeable interrupt
 
     // Debug Interface
-    .debug_req_i    (dbg_req),
-        // CPU Control Signals
+    .debug_req_i    ('0),
+    // CPU Control Signals
     .fetch_enable_i (1'b1),
     .alert_minor_o  (),
     .alert_major_o  (),
     .core_sleep_o   ()
 );
-
-// Debug module
-rv_dm #(
-  .NrHarts(1),
-  .IdcodeValue(JTAG_ID)
- // .DirectDmiTap (DirectDmiTap)
-) debug_module (
-  .clk_i(clk_i),       // clk_i
-  .rst_ni(rst_ni),      // asynchronous reset active low, connect PoR
-                                          // here, not the system reset
-  .testmode_i('0),
-  .ndmreset_o(dbg_rst),  // non-debug module reset
-  .dmactive_o(),  // debug module is active
-  .debug_req_o(dbg_req), // async debug request
-  .unavailable_i(1'b0), // communicate whether the hart is unavailable
-                                            // (e.g.: power down)
-
-  // bus device with debug memory, for an execution based technique
-  .tl_d_i(dbgrom_to_xbar),
-  .tl_d_o(xbar_to_dbgrom),
-
-  // bus host, for system bus accesses
-  .tl_h_o(dm_to_xbar),
-  .tl_h_i(xbar_to_dm),
-
-  .jtag_req_i(jtag_req),
-  .jtag_rsp_o(jtag_rsp)
-);
-
 
 
 // main xbar module
@@ -2992,14 +3447,10 @@ rv_dm #(
   .tl_brqif_o         (xbar_to_ifu),
   .tl_brqlsu_i        (lsu_to_xbar),
   .tl_brqlsu_o        (xbar_to_lsu),
-  .tl_dm_sba_i        (dm_to_xbar),
-  .tl_dm_sba_o        (xbar_to_dm),
 
   // Device interfaces
   .tl_iccm_o          (xbar_to_iccm),
   .tl_iccm_i          (iccm_to_xbar),
-  .tl_debug_rom_o     (dbgrom_to_xbar),
-  .tl_debug_rom_i     (xbar_to_dbgrom),
   .tl_dccm_o          (xbar_to_dccm),
   .tl_dccm_i          (dccm_to_xbar),
   .tl_timer0_o        (xbar_to_timer),
@@ -3087,7 +3538,6 @@ gpio GPIO (
 rstmgr reset_manager(
   .clk_i(clk_i),
   .rst_ni(rst_ni),
-  .ndmreset (dbg_rst),
   .prog_rst_ni(prog_rst_ni),
   .sys_rst_ni(system_rst_ni)
 );
@@ -3170,38 +3620,47 @@ instr_mem_top iccm_adapter(
   .rdata_i          (instr_rdata)
 );
 
- wire [31:0] un_conn1;
-  sky130_sram_4kbyte_1rw1r_32x1024_8 u_iccm (
+
+/*  sram_top #(  
+     .NUM_WMASKS  (4),
+     .MEMD        (2048),
+     .DATA_WIDTH  (32), // data width
+     .nRPORTS     (1) , // number of reading ports
+     .nWPORTS     (1), // number of write ports
+     .IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
+     .BASIC_MODEL (1024),
+     .ADDR_WIDTH  (11)
+    ) u_iccm (
 `ifdef USE_POWER_PINS
     .vccd1 (VPWR),
     .vssd1 (VGND),
 `endif
-    .clk0      (clk_i), // clock
-    .csb0      (instr_csb), // active low chip select  intentionally kept enabled
-    .web0      (instr_we), // active low write control
-    .wmask0    (instr_wmask), // write mask
-    .addr0     (instr_addr[9:0]),
-    .din0      (instr_wdata),
-    .dout0     (instr_rdata),
+    .clk      (clk_i), // clock
+    .csb      (instr_csb), // active low chip select  intentionally kept enabled
+    .web      (instr_we), // active low write control
+    .wmask    (instr_wmask), // write mask
+    .addr     (instr_addr[10:0]),
+    .din      (instr_wdata),
+    .dout     (instr_rdata),
     .clk1     (1'b0),
     .csb1     (1'b1),
     .addr1    ('0),
-    .dout1    (un_conn1)
-    ); 
+    .dout1    ()
+    ); */
 
 
-// sram_top u_iccm(
-// `ifdef USE_POWER_PINS
-//     .VPWR   (VPWR),
-//     .VGND   (VGND),
-// `endif
-//    .clk_i   (clk_i),
-//    .web_i   (instr_we),
-//    .wmask_i (instr_wmask),
-//    .addr_i  (instr_addr[10:0]),
-//    .din_i   (instr_wdata),
-//    .dout_o  (instr_rdata)
-//   );
+sram_top u_iccm(
+`ifdef USE_POWER_PINS
+    .VPWR   (VPWR),
+    .VGND   (VGND),
+`endif
+   .clk_i   (clk_i),
+   .web_i   (instr_we),
+   .wmask_i (instr_wmask),
+   .addr_i  (instr_addr[10:0]),
+   .din_i   (instr_wdata),
+   .dout_o  (instr_rdata)
+  );
 
 // dummy data memory
 
@@ -3222,41 +3681,48 @@ data_mem_top dccm_adapter(
    .rdata_i (data_rdata)
 );
 
-wire [31:0] un_conn2;
-sky130_sram_4kbyte_1rw1r_32x1024_8  u_dccm (
+
+//sram_top #(  
+//   .NUM_WMASKS  (4),
+//   .MEMD        (2048),
+//   .DATA_WIDTH  (32), // data width
+//   .nRPORTS     (1) , // number of reading ports
+//   .nWPORTS     (1), // number of write ports
+//   .IZERO       (0) , // binary / Initial RAM with zeros (has priority over IFILE)
+//   .BASIC_MODEL (1024),
+/*   .ADDR_WIDTH  (11)
+  ) u_dccm (
 `ifdef USE_POWER_PINS
   .vccd1 (VPWR),
   .vssd1 (VGND),
 `endif
-  .clk0      (clk_i), // clock
-  .csb0      (instr_csb), // active low chip select  intentionally kept enabled
-  .web0      (data_we), // active low write control
-  .wmask0    (data_wmask), // write mask
-  .addr0     (data_addr[9:0]),
-  .din0      (data_wdata),
-  .dout0     (data_rdata),
-  .clk1     (1'b0),
-  .csb1     (1'b1),
-  .addr1    ('0),
-  .dout1    (un_conn2)
-  );
+  .clk      (clk_i), // clock
+  .csb      (instr_csb), // active low chip select  intentionally kept enabled
+  .web      (data_we), // active low write control
+  .wmask    (data_wmask), // write mask
+  .addr     (data_addr[10:0]),
+  .din      (data_wdata),
+  .dout     (data_rdata),
+  .clk1      (1'b0),
+  .csb1      (1'b1),
+  .addr1     ('0),
+  .dout1     ()
+  );*/
 
-// sram_top u_dccm(
-// `ifdef USE_POWER_PINS
-//     .VPWR   (VPWR),
-//     .VGND   (VGND),
-// `endif
-//    .clk_i   (clk_i),
-//    .web_i   (data_we),
-//    .wmask_i (data_wmask),
-//    .addr_i  (data_addr[10:0]),
-//    .din_i   (data_wdata),
-//    .dout_o  (data_rdata)
-//   );
-endmodule
-`ifdef RISCV_FORMAL
-  `define RVFI
+sram_top u_dccm(
+`ifdef USE_POWER_PINS
+    .VPWR   (VPWR),
+    .VGND   (VGND),
 `endif
+   .clk_i   (clk_i),
+   .web_i   (data_we),
+   .wmask_i (data_wmask),
+   .addr_i  (data_addr[10:0]),
+   .din_i   (data_wdata),
+   .dout_o  (data_rdata)
+  );
+endmodule
+
 
 
 /**
@@ -28792,6 +29258,8 @@ endmodule : rr_arb_tree
 
 // basic reset managemnet logic for azadi
 
+// basic reset managemnet logic for azadi
+
 module rstmgr(
 
     input clk_i, //system clock
@@ -28812,27 +29280,26 @@ always_comb begin : comb_part
   // default values
   rst_fsm_ns  = rst_fsm_cs;
   sys_rst_ni  = 1'b0;
-  rst_run_d   = rst_run_q; 
 
   unique case (rst_fsm_cs)
     RESET: begin
       sys_rst_ni   = 1'b0;
-      if (rst_run_q) begin 
-        rst_fsm_ns   = RUN;
-      end else begin
-        rst_fsm_ns   = IDLE;
-      end
+      rst_fsm_ns   = IDLE;
     end
     IDLE: begin
       sys_rst_ni   = 1'b0;
-      if (!prog_rst_ni) begin
+      rst_run_d    = 1'b0;
+      if (rst_run_q) begin 
+        rst_fsm_ns   = RUN;
+      end else if (!prog_rst_ni) begin
         rst_fsm_ns = PROG;
       end else begin
         rst_fsm_ns = IDLE;
       end
     end
     PROG: begin
-      sys_rst_ni       = 1'b0;
+      sys_rst_ni  = 1'b0;
+      rst_run_d   = 1'b0;
       if (!prog_rst_ni) begin
         rst_fsm_ns = PROG;
       end else begin
@@ -28841,13 +29308,14 @@ always_comb begin : comb_part
     end
     RUN: begin
       sys_rst_ni  = 1'b1;
-      
-      if (!prog_rst_ni) begin
-	rst_run_d   = 1'b0;
-	rst_fsm_ns = PROG;
-      end else begin
+      rst_run_d   = 1'b0;
+      if (!rst_ni) begin
 	rst_run_d   = 1'b1;
-	rst_fsm_ns = RUN;
+	rst_fsm_ns  = RESET;
+      end else if (!prog_rst_ni) begin
+	rst_fsm_ns  = PROG;
+      end else begin
+	rst_fsm_ns  = RUN;
       end
     end
     default: begin
@@ -28868,9 +29336,7 @@ always_ff @(posedge clk_i or negedge rst_ni) begin : seq_part
   end
 end
 
-
 endmodule
-
 
 module rv_dm #(
   parameter int              NrHarts = 1,
@@ -36571,250 +37037,6 @@ module tlul_socket_1n #(
 
 endmodule
 
-// TL-UL socket M:1 module
-//
-// Verilog parameters
-//   M:             Number of host ports.
-//   HReqPass:      M bit array to allow requests to pass through the host i
-//                  FIFO with no clock delay if the request FIFO is empty. If
-//                  1'b0, at least one clock cycle of latency is created.
-//                  Default is 1'b1.
-//   HRspPass:      Same as HReqPass but for host response FIFO.
-//   HReqDepth:     Mx4 bit array. bit[i*4+:4] is depth of host i request FIFO.
-//                  Depth of zero is allowed if ReqPass is true. A maximum value
-//                  of 16 is allowed, default is 2.
-//   HRspDepth:     Same as HReqDepth but for host response FIFO.
-//   DReqPass:      Same as HReqPass but for device request FIFO.
-//   DRspPass:      Same as HReqPass but for device response FIFO.
-//   DReqDepth:     Same as HReqDepth but for device request FIFO.
-//   DRspDepth:     Same as HReqDepth but for device response FIFO.
-
-module tlul_socket_m1 #(
-  parameter int unsigned  M         = 4,
-  parameter bit [M-1:0]   HReqPass  = {M{1'b1}},
-  parameter bit [M-1:0]   HRspPass  = {M{1'b1}},
-  parameter bit [M*4-1:0] HReqDepth = {M{4'h2}},
-  parameter bit [M*4-1:0] HRspDepth = {M{4'h2}},
-  parameter bit           DReqPass  = 1'b1,
-  parameter bit           DRspPass  = 1'b1,
-  parameter bit [3:0]     DReqDepth = 4'h2,
-  parameter bit [3:0]     DRspDepth = 4'h2
-) (
-  input  logic                   clk_i,
-  input  logic                   rst_ni,
-
-  input  tlul_pkg::tl_h2d_t tl_h_i [M],
-  output tlul_pkg::tl_d2h_t tl_h_o [M],
-
-  output tlul_pkg::tl_h2d_t tl_d_o,
-  input  tlul_pkg::tl_d2h_t tl_d_i
-);
-
-  // Signals
-  //
-  //  tl_h_i/o[0] |  tl_h_i/o[1] | ... |  tl_h_i/o[M-1]
-  //      |              |                    |
-  // u_hostfifo[0]  u_hostfifo[1]        u_hostfifo[M-1]
-  //      |              |                    |
-  //       hreq_fifo_o(i) / hrsp_fifo_i(i)
-  //     ---------------------------------------
-  //     |       request/grant/req_data        |
-  //     |                                     |
-  //     |           PRIM_ARBITER              |
-  //     |                                     |
-  //     |  arb_valid / arb_ready / arb_data   |
-  //     ---------------------------------------
-  //                     |
-  //                dreq_fifo_i / drsp_fifo_o
-  //                     |
-  //                u_devicefifo
-  //                     |
-  //                  tl_d_o/i
-  //
-  // Required ID width to distinguish between host ports
-  //  Used in response steering
-  localparam int unsigned IDW   = tlul_pkg::TL_AIW;
-  localparam int unsigned STIDW = $clog2(M);
-
-  tlul_pkg::tl_h2d_t hreq_fifo_o [M];
-  tlul_pkg::tl_d2h_t hrsp_fifo_i [M];
-
-  logic [M-1:0] hrequest;
-  logic [M-1:0] hgrant;
-
-  tlul_pkg::tl_h2d_t dreq_fifo_i;
-  tlul_pkg::tl_d2h_t drsp_fifo_o;
-
-  logic arb_valid;
-  logic arb_ready;
-  tlul_pkg::tl_h2d_t arb_data;
-
-  // Host Req/Rsp FIFO
-  for (genvar i = 0 ; i < M ; i++) begin : gen_host_fifo
-    tlul_pkg::tl_h2d_t hreq_fifo_i;
-
-    // ID Shifting
-    logic [STIDW-1:0] reqid_sub;
-    logic [IDW-1:0] shifted_id;
-    assign reqid_sub = i;   // can cause conversion error?
-    assign shifted_id = {
-      tl_h_i[i].a_source[0+:(IDW-STIDW)],
-      reqid_sub
-    };
-
- 
-    // assign not connected bits to nc_* signal to make lint happy
-    logic [IDW-1 : IDW-STIDW] unused_tl_h_source;
-    assign unused_tl_h_source = tl_h_i[i].a_source[IDW-1 -: STIDW];
-
-    // Put shifted ID
-    assign hreq_fifo_i = '{
-      a_valid:    tl_h_i[i].a_valid,
-      a_opcode:   tl_h_i[i].a_opcode,
-      a_param:    tl_h_i[i].a_param,
-      a_size:     tl_h_i[i].a_size,
-      a_source:   shifted_id,
-      a_address:  tl_h_i[i].a_address,
-      a_mask:     tl_h_i[i].a_mask,
-      a_data:     tl_h_i[i].a_data,
-      d_ready:    tl_h_i[i].d_ready
-    };
-
-    tlul_fifo_sync #(
-      .ReqPass    (HReqPass[i]),
-      .RspPass    (HRspPass[i]),
-      .ReqDepth   (HReqDepth[i*4+:4]),
-      .RspDepth   (HRspDepth[i*4+:4]),
-      .SpareReqW  (1)
-    ) u_hostfifo (
-      .clk_i,
-      .rst_ni,
-      .tl_h_i      (hreq_fifo_i),
-      .tl_h_o      (tl_h_o[i]),
-      .tl_d_o      (hreq_fifo_o[i]),
-      .tl_d_i      (hrsp_fifo_i[i]),
-      .spare_req_i (1'b0),
-      .spare_req_o (),
-      .spare_rsp_i (1'b0),
-      .spare_rsp_o ()
-    );
-  end
-
-  // Device Req/Rsp FIFO
-  tlul_fifo_sync #(
-    .ReqPass    (DReqPass),
-    .RspPass    (DRspPass),
-    .ReqDepth   (DReqDepth),
-    .RspDepth   (DRspDepth),
-    .SpareReqW  (1)
-  ) u_devicefifo (
-    .clk_i,
-    .rst_ni,
-    .tl_h_i      (dreq_fifo_i),
-    .tl_h_o      (drsp_fifo_o),
-    .tl_d_o      (tl_d_o),
-    .tl_d_i      (tl_d_i),
-    .spare_req_i (1'b0),
-    .spare_req_o (),
-    .spare_rsp_i (1'b0),
-    .spare_rsp_o ()
-  );
-
-  // Request Arbiter
-  for (genvar i = 0 ; i < M ; i++) begin : gen_arbreqgnt
-    assign hrequest[i] = hreq_fifo_o[i].a_valid;
-  end
-
-  assign arb_ready = drsp_fifo_o.a_ready;
-
-  if (tlul_pkg::ArbiterImpl == "PPC") begin : gen_arb_ppc
-    prim_arbiter_ppc #(
-      .N          (M),
-      .DW         ($bits(tlul_pkg::tl_h2d_t)),
-      .EnReqStabA (0)
-    ) u_reqarb (
-      .clk_i,
-      .rst_ni,
-      .req_i   ( hrequest    ),
-      .data_i  ( hreq_fifo_o ),
-      .gnt_o   ( hgrant      ),
-      .idx_o   (             ),
-      .valid_o ( arb_valid   ),
-      .data_o  ( arb_data    ),
-      .ready_i ( arb_ready   )
-    );
-  end else if (tlul_pkg::ArbiterImpl == "BINTREE") begin : gen_tree_arb
-    prim_arbiter_tree #(
-      .N          (M),
-      .DW         ($bits(tlul_pkg::tl_h2d_t)),
-      .EnReqStabA (0)
-    ) u_reqarb (
-      .clk_i,
-      .rst_ni,
-      .req_i   ( hrequest    ),
-      .data_i  ( hreq_fifo_o ),
-      .gnt_o   ( hgrant      ),
-      .idx_o   (             ),
-      .valid_o ( arb_valid   ),
-      .data_o  ( arb_data    ),
-      .ready_i ( arb_ready   )
-    );
-  end else begin : gen_unknown
-    
-  end
-
-  logic [  M-1:0] hfifo_rspvalid;
-  logic [  M-1:0] dfifo_rspready;
-  logic [IDW-1:0] hfifo_rspid;
-  logic dfifo_rspready_merged;
-
-  // arb_data --> dreq_fifo_i
-  //   dreq_fifo_i.hd_rspready <= dfifo_rspready
-
-  assign dfifo_rspready_merged = |dfifo_rspready;
-  assign dreq_fifo_i = '{
-    a_valid:   arb_valid,
-    a_opcode:  arb_data.a_opcode,
-    a_param:   arb_data.a_param,
-    a_size:    arb_data.a_size,
-    a_source:  arb_data.a_source,
-    a_address: arb_data.a_address,
-    a_mask:    arb_data.a_mask,
-    a_data:    arb_data.a_data,
-
-    d_ready:   dfifo_rspready_merged
-  };
-
-  // Response ID steering
-  // drsp_fifo_o --> hrsp_fifo_i[i]
-
-  // Response ID shifting before put into host fifo
-  assign hfifo_rspid = {
-    {STIDW{1'b0}},
-    drsp_fifo_o.d_source[IDW-1:STIDW]
-  };
-  for (genvar i = 0 ; i < M ; i++) begin : gen_idrouting
-    assign hfifo_rspvalid[i] = drsp_fifo_o.d_valid &
-                               (drsp_fifo_o.d_source[0+:STIDW] == i);
-    assign dfifo_rspready[i] = hreq_fifo_o[i].d_ready                &
-                               (drsp_fifo_o.d_source[0+:STIDW] == i) &
-                              drsp_fifo_o.d_valid;
-
-    assign hrsp_fifo_i[i] = '{
-      d_valid:  hfifo_rspvalid[i],
-      d_opcode: drsp_fifo_o.d_opcode,
-      d_param:  drsp_fifo_o.d_param,
-      d_size:   drsp_fifo_o.d_size,
-      d_source: hfifo_rspid,
-      d_sink:   drsp_fifo_o.d_sink,
-      d_data:   drsp_fifo_o.d_data,
-      d_error:  drsp_fifo_o.d_error,
-      a_ready:  hgrant[i]
-    };
-  end
-
-
-endmodule
 /**
  * Tile-Link UL adapter for SRAM-like devices
  *
@@ -37161,20 +37383,15 @@ module tl_xbar_main (
   input logic clk_i,
   input logic rst_ni,
 
-
   // Host interfaces
   input  tlul_pkg::tl_h2d_t tl_brqif_i,
   output tlul_pkg::tl_d2h_t tl_brqif_o,
   input  tlul_pkg::tl_h2d_t tl_brqlsu_i,
   output tlul_pkg::tl_d2h_t tl_brqlsu_o,
-  input  tlul_pkg::tl_h2d_t tl_dm_sba_i,
-  output tlul_pkg::tl_d2h_t tl_dm_sba_o,
 
   // Device interfaces
   output tlul_pkg::tl_h2d_t tl_iccm_o,
   input  tlul_pkg::tl_d2h_t tl_iccm_i,
-  output tlul_pkg::tl_h2d_t tl_debug_rom_o,
-  input  tlul_pkg::tl_d2h_t tl_debug_rom_i,
   output tlul_pkg::tl_h2d_t tl_dccm_o,
   input  tlul_pkg::tl_d2h_t tl_dccm_i,
   output tlul_pkg::tl_h2d_t tl_timer0_o,
@@ -37196,387 +37413,84 @@ module tl_xbar_main (
   import tlul_pkg::*;
   import tl_main_pkg::*;
 
-  // scanmode_i is currently not used, but provisioned for future use
-  // this assignment prevents lint warnings
-
-
-// host 1 IFU
-  tlul_pkg::tl_h2d_t brqifu_to_s1n; 
-  tlul_pkg::tl_d2h_t s1n_to_brqifu;
-  logic [1:0] device_sel_1;
-
-// host 2 LSU
+// host LSU
   tlul_pkg::tl_h2d_t brqlsu_to_s1n;
   tlul_pkg::tl_d2h_t s1n_to_brqlsu;
-  logic [3:0] device_sel_2;
+  logic [3:0] device_sel;
 
-// host 3 debug system bus access
-  tlul_pkg::tl_h2d_t dbg_to_s1n;
-  tlul_pkg::tl_d2h_t s1n_to_dbg;
-  logic [3:0] device_sel_3;
+  tlul_pkg::tl_h2d_t  h_dv_o[7];
+  tlul_pkg::tl_d2h_t  h_dv_i[7];
 
+  assign brqlsu_to_s1n = tl_brqlsu_i;
+  assign tl_brqlsu_o   = s1n_to_brqlsu;
 // Dveice connections
 
-  tlul_pkg::tl_h2d_t  h1_dv_i[2];
-  tlul_pkg::tl_d2h_t  h1_dv_o[2];
-  tlul_pkg::tl_h2d_t  h2_dv_i[9];
-  tlul_pkg::tl_d2h_t  h2_dv_o[9];
-  tlul_pkg::tl_h2d_t  h3_dv_i[8];
-  tlul_pkg::tl_d2h_t  h3_dv_o[8];
+  assign tl_iccm_o  = tl_brqif_i;
+  assign tl_brqif_o = tl_iccm_i;
 
-// ICCM
-  tlul_pkg::tl_h2d_t s1n_sm1_1[3];
-  tlul_pkg::tl_d2h_t sm1_s1n_1[3];
+  assign tl_dccm_o = h_dv_o[0];
+  assign h_dv_i[0] = tl_dccm_i;
 
-// DCCM
-  tlul_pkg::tl_h2d_t s1n_sm1_2[2];
-  tlul_pkg::tl_d2h_t sm1_s1n_2[2];
+  assign tl_timer0_o = h_dv_o[1];
+  assign h_dv_i[1]   = tl_timer0_i;
 
-// DEBUG ROM
-  tlul_pkg::tl_h2d_t s1n_sm1_4[2];
-  tlul_pkg::tl_d2h_t sm1_s1n_4[2];
+  assign tl_uart_o   = h_dv_o[2];
+  assign h_dv_i[2]   = tl_uart_i;
 
-// TIMER 
-  tlul_pkg::tl_h2d_t s1n_sm1_5[2];
-  tlul_pkg::tl_d2h_t sm1_s1n_5[2];
+  assign tl_spi_o    = h_dv_o[3];
+  assign h_dv_i[3]   = tl_spi_i;
 
-// UART
-  tlul_pkg::tl_h2d_t s1n_sm1_6[2];
-  tlul_pkg::tl_d2h_t sm1_s1n_6[2];
+  assign tl_pwm_o    = h_dv_o[4];
+  assign h_dv_i[4]   = tl_pwm_i;
 
-// SPI
-  tlul_pkg::tl_h2d_t s1n_sm1_7[2];
-  tlul_pkg::tl_d2h_t sm1_s1n_7[2];
+  assign tl_gpio_o   = h_dv_o[5];
+  assign h_dv_i[5]   = tl_gpio_i;
 
-// PWM
-  tlul_pkg::tl_h2d_t s1n_sm1_8[2];
-  tlul_pkg::tl_d2h_t sm1_s1n_8[2];
-
-// GPIO
-  tlul_pkg::tl_h2d_t s1n_sm1_9[2];
-  tlul_pkg::tl_d2h_t sm1_s1n_9[2];
-
-// PLIC
-  tlul_pkg::tl_h2d_t s1n_sm1_10[2];
-  tlul_pkg::tl_d2h_t sm1_s1n_10[2];
-
-// Device 1 host connections (ICCM)
-  assign h1_dv_o[0]   = sm1_s1n_1[0];
-  assign h3_dv_o[1]   = sm1_s1n_1[1];
-  assign h2_dv_o[8]  = sm1_s1n_1[2];
-  assign s1n_sm1_1[0] = h1_dv_i[0];
-  assign s1n_sm1_1[1] = h3_dv_i[1];
-  assign s1n_sm1_1[2] = h2_dv_i[8];
-
-// Device 2 host connections (DCCM)
-  assign h2_dv_o[0] = sm1_s1n_2[0];
-  assign h3_dv_o[0] = sm1_s1n_2[1];
-  assign s1n_sm1_2[0] = h2_dv_i[0];
-  assign s1n_sm1_2[1] = h3_dv_i[0];
-
-// Device 3 host connections (DEBUG ROM)
-  assign h1_dv_o[1] = sm1_s1n_4[0];
-  assign h2_dv_o[1] = sm1_s1n_4[1];
-  assign s1n_sm1_4[0]    = h1_dv_i[1];
-  assign s1n_sm1_4[1]    = h2_dv_i[1];
-
-// Device 4 host connections (TIMER0) 
-  assign h2_dv_o[2] = sm1_s1n_5[0];
-  assign h3_dv_o[2] = sm1_s1n_5[1];
-  assign s1n_sm1_5[0]   = h2_dv_i[2];
-  assign s1n_sm1_5[1]   = h3_dv_i[2];
-
-// Device 5 host connections (UART)
-  assign h2_dv_o[3] = sm1_s1n_6[0];
-  assign h3_dv_o[3] = sm1_s1n_6[1];
-  assign s1n_sm1_6[0]   = h2_dv_i[3];
-  assign s1n_sm1_6[1]   = h3_dv_i[3];
-
-// Device 6 host connections (SPI)
-  assign h2_dv_o[4] = sm1_s1n_7[0];
-  assign h3_dv_o[4] = sm1_s1n_7[1];
-  assign s1n_sm1_7[0]   = h2_dv_i[4];
-  assign s1n_sm1_7[1]   = h3_dv_i[4];
-
-// Device 7 host connections (PWM)
-  assign h2_dv_o[5] = sm1_s1n_8[0];
-  assign h3_dv_o[5] = sm1_s1n_8[1];
-  assign s1n_sm1_8[0]   = h2_dv_i[5];
-  assign s1n_sm1_8[1]   = h3_dv_i[5];
-
-// Device 8 host connections (GPIO)
-  assign h2_dv_o[6] = sm1_s1n_9[0];
-  assign h3_dv_o[6] = sm1_s1n_9[1];
-  assign s1n_sm1_9[0]   = h2_dv_i[6];
-  assign s1n_sm1_9[1]   = h3_dv_i[6];
-
-// Device 9 host connections (PLIC)
-  assign h2_dv_o[7] = sm1_s1n_10[0];
-  assign h3_dv_o[7] = sm1_s1n_10[1];
-  assign s1n_sm1_10[0]   = h2_dv_i[7];
-  assign s1n_sm1_10[1]   = h3_dv_i[7];
+  assign tl_plic_o   = h_dv_o[6];
+  assign h_dv_i[6]   = tl_plic_i; 
 
 
-// hostv 1 connections
-  assign brqifu_to_s1n  = tl_brqif_i;
-  assign tl_brqif_o     = s1n_to_brqifu;
-// hostv 2 connections
-  assign brqlsu_to_s1n  = tl_brqlsu_i;
-  assign tl_brqlsu_o    = s1n_to_brqlsu;
-// host 3 connections
-  assign dbg_to_s1n     = tl_dm_sba_i;
-  assign tl_dm_sba_o    = s1n_to_dbg;
 
-// host 1 device selection
-  always_comb begin 
-      device_sel_1 = 2'd2;
-    if((brqifu_to_s1n.a_address & ~(ADDR_MASK_ICCM)) == ADDR_SPACE_ICCM) begin
-      device_sel_1 = 2'd0;
-    end else if ((brqifu_to_s1n.a_address & ~(ADDR_MASK_DEBUG_ROM)) == ADDR_SPACE_DEBUG_ROM) begin
-      device_sel_1 = 2'd1;
-    end
-  end
-
-// host 1 socket 
-  tlul_socket_1n #(
-    .HReqDepth (4'h0),
-    .HRspDepth (4'h0),
-    .DReqDepth (12'h0),
-    .DRspDepth (12'h0),
-    .N         (2)
-  ) host_1 (
-    .clk_i        (clk_i),
-    .rst_ni       (rst_ni),
-    .tl_h_i       (brqifu_to_s1n),
-    .tl_h_o       (s1n_to_brqifu),
-    .tl_d_o       (h1_dv_i),
-    .tl_d_i       (h1_dv_o),
-    .dev_select_i (device_sel_1)
-  );
-
-// host 2 socket
+// host  socket
   always_comb begin 
     
-     device_sel_2 = 4'd9;
+     device_sel = 4'd9;
 
     if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_DCCM)) == ADDR_SPACE_DCCM) begin
-     device_sel_2 = 4'd0; 
-    end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_DEBUG_ROM)) == ADDR_SPACE_DEBUG_ROM) begin
-      device_sel_2 = 4'd1;
+     device_sel = 4'd0; 
     end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_TIMER0))    == ADDR_SPACE_TIMER0) begin
-      device_sel_2 = 4'd2;
+      device_sel = 4'd1;
     end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_UART0))     == ADDR_SPACE_UART0) begin
-      device_sel_2 = 4'd3;
+      device_sel = 4'd2;
     end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_SPI0))      == ADDR_SPACE_SPI0) begin
-      device_sel_2 = 4'd4;
+      device_sel = 4'd3;
     end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_PWM))       == ADDR_SPACE_PWM) begin
-      device_sel_2 = 4'd5;
+      device_sel = 4'd4;
     end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_GPIO))      == ADDR_SPACE_GPIO) begin
-      device_sel_2 = 4'd6;
+      device_sel = 4'd5;
     end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_PLIC))      == ADDR_SPACE_PLIC) begin
-      device_sel_2 = 4'd7;
-    end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_ICCM))      == ADDR_SPACE_ICCM) begin
-      device_sel_2 = 4'd8;
-    end
+      device_sel = 4'd6;
+    end 
   end
 
-// host 2 socket
-
+  // host 2 socket
   tlul_socket_1n #(
     .HReqDepth (4'h0),
     .HRspDepth (4'h0),
     .DReqDepth (36'h0),
     .DRspDepth (36'h0),
-    .N         (9)
-  ) host_2 (
+    .N         (7)
+  ) host_lsu (
     .clk_i        (clk_i),
     .rst_ni       (rst_ni),
     .tl_h_i       (brqlsu_to_s1n),
     .tl_h_o       (s1n_to_brqlsu),
-    .tl_d_o       (h2_dv_i),
-    .tl_d_i       (h2_dv_o),
-    .dev_select_i (device_sel_2)
+    .tl_d_o       (h_dv_o),
+    .tl_d_i       (h_dv_i),
+    .dev_select_i (device_sel)
   );
-
-// host 3 device selection
-
-  always_comb begin 
-    
-     device_sel_3 = 4'd8;
-
-    if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_DCCM)) == ADDR_SPACE_DCCM) begin
-     device_sel_3 = 4'd0; 
-    end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_ICCM))   == ADDR_SPACE_ICCM) begin
-      device_sel_3 = 4'd1;
-    end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_TIMER0)) == ADDR_SPACE_TIMER0) begin
-      device_sel_3 = 4'd2;
-    end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_UART0))  == ADDR_SPACE_UART0) begin
-      device_sel_3 = 4'd3;
-    end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_SPI0))   == ADDR_SPACE_SPI0) begin
-      device_sel_3 = 4'd4;
-    end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_PWM))    == ADDR_SPACE_PWM) begin
-      device_sel_3 = 4'd5;
-    end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_GPIO))   == ADDR_SPACE_GPIO) begin
-      device_sel_3 = 4'd6;
-    end else if ((brqlsu_to_s1n.a_address & ~(ADDR_MASK_PLIC))   == ADDR_SPACE_PLIC) begin
-      device_sel_3 = 4'd7;
-    end
-  end
-
-  tlul_socket_1n #(
-    .HReqDepth (4'h0),
-    .HRspDepth (4'h0),
-    .DReqDepth (36'h0),
-    .DRspDepth (36'h0),
-    .N         (8)
-  ) host_3 (
-    .clk_i        (clk_i),
-    .rst_ni       (rst_ni),
-    .tl_h_i       (dbg_to_s1n),
-    .tl_h_o       (s1n_to_dbg),
-    .tl_d_o       (h3_dv_i),
-    .tl_d_i       (h3_dv_o),
-    .dev_select_i (device_sel_3)
-  );
-
-
-// Devices
-  tlul_socket_m1 #(
-    .HReqDepth (8'h0),
-    .HRspDepth (8'h0),
-    .DReqDepth (4'h0),
-    .DRspDepth (4'h0),
-    .M         (3)
-  ) ICCM (
-    .clk_i        (clk_i),
-    .rst_ni       (rst_ni),
-    .tl_h_i       (s1n_sm1_1),
-    .tl_h_o       (sm1_s1n_1),
-    .tl_d_o       (tl_iccm_o),
-    .tl_d_i       (tl_iccm_i)
-  );
-
-  tlul_socket_m1 #(
-    .HReqDepth (8'h0),
-    .HRspDepth (8'h0),
-    .DReqDepth (4'h0),
-    .DRspDepth (4'h0),
-    .M         (2)
-  ) DCCM (
-    .clk_i        (clk_i),
-    .rst_ni       (rst_ni),
-    .tl_h_i       (s1n_sm1_2),
-    .tl_h_o       (sm1_s1n_2),
-    .tl_d_o       (tl_dccm_o),
-    .tl_d_i       (tl_dccm_i)
-  );
-
-  tlul_socket_m1 #(
-    .HReqDepth (8'h0),
-    .HRspDepth (8'h0),
-    .DReqDepth (4'h0),
-    .DRspDepth (4'h0),
-    .M         (2)
-  ) DEBUG_ROM (
-    .clk_i        (clk_i),
-    .rst_ni       (rst_ni),
-    .tl_h_i       (s1n_sm1_4),
-    .tl_h_o       (sm1_s1n_4),
-    .tl_d_o       (tl_debug_rom_o),
-    .tl_d_i       (tl_debug_rom_i)
-  );
-
-  tlul_socket_m1 #(
-    .HReqDepth (8'h0),
-    .HRspDepth (8'h0),
-    .DReqDepth (4'h0),
-    .DRspDepth (4'h0),
-    .M         (2)
-  ) TIMER (
-    .clk_i        (clk_i),
-    .rst_ni       (rst_ni),
-    .tl_h_i       (s1n_sm1_5),
-    .tl_h_o       (sm1_s1n_5),
-    .tl_d_o       (tl_timer0_o),
-    .tl_d_i       (tl_timer0_i)
-  );
-
-  tlul_socket_m1 #(
-    .HReqDepth (8'h0),
-    .HRspDepth (8'h0),
-    .DReqDepth (4'h0),
-    .DRspDepth (4'h0),
-    .M         (2)
-  ) UART (
-    .clk_i        (clk_i),
-    .rst_ni       (rst_ni),
-    .tl_h_i       (s1n_sm1_6),
-    .tl_h_o       (sm1_s1n_6),
-    .tl_d_o       (tl_uart_o),
-    .tl_d_i       (tl_uart_i)
-  );
-
-  tlul_socket_m1 #(
-    .HReqDepth (8'h0),
-    .HRspDepth (8'h0),
-    .DReqDepth (4'h0),
-    .DRspDepth (4'h0),
-    .M         (2)
-  ) SPI (
-    .clk_i        (clk_i),
-    .rst_ni       (rst_ni),
-    .tl_h_i       (s1n_sm1_7),
-    .tl_h_o       (sm1_s1n_7),
-    .tl_d_o       (tl_spi_o),
-    .tl_d_i       (tl_spi_i)
-  );
-
-  tlul_socket_m1 #(
-    .HReqDepth (8'h0),
-    .HRspDepth (8'h0),
-    .DReqDepth (4'h0),
-    .DRspDepth (4'h0),
-    .M         (2)
-  ) PWM (
-    .clk_i        (clk_i),
-    .rst_ni       (rst_ni),
-    .tl_h_i       (s1n_sm1_8),
-    .tl_h_o       (sm1_s1n_8),
-    .tl_d_o       (tl_pwm_o),
-    .tl_d_i       (tl_pwm_i)
-  );
-
-  tlul_socket_m1 #(
-    .HReqDepth (8'h0),
-    .HRspDepth (8'h0),
-    .DReqDepth (4'h0),
-    .DRspDepth (4'h0),
-    .M         (2)
-  ) GPIO (
-    .clk_i        (clk_i),
-    .rst_ni       (rst_ni),
-    .tl_h_i       (s1n_sm1_9),
-    .tl_h_o       (sm1_s1n_9),
-    .tl_d_o       (tl_gpio_o),
-    .tl_d_i       (tl_gpio_i)
-  );
-
-  tlul_socket_m1 #(
-    .HReqDepth (8'h0),
-    .HRspDepth (8'h0),
-    .DReqDepth (4'h0),
-    .DRspDepth (4'h0),
-    .M         (2)
-  ) PLIC (
-    .clk_i        (clk_i),
-    .rst_ni       (rst_ni),
-    .tl_h_i       (s1n_sm1_10),
-    .tl_h_o       (sm1_s1n_10),
-    .tl_d_o       (tl_plic_o),
-    .tl_d_i       (tl_plic_i)
-  );
-
 endmodule
+
 module uart_core (
     input  wire clk_i,
     input  wire rst_ni,

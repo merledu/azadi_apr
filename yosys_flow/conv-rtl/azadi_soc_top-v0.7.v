@@ -6,12 +6,6 @@ module azadi_soc_top (
 	gpio_i,
 	gpio_o,
 	gpio_oe,
-	jtag_tck_i,
-	jtag_tms_i,
-	jtag_trst_ni,
-	jtag_tdi_i,
-	jtag_tdo_o,
-	jtag_tdo_oe_o,
 	uart_tx,
 	uart_rx,
 	pwm_o,
@@ -31,12 +25,6 @@ module azadi_soc_top (
 	input wire [31:0] gpio_i;
 	output wire [31:0] gpio_o;
 	output wire [31:0] gpio_oe;
-	input wire jtag_tck_i;
-	input wire jtag_tms_i;
-	input wire jtag_trst_ni;
-	input wire jtag_tdi_i;
-	output wire jtag_tdo_o;
-	output wire jtag_tdo_oe_o;
 	output wire uart_tx;
 	input wire uart_rx;
 	output wire pwm_o;
@@ -48,7 +36,6 @@ module azadi_soc_top (
 	output wire sd_o;
 	output wire sd_oe;
 	input wire sd_i;
-	localparam [31:0] JTAG_ID = 32'b00000100111101010100100001001101;
 	wire prog_rst_n;
 	wire system_rst_ni;
 	wire [31:0] gpio_in;
@@ -59,8 +46,6 @@ module azadi_soc_top (
 	wire [11:0] tlul_addr;
 	wire req_i;
 	wire [31:0] tlul_data;
-	wire dbg_req;
-	wire dbg_rst;
 	wire instr_csb;
 	wire [11:0] instr_addr;
 	wire [31:0] instr_wdata;
@@ -92,10 +77,6 @@ module azadi_soc_top (
 	wire [51:0] dccm_to_xbar;
 	wire [85:0] xbarp_to_gpio;
 	wire [51:0] gpio_to_xbarp;
-	wire [85:0] dm_to_xbar;
-	wire [51:0] xbar_to_dm;
-	wire [85:0] dbgrom_to_xbar;
-	wire [51:0] xbar_to_dbgrom;
 	wire [85:0] plic_req;
 	wire [51:0] plic_resp;
 	wire [85:0] xbar_to_uart;
@@ -122,17 +103,6 @@ module azadi_soc_top (
 	wire intr_timer;
 	wire intr_u_tx;
 	assign intr_vector = {intr_srx, intr_stx, intr_u_tx, intr_gpio, 1'b0};
-	wire [3:0] jtag_req;
-	wire [1:0] jtag_rsp;
-	assign jtag_req[3] = jtag_tck_i;
-	assign jtag_req[2] = jtag_tms_i;
-	assign jtag_req[1] = jtag_trst_ni;
-	assign jtag_req[0] = jtag_tdi_i;
-	assign jtag_tdo_o = jtag_rsp[1];
-	assign jtag_tdo_oe_o = jtag_rsp[0];
-	localparam [63:0] dm_HaltAddress = 64'h0000000000000800;
-	localparam [63:0] dm_ExceptionAddress = dm_HaltAddress + 8;
-	localparam [31:0] tl_main_pkg_ADDR_SPACE_DEBUG_ROM = 32'h10040000;
 	localparam integer brq_pkg_RV32BNone = 0;
 	localparam integer brq_pkg_RV32MSlow = 1;
 	localparam integer brq_pkg_RegFileFF = 0;
@@ -154,8 +124,8 @@ module azadi_soc_top (
 		.DbgTriggerEn(1'b1),
 		.DbgHwBreakNum(1),
 		.Securebrq(1'b0),
-		.DmHaltAddr(tl_main_pkg_ADDR_SPACE_DEBUG_ROM + 32'h00000800),
-		.DmExceptionAddr(tl_main_pkg_ADDR_SPACE_DEBUG_ROM + dm_ExceptionAddress)
+		.DmHaltAddr(1'sb0),
+		.DmExceptionAddr(1'sb0)
 	) u_top(
 		.clk_i(clk_i),
 		.rst_ni(system_rst_ni),
@@ -170,29 +140,11 @@ module azadi_soc_top (
 		.irq_external_i(intr_req),
 		.irq_fast_i({15 {1'sb0}}),
 		.irq_nm_i(1'b0),
-		.debug_req_i(dbg_req),
+		.debug_req_i(1'b0),
 		.fetch_enable_i(1'b1),
 		.alert_minor_o(),
 		.alert_major_o(),
 		.core_sleep_o()
-	);
-	rv_dm #(
-		.NrHarts(1),
-		.IdcodeValue(JTAG_ID)
-	) debug_module(
-		.clk_i(clk_i),
-		.rst_ni(rst_ni),
-		.testmode_i(1'b0),
-		.ndmreset_o(dbg_rst),
-		.dmactive_o(),
-		.debug_req_o(dbg_req),
-		.unavailable_i(1'b0),
-		.tl_d_i(dbgrom_to_xbar),
-		.tl_d_o(xbar_to_dbgrom),
-		.tl_h_o(dm_to_xbar),
-		.tl_h_i(xbar_to_dm),
-		.jtag_req_i(jtag_req),
-		.jtag_rsp_o(jtag_rsp)
 	);
 	tl_xbar_main main_swith(
 		.clk_i(clk_i),
@@ -201,12 +153,8 @@ module azadi_soc_top (
 		.tl_brqif_o(xbar_to_ifu),
 		.tl_brqlsu_i(lsu_to_xbar),
 		.tl_brqlsu_o(xbar_to_lsu),
-		.tl_dm_sba_i(dm_to_xbar),
-		.tl_dm_sba_o(xbar_to_dm),
 		.tl_iccm_o(xbar_to_iccm),
 		.tl_iccm_i(iccm_to_xbar),
-		.tl_debug_rom_o(dbgrom_to_xbar),
-		.tl_debug_rom_i(xbar_to_dbgrom),
 		.tl_dccm_o(xbar_to_dccm),
 		.tl_dccm_i(dccm_to_xbar),
 		.tl_timer0_o(xbar_to_timer),
@@ -266,7 +214,6 @@ module azadi_soc_top (
 	rstmgr reset_manager(
 		.clk_i(clk_i),
 		.rst_ni(rst_ni),
-		.ndmreset(dbg_rst),
 		.prog_rst_ni(prog_rst_ni),
 		.sys_rst_ni(system_rst_ni)
 	);
@@ -325,19 +272,13 @@ module azadi_soc_top (
 		.we_o(instr_we),
 		.rdata_i(instr_rdata)
 	);
-	wire [31:0] un_conn1;
-	sky130_sram_4kbyte_1rw1r_32x1024_8 u_iccm(
-		.clk0(clk_i),
-		.csb0(instr_csb),
-		.web0(instr_we),
-		.wmask0(instr_wmask),
-		.addr0(instr_addr[9:0]),
-		.din0(instr_wdata),
-		.dout0(instr_rdata),
-		.clk1(1'b0),
-		.csb1(1'b1),
-		.addr1({10 {1'sb0}}),
-		.dout1(un_conn1)
+	sram_top u_iccm(
+		.clk_i(clk_i),
+		.web_i(instr_we),
+		.wmask_i(instr_wmask),
+		.addr_i(instr_addr[10:0]),
+		.din_i(instr_wdata),
+		.dout_o(instr_rdata)
 	);
 	data_mem_top dccm_adapter(
 		.clk_i(clk_i),
@@ -351,19 +292,13 @@ module azadi_soc_top (
 		.we_o(data_we),
 		.rdata_i(data_rdata)
 	);
-	wire [31:0] un_conn2;
-	sky130_sram_4kbyte_1rw1r_32x1024_8 u_dccm(
-		.clk0(clk_i),
-		.csb0(instr_csb),
-		.web0(data_we),
-		.wmask0(data_wmask),
-		.addr0(data_addr[9:0]),
-		.din0(data_wdata),
-		.dout0(data_rdata),
-		.clk1(1'b0),
-		.csb1(1'b1),
-		.addr1({10 {1'sb0}}),
-		.dout1(un_conn2)
+	sram_top u_dccm(
+		.clk_i(clk_i),
+		.web_i(data_we),
+		.wmask_i(data_wmask),
+		.addr_i(data_addr[10:0]),
+		.din_i(data_wdata),
+		.dout_o(data_rdata)
 	);
 endmodule
 module brq_core (
@@ -19548,24 +19483,24 @@ module rstmgr (
 	always @(*) begin : comb_part
 		rst_fsm_ns = rst_fsm_cs;
 		sys_rst_ni = 1'b0;
-		rst_run_d = rst_run_q;
 		case (rst_fsm_cs)
 			RESET: begin
 				sys_rst_ni = 1'b0;
-				if (rst_run_q)
-					rst_fsm_ns = RUN;
-				else
-					rst_fsm_ns = IDLE;
+				rst_fsm_ns = IDLE;
 			end
 			IDLE: begin
 				sys_rst_ni = 1'b0;
-				if (!prog_rst_ni)
+				rst_run_d = 1'b0;
+				if (rst_run_q)
+					rst_fsm_ns = RUN;
+				else if (!prog_rst_ni)
 					rst_fsm_ns = PROG;
 				else
 					rst_fsm_ns = IDLE;
 			end
 			PROG: begin
 				sys_rst_ni = 1'b0;
+				rst_run_d = 1'b0;
 				if (!prog_rst_ni)
 					rst_fsm_ns = PROG;
 				else
@@ -19573,14 +19508,15 @@ module rstmgr (
 			end
 			RUN: begin
 				sys_rst_ni = 1'b1;
-				if (!prog_rst_ni) begin
-					rst_run_d = 1'b0;
-					rst_fsm_ns = PROG;
-				end
-				else begin
+				rst_run_d = 1'b0;
+				if (!rst_ni) begin
 					rst_run_d = 1'b1;
-					rst_fsm_ns = RUN;
+					rst_fsm_ns = RESET;
 				end
+				else if (!prog_rst_ni)
+					rst_fsm_ns = PROG;
+				else
+					rst_fsm_ns = RUN;
 			end
 			default: begin
 				rst_fsm_ns = rst_fsm_cs;
@@ -24854,221 +24790,6 @@ module tlul_socket_1n (
 		.tl_h_o(tl_u_i[N])
 	);
 endmodule
-module tlul_socket_m1 (
-	clk_i,
-	rst_ni,
-	tl_h_i,
-	tl_h_o,
-	tl_d_o,
-	tl_d_i
-);
-	parameter [31:0] M = 4;
-	parameter [M - 1:0] HReqPass = {M {1'b1}};
-	parameter [M - 1:0] HRspPass = {M {1'b1}};
-	parameter [(M * 4) - 1:0] HReqDepth = {M {4'h2}};
-	parameter [(M * 4) - 1:0] HRspDepth = {M {4'h2}};
-	parameter [0:0] DReqPass = 1'b1;
-	parameter [0:0] DRspPass = 1'b1;
-	parameter [3:0] DReqDepth = 4'h2;
-	parameter [3:0] DRspDepth = 4'h2;
-	input wire clk_i;
-	input wire rst_ni;
-	localparam signed [31:0] tlul_pkg_TL_AIW = 8;
-	localparam signed [31:0] tlul_pkg_TL_AW = 32;
-	localparam signed [31:0] tlul_pkg_TL_DW = 32;
-	localparam signed [31:0] tlul_pkg_TL_DBW = 4;
-	localparam signed [31:0] tlul_pkg_TL_SZW = 2;
-	input wire [(0 >= (M - 1) ? ((2 - M) * 86) + (((M - 1) * 86) - 1) : (M * 86) - 1):(0 >= (M - 1) ? (M - 1) * 86 : 0)] tl_h_i;
-	localparam signed [31:0] tlul_pkg_TL_DIW = 1;
-	output wire [(0 >= (M - 1) ? ((2 - M) * 52) + (((M - 1) * 52) - 1) : (M * 52) - 1):(0 >= (M - 1) ? (M - 1) * 52 : 0)] tl_h_o;
-	output wire [85:0] tl_d_o;
-	input wire [51:0] tl_d_i;
-	localparam [31:0] IDW = tlul_pkg_TL_AIW;
-	localparam [31:0] STIDW = $clog2(M);
-	wire [(0 >= (M - 1) ? ((2 - M) * 86) + (((M - 1) * 86) - 1) : (M * 86) - 1):(0 >= (M - 1) ? (M - 1) * 86 : 0)] hreq_fifo_o;
-	wire [51:0] hrsp_fifo_i [0:M - 1];
-	wire [M - 1:0] hrequest;
-	wire [M - 1:0] hgrant;
-	wire [85:0] dreq_fifo_i;
-	wire [51:0] drsp_fifo_o;
-	wire arb_valid;
-	wire arb_ready;
-	wire [85:0] arb_data;
-	generate
-		genvar i;
-		for (i = 0; i < M; i = i + 1) begin : gen_host_fifo
-			wire [85:0] hreq_fifo_i;
-			wire [STIDW - 1:0] reqid_sub;
-			wire [7:0] shifted_id;
-			assign reqid_sub = i;
-			assign shifted_id = {tl_h_i[((0 >= (M - 1) ? i : (M - 1) - i) * 86) + 69+:IDW - STIDW], reqid_sub};
-			wire [7:IDW - STIDW] unused_tl_h_source;
-			assign unused_tl_h_source = tl_h_i[((0 >= (M - 1) ? i : (M - 1) - i) * 86) + 76-:STIDW];
-			function automatic [2:0] sv2v_cast_3;
-				input reg [2:0] inp;
-				sv2v_cast_3 = inp;
-			endfunction
-			function automatic [1:0] sv2v_cast_539D2;
-				input reg [1:0] inp;
-				sv2v_cast_539D2 = inp;
-			endfunction
-			function automatic [7:0] sv2v_cast_F6BCE;
-				input reg [7:0] inp;
-				sv2v_cast_F6BCE = inp;
-			endfunction
-			function automatic [31:0] sv2v_cast_C6CCE;
-				input reg [31:0] inp;
-				sv2v_cast_C6CCE = inp;
-			endfunction
-			function automatic [3:0] sv2v_cast_45434;
-				input reg [3:0] inp;
-				sv2v_cast_45434 = inp;
-			endfunction
-			function automatic [31:0] sv2v_cast_486C6;
-				input reg [31:0] inp;
-				sv2v_cast_486C6 = inp;
-			endfunction
-			assign hreq_fifo_i = {tl_h_i[((0 >= (M - 1) ? i : (M - 1) - i) * 86) + 85], sv2v_cast_3(tl_h_i[((0 >= (M - 1) ? i : (M - 1) - i) * 86) + 84-:3]), sv2v_cast_3(tl_h_i[((0 >= (M - 1) ? i : (M - 1) - i) * 86) + 81-:3]), sv2v_cast_539D2(tl_h_i[((0 >= (M - 1) ? i : (M - 1) - i) * 86) + 78-:2]), sv2v_cast_F6BCE(shifted_id), sv2v_cast_C6CCE(tl_h_i[((0 >= (M - 1) ? i : (M - 1) - i) * 86) + 68-:32]), sv2v_cast_45434(tl_h_i[((0 >= (M - 1) ? i : (M - 1) - i) * 86) + 36-:4]), sv2v_cast_486C6(tl_h_i[((0 >= (M - 1) ? i : (M - 1) - i) * 86) + tlul_pkg_TL_DW-:tlul_pkg_TL_DW]), tl_h_i[(0 >= (M - 1) ? i : (M - 1) - i) * 86]};
-			tlul_fifo_sync #(
-				.ReqPass(HReqPass[i]),
-				.RspPass(HRspPass[i]),
-				.ReqDepth(HReqDepth[i * 4+:4]),
-				.RspDepth(HRspDepth[i * 4+:4]),
-				.SpareReqW(1)
-			) u_hostfifo(
-				.clk_i(clk_i),
-				.rst_ni(rst_ni),
-				.tl_h_i(hreq_fifo_i),
-				.tl_h_o(tl_h_o[(0 >= (M - 1) ? i : (M - 1) - i) * 52+:52]),
-				.tl_d_o(hreq_fifo_o[(0 >= (M - 1) ? i : (M - 1) - i) * 86+:86]),
-				.tl_d_i(hrsp_fifo_i[i]),
-				.spare_req_i(1'b0),
-				.spare_req_o(),
-				.spare_rsp_i(1'b0),
-				.spare_rsp_o()
-			);
-		end
-	endgenerate
-	tlul_fifo_sync #(
-		.ReqPass(DReqPass),
-		.RspPass(DRspPass),
-		.ReqDepth(DReqDepth),
-		.RspDepth(DRspDepth),
-		.SpareReqW(1)
-	) u_devicefifo(
-		.clk_i(clk_i),
-		.rst_ni(rst_ni),
-		.tl_h_i(dreq_fifo_i),
-		.tl_h_o(drsp_fifo_o),
-		.tl_d_o(tl_d_o),
-		.tl_d_i(tl_d_i),
-		.spare_req_i(1'b0),
-		.spare_req_o(),
-		.spare_rsp_i(1'b0),
-		.spare_rsp_o()
-	);
-	generate
-		for (i = 0; i < M; i = i + 1) begin : gen_arbreqgnt
-			assign hrequest[i] = hreq_fifo_o[((0 >= (M - 1) ? i : (M - 1) - i) * 86) + 85];
-		end
-	endgenerate
-	assign arb_ready = drsp_fifo_o[0];
-	localparam tlul_pkg_ArbiterImpl = "PPC";
-	generate
-		if (tlul_pkg_ArbiterImpl == "PPC") begin : gen_arb_ppc
-			prim_arbiter_ppc #(
-				.N(M),
-				.DW(86),
-				.EnReqStabA(0)
-			) u_reqarb(
-				.clk_i(clk_i),
-				.rst_ni(rst_ni),
-				.req_i(hrequest),
-				.data_i(hreq_fifo_o),
-				.gnt_o(hgrant),
-				.idx_o(),
-				.valid_o(arb_valid),
-				.data_o(arb_data),
-				.ready_i(arb_ready)
-			);
-		end
-		else if (tlul_pkg_ArbiterImpl == "BINTREE") begin : gen_tree_arb
-			prim_arbiter_tree #(
-				.N(M),
-				.DW(86),
-				.EnReqStabA(0)
-			) u_reqarb(
-				.clk_i(clk_i),
-				.rst_ni(rst_ni),
-				.req_i(hrequest),
-				.data_i(hreq_fifo_o),
-				.gnt_o(hgrant),
-				.idx_o(),
-				.valid_o(arb_valid),
-				.data_o(arb_data),
-				.ready_i(arb_ready)
-			);
-		end
-	endgenerate
-	wire [M - 1:0] hfifo_rspvalid;
-	wire [M - 1:0] dfifo_rspready;
-	wire [7:0] hfifo_rspid;
-	wire dfifo_rspready_merged;
-	assign dfifo_rspready_merged = |dfifo_rspready;
-	function automatic [2:0] sv2v_cast_3;
-		input reg [2:0] inp;
-		sv2v_cast_3 = inp;
-	endfunction
-	function automatic [1:0] sv2v_cast_539D2;
-		input reg [1:0] inp;
-		sv2v_cast_539D2 = inp;
-	endfunction
-	function automatic [7:0] sv2v_cast_F6BCE;
-		input reg [7:0] inp;
-		sv2v_cast_F6BCE = inp;
-	endfunction
-	function automatic [31:0] sv2v_cast_C6CCE;
-		input reg [31:0] inp;
-		sv2v_cast_C6CCE = inp;
-	endfunction
-	function automatic [3:0] sv2v_cast_45434;
-		input reg [3:0] inp;
-		sv2v_cast_45434 = inp;
-	endfunction
-	function automatic [31:0] sv2v_cast_486C6;
-		input reg [31:0] inp;
-		sv2v_cast_486C6 = inp;
-	endfunction
-	assign dreq_fifo_i = {arb_valid, sv2v_cast_3(arb_data[84-:3]), sv2v_cast_3(arb_data[81-:3]), sv2v_cast_539D2(arb_data[78-:2]), sv2v_cast_F6BCE(arb_data[76-:8]), sv2v_cast_C6CCE(arb_data[68-:32]), sv2v_cast_45434(arb_data[36-:4]), sv2v_cast_486C6(arb_data[tlul_pkg_TL_DW-:tlul_pkg_TL_DW]), dfifo_rspready_merged};
-	assign hfifo_rspid = {{STIDW {1'b0}}, drsp_fifo_o[42:35 + STIDW]};
-	generate
-		for (i = 0; i < M; i = i + 1) begin : gen_idrouting
-			assign hfifo_rspvalid[i] = drsp_fifo_o[51] & (drsp_fifo_o[35+:STIDW] == i);
-			assign dfifo_rspready[i] = (hreq_fifo_o[(0 >= (M - 1) ? i : (M - 1) - i) * 86] & (drsp_fifo_o[35+:STIDW] == i)) & drsp_fifo_o[51];
-			function automatic [2:0] sv2v_cast_3;
-				input reg [2:0] inp;
-				sv2v_cast_3 = inp;
-			endfunction
-			function automatic [1:0] sv2v_cast_539D2;
-				input reg [1:0] inp;
-				sv2v_cast_539D2 = inp;
-			endfunction
-			function automatic [7:0] sv2v_cast_F6BCE;
-				input reg [7:0] inp;
-				sv2v_cast_F6BCE = inp;
-			endfunction
-			function automatic [0:0] sv2v_cast_D8FDD;
-				input reg [0:0] inp;
-				sv2v_cast_D8FDD = inp;
-			endfunction
-			function automatic [31:0] sv2v_cast_486C6;
-				input reg [31:0] inp;
-				sv2v_cast_486C6 = inp;
-			endfunction
-			assign hrsp_fifo_i[i] = {hfifo_rspvalid[i], sv2v_cast_3(drsp_fifo_o[50-:3]), sv2v_cast_3(drsp_fifo_o[47-:3]), sv2v_cast_539D2(drsp_fifo_o[44-:2]), sv2v_cast_F6BCE(hfifo_rspid), sv2v_cast_D8FDD(drsp_fifo_o[34-:1]), sv2v_cast_486C6(drsp_fifo_o[33-:tlul_pkg_TL_DW]), drsp_fifo_o[1], hgrant[i]};
-		end
-	endgenerate
-endmodule
 module tlul_sram_adapter (
 	clk_i,
 	rst_ni,
@@ -25340,12 +25061,8 @@ module tl_xbar_main (
 	tl_brqif_o,
 	tl_brqlsu_i,
 	tl_brqlsu_o,
-	tl_dm_sba_i,
-	tl_dm_sba_o,
 	tl_iccm_o,
 	tl_iccm_i,
-	tl_debug_rom_o,
-	tl_debug_rom_i,
 	tl_dccm_o,
 	tl_dccm_i,
 	tl_timer0_o,
@@ -25373,12 +25090,8 @@ module tl_xbar_main (
 	output wire [51:0] tl_brqif_o;
 	input wire [85:0] tl_brqlsu_i;
 	output wire [51:0] tl_brqlsu_o;
-	input wire [85:0] tl_dm_sba_i;
-	output wire [51:0] tl_dm_sba_o;
 	output wire [85:0] tl_iccm_o;
 	input wire [51:0] tl_iccm_i;
-	output wire [85:0] tl_debug_rom_o;
-	input wire [51:0] tl_debug_rom_i;
 	output wire [85:0] tl_dccm_o;
 	input wire [51:0] tl_dccm_i;
 	output wire [85:0] tl_timer0_o;
@@ -25393,109 +25106,29 @@ module tl_xbar_main (
 	input wire [51:0] tl_gpio_i;
 	output wire [85:0] tl_plic_o;
 	input wire [51:0] tl_plic_i;
-	wire [85:0] brqifu_to_s1n;
-	wire [51:0] s1n_to_brqifu;
-	reg [1:0] device_sel_1;
 	wire [85:0] brqlsu_to_s1n;
 	wire [51:0] s1n_to_brqlsu;
-	reg [3:0] device_sel_2;
-	wire [85:0] dbg_to_s1n;
-	wire [51:0] s1n_to_dbg;
-	reg [3:0] device_sel_3;
-	wire [171:0] h1_dv_i;
-	wire [103:0] h1_dv_o;
-	wire [773:0] h2_dv_i;
-	wire [467:0] h2_dv_o;
-	wire [687:0] h3_dv_i;
-	wire [415:0] h3_dv_o;
-	wire [257:0] s1n_sm1_1;
-	wire [155:0] sm1_s1n_1;
-	wire [171:0] s1n_sm1_2;
-	wire [103:0] sm1_s1n_2;
-	wire [171:0] s1n_sm1_4;
-	wire [103:0] sm1_s1n_4;
-	wire [171:0] s1n_sm1_5;
-	wire [103:0] sm1_s1n_5;
-	wire [171:0] s1n_sm1_6;
-	wire [103:0] sm1_s1n_6;
-	wire [171:0] s1n_sm1_7;
-	wire [103:0] sm1_s1n_7;
-	wire [171:0] s1n_sm1_8;
-	wire [103:0] sm1_s1n_8;
-	wire [171:0] s1n_sm1_9;
-	wire [103:0] sm1_s1n_9;
-	wire [171:0] s1n_sm1_10;
-	wire [103:0] sm1_s1n_10;
-	assign h1_dv_o[52+:52] = sm1_s1n_1[104+:52];
-	assign h3_dv_o[312+:52] = sm1_s1n_1[52+:52];
-	assign h2_dv_o[0+:52] = sm1_s1n_1[0+:52];
-	assign s1n_sm1_1[172+:86] = h1_dv_i[86+:86];
-	assign s1n_sm1_1[86+:86] = h3_dv_i[516+:86];
-	assign s1n_sm1_1[0+:86] = h2_dv_i[0+:86];
-	assign h2_dv_o[416+:52] = sm1_s1n_2[52+:52];
-	assign h3_dv_o[364+:52] = sm1_s1n_2[0+:52];
-	assign s1n_sm1_2[86+:86] = h2_dv_i[688+:86];
-	assign s1n_sm1_2[0+:86] = h3_dv_i[602+:86];
-	assign h1_dv_o[0+:52] = sm1_s1n_4[52+:52];
-	assign h2_dv_o[364+:52] = sm1_s1n_4[0+:52];
-	assign s1n_sm1_4[86+:86] = h1_dv_i[0+:86];
-	assign s1n_sm1_4[0+:86] = h2_dv_i[602+:86];
-	assign h2_dv_o[312+:52] = sm1_s1n_5[52+:52];
-	assign h3_dv_o[260+:52] = sm1_s1n_5[0+:52];
-	assign s1n_sm1_5[86+:86] = h2_dv_i[516+:86];
-	assign s1n_sm1_5[0+:86] = h3_dv_i[430+:86];
-	assign h2_dv_o[260+:52] = sm1_s1n_6[52+:52];
-	assign h3_dv_o[208+:52] = sm1_s1n_6[0+:52];
-	assign s1n_sm1_6[86+:86] = h2_dv_i[430+:86];
-	assign s1n_sm1_6[0+:86] = h3_dv_i[344+:86];
-	assign h2_dv_o[208+:52] = sm1_s1n_7[52+:52];
-	assign h3_dv_o[156+:52] = sm1_s1n_7[0+:52];
-	assign s1n_sm1_7[86+:86] = h2_dv_i[344+:86];
-	assign s1n_sm1_7[0+:86] = h3_dv_i[258+:86];
-	assign h2_dv_o[156+:52] = sm1_s1n_8[52+:52];
-	assign h3_dv_o[104+:52] = sm1_s1n_8[0+:52];
-	assign s1n_sm1_8[86+:86] = h2_dv_i[258+:86];
-	assign s1n_sm1_8[0+:86] = h3_dv_i[172+:86];
-	assign h2_dv_o[104+:52] = sm1_s1n_9[52+:52];
-	assign h3_dv_o[52+:52] = sm1_s1n_9[0+:52];
-	assign s1n_sm1_9[86+:86] = h2_dv_i[172+:86];
-	assign s1n_sm1_9[0+:86] = h3_dv_i[86+:86];
-	assign h2_dv_o[52+:52] = sm1_s1n_10[52+:52];
-	assign h3_dv_o[0+:52] = sm1_s1n_10[0+:52];
-	assign s1n_sm1_10[86+:86] = h2_dv_i[86+:86];
-	assign s1n_sm1_10[0+:86] = h3_dv_i[0+:86];
-	assign brqifu_to_s1n = tl_brqif_i;
-	assign tl_brqif_o = s1n_to_brqifu;
+	reg [3:0] device_sel;
+	wire [601:0] h_dv_o;
+	wire [363:0] h_dv_i;
 	assign brqlsu_to_s1n = tl_brqlsu_i;
 	assign tl_brqlsu_o = s1n_to_brqlsu;
-	assign dbg_to_s1n = tl_dm_sba_i;
-	assign tl_dm_sba_o = s1n_to_dbg;
-	localparam [31:0] tl_main_pkg_ADDR_MASK_DEBUG_ROM = 32'h0000ffff;
-	localparam [31:0] tl_main_pkg_ADDR_MASK_ICCM = 32'h0000ffff;
-	localparam [31:0] tl_main_pkg_ADDR_SPACE_DEBUG_ROM = 32'h10040000;
-	localparam [31:0] tl_main_pkg_ADDR_SPACE_ICCM = 32'h20000000;
-	always @(*) begin
-		device_sel_1 = 2'd2;
-		if ((brqifu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_ICCM) == tl_main_pkg_ADDR_SPACE_ICCM)
-			device_sel_1 = 2'd0;
-		else if ((brqifu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_DEBUG_ROM) == tl_main_pkg_ADDR_SPACE_DEBUG_ROM)
-			device_sel_1 = 2'd1;
-	end
-	tlul_socket_1n #(
-		.HReqDepth(4'h0),
-		.HRspDepth(4'h0),
-		.DReqDepth(12'h000),
-		.DRspDepth(12'h000),
-		.N(2)
-	) host_1(
-		.clk_i(clk_i),
-		.rst_ni(rst_ni),
-		.tl_h_i(brqifu_to_s1n),
-		.tl_h_o(s1n_to_brqifu),
-		.tl_d_o(h1_dv_i),
-		.tl_d_i(h1_dv_o),
-		.dev_select_i(device_sel_1)
-	);
+	assign tl_iccm_o = tl_brqif_i;
+	assign tl_brqif_o = tl_iccm_i;
+	assign tl_dccm_o = h_dv_o[516+:86];
+	assign h_dv_i[312+:52] = tl_dccm_i;
+	assign tl_timer0_o = h_dv_o[430+:86];
+	assign h_dv_i[260+:52] = tl_timer0_i;
+	assign tl_uart_o = h_dv_o[344+:86];
+	assign h_dv_i[208+:52] = tl_uart_i;
+	assign tl_spi_o = h_dv_o[258+:86];
+	assign h_dv_i[156+:52] = tl_spi_i;
+	assign tl_pwm_o = h_dv_o[172+:86];
+	assign h_dv_i[104+:52] = tl_pwm_i;
+	assign tl_gpio_o = h_dv_o[86+:86];
+	assign h_dv_i[52+:52] = tl_gpio_i;
+	assign tl_plic_o = h_dv_o[0+:86];
+	assign h_dv_i[0+:52] = tl_plic_i;
 	localparam [31:0] tl_main_pkg_ADDR_MASK_DCCM = 32'h0000ffff;
 	localparam [31:0] tl_main_pkg_ADDR_MASK_GPIO = 32'h0000ffff;
 	localparam [31:0] tl_main_pkg_ADDR_MASK_PLIC = 32'h0000ffff;
@@ -25511,200 +25144,36 @@ module tl_xbar_main (
 	localparam [31:0] tl_main_pkg_ADDR_SPACE_TIMER0 = 32'h40000000;
 	localparam [31:0] tl_main_pkg_ADDR_SPACE_UART0 = 32'h40060000;
 	always @(*) begin
-		device_sel_2 = 4'd9;
+		device_sel = 4'd9;
 		if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_DCCM) == tl_main_pkg_ADDR_SPACE_DCCM)
-			device_sel_2 = 4'd0;
-		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_DEBUG_ROM) == tl_main_pkg_ADDR_SPACE_DEBUG_ROM)
-			device_sel_2 = 4'd1;
+			device_sel = 4'd0;
 		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_TIMER0) == tl_main_pkg_ADDR_SPACE_TIMER0)
-			device_sel_2 = 4'd2;
+			device_sel = 4'd1;
 		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_UART0) == tl_main_pkg_ADDR_SPACE_UART0)
-			device_sel_2 = 4'd3;
+			device_sel = 4'd2;
 		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_SPI0) == tl_main_pkg_ADDR_SPACE_SPI0)
-			device_sel_2 = 4'd4;
+			device_sel = 4'd3;
 		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_PWM) == tl_main_pkg_ADDR_SPACE_PWM)
-			device_sel_2 = 4'd5;
+			device_sel = 4'd4;
 		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_GPIO) == tl_main_pkg_ADDR_SPACE_GPIO)
-			device_sel_2 = 4'd6;
+			device_sel = 4'd5;
 		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_PLIC) == tl_main_pkg_ADDR_SPACE_PLIC)
-			device_sel_2 = 4'd7;
-		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_ICCM) == tl_main_pkg_ADDR_SPACE_ICCM)
-			device_sel_2 = 4'd8;
+			device_sel = 4'd6;
 	end
 	tlul_socket_1n #(
 		.HReqDepth(4'h0),
 		.HRspDepth(4'h0),
 		.DReqDepth(36'h000000000),
 		.DRspDepth(36'h000000000),
-		.N(9)
-	) host_2(
+		.N(7)
+	) host_lsu(
 		.clk_i(clk_i),
 		.rst_ni(rst_ni),
 		.tl_h_i(brqlsu_to_s1n),
 		.tl_h_o(s1n_to_brqlsu),
-		.tl_d_o(h2_dv_i),
-		.tl_d_i(h2_dv_o),
-		.dev_select_i(device_sel_2)
-	);
-	always @(*) begin
-		device_sel_3 = 4'd8;
-		if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_DCCM) == tl_main_pkg_ADDR_SPACE_DCCM)
-			device_sel_3 = 4'd0;
-		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_ICCM) == tl_main_pkg_ADDR_SPACE_ICCM)
-			device_sel_3 = 4'd1;
-		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_TIMER0) == tl_main_pkg_ADDR_SPACE_TIMER0)
-			device_sel_3 = 4'd2;
-		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_UART0) == tl_main_pkg_ADDR_SPACE_UART0)
-			device_sel_3 = 4'd3;
-		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_SPI0) == tl_main_pkg_ADDR_SPACE_SPI0)
-			device_sel_3 = 4'd4;
-		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_PWM) == tl_main_pkg_ADDR_SPACE_PWM)
-			device_sel_3 = 4'd5;
-		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_GPIO) == tl_main_pkg_ADDR_SPACE_GPIO)
-			device_sel_3 = 4'd6;
-		else if ((brqlsu_to_s1n[68-:32] & ~tl_main_pkg_ADDR_MASK_PLIC) == tl_main_pkg_ADDR_SPACE_PLIC)
-			device_sel_3 = 4'd7;
-	end
-	tlul_socket_1n #(
-		.HReqDepth(4'h0),
-		.HRspDepth(4'h0),
-		.DReqDepth(36'h000000000),
-		.DRspDepth(36'h000000000),
-		.N(8)
-	) host_3(
-		.clk_i(clk_i),
-		.rst_ni(rst_ni),
-		.tl_h_i(dbg_to_s1n),
-		.tl_h_o(s1n_to_dbg),
-		.tl_d_o(h3_dv_i),
-		.tl_d_i(h3_dv_o),
-		.dev_select_i(device_sel_3)
-	);
-	tlul_socket_m1 #(
-		.HReqDepth(8'h00),
-		.HRspDepth(8'h00),
-		.DReqDepth(4'h0),
-		.DRspDepth(4'h0),
-		.M(3)
-	) ICCM(
-		.clk_i(clk_i),
-		.rst_ni(rst_ni),
-		.tl_h_i(s1n_sm1_1),
-		.tl_h_o(sm1_s1n_1),
-		.tl_d_o(tl_iccm_o),
-		.tl_d_i(tl_iccm_i)
-	);
-	tlul_socket_m1 #(
-		.HReqDepth(8'h00),
-		.HRspDepth(8'h00),
-		.DReqDepth(4'h0),
-		.DRspDepth(4'h0),
-		.M(2)
-	) DCCM(
-		.clk_i(clk_i),
-		.rst_ni(rst_ni),
-		.tl_h_i(s1n_sm1_2),
-		.tl_h_o(sm1_s1n_2),
-		.tl_d_o(tl_dccm_o),
-		.tl_d_i(tl_dccm_i)
-	);
-	tlul_socket_m1 #(
-		.HReqDepth(8'h00),
-		.HRspDepth(8'h00),
-		.DReqDepth(4'h0),
-		.DRspDepth(4'h0),
-		.M(2)
-	) DEBUG_ROM(
-		.clk_i(clk_i),
-		.rst_ni(rst_ni),
-		.tl_h_i(s1n_sm1_4),
-		.tl_h_o(sm1_s1n_4),
-		.tl_d_o(tl_debug_rom_o),
-		.tl_d_i(tl_debug_rom_i)
-	);
-	tlul_socket_m1 #(
-		.HReqDepth(8'h00),
-		.HRspDepth(8'h00),
-		.DReqDepth(4'h0),
-		.DRspDepth(4'h0),
-		.M(2)
-	) TIMER(
-		.clk_i(clk_i),
-		.rst_ni(rst_ni),
-		.tl_h_i(s1n_sm1_5),
-		.tl_h_o(sm1_s1n_5),
-		.tl_d_o(tl_timer0_o),
-		.tl_d_i(tl_timer0_i)
-	);
-	tlul_socket_m1 #(
-		.HReqDepth(8'h00),
-		.HRspDepth(8'h00),
-		.DReqDepth(4'h0),
-		.DRspDepth(4'h0),
-		.M(2)
-	) UART(
-		.clk_i(clk_i),
-		.rst_ni(rst_ni),
-		.tl_h_i(s1n_sm1_6),
-		.tl_h_o(sm1_s1n_6),
-		.tl_d_o(tl_uart_o),
-		.tl_d_i(tl_uart_i)
-	);
-	tlul_socket_m1 #(
-		.HReqDepth(8'h00),
-		.HRspDepth(8'h00),
-		.DReqDepth(4'h0),
-		.DRspDepth(4'h0),
-		.M(2)
-	) SPI(
-		.clk_i(clk_i),
-		.rst_ni(rst_ni),
-		.tl_h_i(s1n_sm1_7),
-		.tl_h_o(sm1_s1n_7),
-		.tl_d_o(tl_spi_o),
-		.tl_d_i(tl_spi_i)
-	);
-	tlul_socket_m1 #(
-		.HReqDepth(8'h00),
-		.HRspDepth(8'h00),
-		.DReqDepth(4'h0),
-		.DRspDepth(4'h0),
-		.M(2)
-	) PWM(
-		.clk_i(clk_i),
-		.rst_ni(rst_ni),
-		.tl_h_i(s1n_sm1_8),
-		.tl_h_o(sm1_s1n_8),
-		.tl_d_o(tl_pwm_o),
-		.tl_d_i(tl_pwm_i)
-	);
-	tlul_socket_m1 #(
-		.HReqDepth(8'h00),
-		.HRspDepth(8'h00),
-		.DReqDepth(4'h0),
-		.DRspDepth(4'h0),
-		.M(2)
-	) GPIO(
-		.clk_i(clk_i),
-		.rst_ni(rst_ni),
-		.tl_h_i(s1n_sm1_9),
-		.tl_h_o(sm1_s1n_9),
-		.tl_d_o(tl_gpio_o),
-		.tl_d_i(tl_gpio_i)
-	);
-	tlul_socket_m1 #(
-		.HReqDepth(8'h00),
-		.HRspDepth(8'h00),
-		.DReqDepth(4'h0),
-		.DRspDepth(4'h0),
-		.M(2)
-	) PLIC(
-		.clk_i(clk_i),
-		.rst_ni(rst_ni),
-		.tl_h_i(s1n_sm1_10),
-		.tl_h_o(sm1_s1n_10),
-		.tl_d_o(tl_plic_o),
-		.tl_d_i(tl_plic_i)
+		.tl_d_o(h_dv_o),
+		.tl_d_i(h_dv_i),
+		.dev_select_i(device_sel)
 	);
 endmodule
 module uart_core (
