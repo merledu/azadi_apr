@@ -367,18 +367,22 @@ instr_mem_top iccm_adapter(
 
 
 
-DFFRAM #(0) u_iccm(
+DFFRAM #(
+.USE_LATCH(0),
+.WSIZE(4)
+) u_iccm(
 `ifdef USE_POWER_PINS
-    .VPWR  (VPWR),
-    .VGND  (VGND),
+.VPWR(VPWR),
+.VGND(VGND),
 `endif
-    .CLK (clk_i),
-    .WE  (instr_we? instr_wmask: '0),
-    .EN  (instr_csb),
-    .Di  (instr_wdata),
-    .Do  (instr_rdata),
-    .A   (instr_addr[10:0])
+.CLK(clk_i),
+.WE (instr_we? instr_wmask: '0),
+.EN(instr_csb),
+.Di(instr_wdata),
+.Do(instr_rdata),
+.A(instr_addr[9:0])
 );
+
 
 // dummy data memory
 
@@ -400,8 +404,10 @@ data_mem_top dccm_adapter(
 );
 
 
-
-DFFRAM #(0) u_dccm(
+DFFRAM #(
+.USE_LATCH(0),
+.WSIZE(4)
+) u_dccm(
 `ifdef USE_POWER_PINS
     .VPWR  (VPWR),
     .VGND  (VGND),
@@ -411,6 +417,6 @@ DFFRAM #(0) u_dccm(
     .EN  (data_csb),
     .Di  (data_wdata),
     .Do  (data_rdata),
-    .A   (data_addr[10:0])
+    .A   (data_addr[9:0])
 );
 endmodule
