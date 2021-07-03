@@ -26,8 +26,8 @@ module data_mem_top
   assign wmask_o[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 1'b0;
   assign wmask_o[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 1'b0; 
   
-  assign we_o    = ~we_i;
-  assign csb     = ~tl_req;
+  assign we_o    = we_i;
+  assign csb     = tl_req;
 
 tlul_sram_adapter #(
   .SramAw       (12),

@@ -6,6 +6,7 @@ module rstmgr(
     input clk_i, //system clock
     input rst_ni, // system reset
     input prog_rst_ni,
+    input prog_i,
   
     output logic  sys_rst_ni // reset for system except debug module
 );
@@ -19,26 +20,27 @@ logic rst_run_d, rst_run_q;
 always_comb begin : comb_part
   // default values
   rst_fsm_ns  = rst_fsm_cs;
-  sys_rst_ni  = 1'b0;
+ // sys_rst_ni  = ~prog_rst_ni;
 
   unique case (rst_fsm_cs)
     RESET: begin
-      sys_rst_ni   = 1'b0;
+      sys_rst_ni   = ~prog_rst_ni;
       rst_fsm_ns   = IDLE;
+     // rst_run_d   = 1'b0;
     end
     IDLE: begin
-      sys_rst_ni   = 1'b0;
-      rst_run_d    = 1'b0;
+      sys_rst_ni   = ~prog_rst_ni;
+      rst_run_d   = 1'b0;
       if (rst_run_q) begin 
         rst_fsm_ns   = RUN;
-      end else if (!prog_rst_ni) begin
+      end else if (prog_i) begin
         rst_fsm_ns = PROG;
       end else begin
         rst_fsm_ns = IDLE;
       end
     end
     PROG: begin
-      sys_rst_ni  = 1'b0;
+      sys_rst_ni       = prog_rst_ni;
       rst_run_d   = 1'b0;
       if (!prog_rst_ni) begin
         rst_fsm_ns = PROG;
@@ -48,21 +50,23 @@ always_comb begin : comb_part
     end
     RUN: begin
       sys_rst_ni  = 1'b1;
-      rst_run_d   = 1'b0;
+     // rst_run_d   = 1'b1;
       if (!rst_ni) begin
 	rst_run_d   = 1'b1;
 	rst_fsm_ns  = RESET;
-      end else if (!prog_rst_ni) begin
+      end else if (prog_i) begin
+	rst_run_d   = 1'b0;
 	rst_fsm_ns  = PROG;
       end else begin
+	rst_run_d   = 1'b1;
 	rst_fsm_ns  = RUN;
       end
     end
-    default: begin
+ /*   default: begin
       rst_fsm_ns  = rst_fsm_cs;
       sys_rst_ni  = 1'b0;
       rst_run_d   = 1'b0;
-    end
+    end*/
   endcase 
 end
 
