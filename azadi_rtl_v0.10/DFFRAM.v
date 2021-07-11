@@ -19,6 +19,38 @@
 
 // Add 1x2 binary decoder
 //`default_nettype none
+`define USE_COSTUM
+`ifdef USE_COSTUM
+
+module DFFRAM #(parameter  USE_LATCH=1,
+                            WSIZE=1 )(
+`ifdef USE_POWER_PINS
+    input VPWR,
+    input VGND,
+`endif
+    input CLK,
+    input [3:0] WE,
+    input EN,
+    input [31:0] Di,
+    output reg [31:0] Do,
+    input [9:0] A
+);
+  
+
+reg [31:0] mem [0:1023];
+
+always @(posedge CLK) begin
+    if (EN == 1'b1) begin
+        Do <= mem[A];
+        if (WE[0]) mem[A][ 7: 0] <= Di[ 7: 0];
+        if (WE[1]) mem[A][15: 8] <= Di[15: 8];
+        if (WE[2]) mem[A][23:16] <= Di[23:16];
+        if (WE[3]) mem[A][31:24] <= Di[31:24];
+    end 
+end
+endmodule
+
+`else
 
 module DEC1x2 (
     input           EN,
@@ -390,7 +422,8 @@ module DFFRAM #(parameter  USE_LATCH=1,
 
     // Output MUX    
     MUX2x1 #(.WIDTH(WSIZE*8)) DoMUX ( .A0(Do_pre[0]), .A1(Do_pre[1]), .S(A_buf[9]), .X(Do) );
+    
 
 endmodule
 
-
+`endif

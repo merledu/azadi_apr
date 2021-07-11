@@ -6,7 +6,7 @@ module azadi_soc_top (
 `endif
   input logic clk_i,
   input logic rst_ni,
-  input logic prog,
+  input wire prog,
   //output system_rst_ni,
  // output prog_rst_ni,
   input  logic [15:0] clks_per_bit, 
@@ -137,7 +137,7 @@ brq_core_top #(
     .RV32M            (brq_pkg::RV32MSlow), 
     .RV32B            (brq_pkg::RV32BNone), 
     .RegFile          (brq_pkg::RegFileFF), 
-    .BranchTargetALU  (1'b0), 
+    .BranchTargetALU  (1'b1), 
     .WritebackStage   (1'b1), 
     .ICache           (1'b0), 
     .ICacheECC        (1'b0), 
@@ -280,9 +280,9 @@ gpio GPIO (
 
 
 rstmgr reset_manager(
-  .clk_i(clk_i),
-  .rst_ni(rst_ni),
-  .prog_i(prog),
+  .clk_i  (clk_i),
+  .rst_ni (rst_ni),
+  //.prog_i (prog),
   .prog_rst_ni(prog_rst_ni),
   .sys_rst_ni(system_rst_ni)
 );

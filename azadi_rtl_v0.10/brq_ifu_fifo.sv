@@ -146,7 +146,7 @@ module brq_ifu_fifo #(
   assign instr_addr_d = clear_i ? in_addr_i[31:1] :
                                   instr_addr_next;
 
-  always_ff @(posedge clk_i) begin
+  always_ff @(posedge clk_i or negedge rst_ni) begin
    // if (instr_addr_en) begin
 	if(~rst_ni) begin
 	  instr_addr_q <= '0;
@@ -229,7 +229,7 @@ module brq_ifu_fifo #(
   end
 
   for (genvar i = 0; i < DEPTH; i++) begin : g_fifo_regs
-    always_ff @(posedge clk_i) begin
+    always_ff @(posedge clk_i or negedge rst_ni) begin
      // if (entry_en[i]) begin
 	if(~rst_ni) begin
 	  rdata_q[i]   <= '0;

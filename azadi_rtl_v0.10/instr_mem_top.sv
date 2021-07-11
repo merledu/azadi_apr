@@ -63,7 +63,7 @@ assign wmask_o = (prog_rst_ni) ? mask_sel : 4'b1111;
   .addr_o    (tl_addr),
   .wdata_o   (tl_wdata),
   .wmask_o   (tl_wmask),
-  .rdata_i   ((rst_ni) ? rdata_i: '0),
+  .rdata_i   (rdata_i),
   .rvalid_i  (rvalid),
   .rerror_i  (2'b0)
 );

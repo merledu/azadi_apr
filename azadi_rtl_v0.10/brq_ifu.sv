@@ -126,7 +126,7 @@ module brq_ifu #(
   // exception PC selection mux
   always_comb begin : exc_pc_mux
     unique case (exc_pc_mux_i)
-      EXC_PC_EXC:     exc_pc = { csr_mtvec_i[31:2], 2'b00 };
+      EXC_PC_EXC:     exc_pc = {csr_mepc_i + 32'h4 };
       EXC_PC_IRQ:     exc_pc = { csr_mtvec_i[31:2], 2'b00 };
       EXC_PC_DBD:     exc_pc = DmHaltAddr;
       EXC_PC_DBG_EXC: exc_pc = DmExceptionAddr;
@@ -244,7 +244,7 @@ module brq_ifu #(
   // IF-ID pipeline registers, frozen when the ID stage is stalled
   assign if_id_pipe_reg_we = instr_new_id_d;
 
-  always_ff @(posedge clk_i) begin
+  always_ff @(posedge clk_i or negedge rst_ni) begin
    // if (if_id_pipe_reg_we) begin
 	if(~rst_ni) begin
 	  instr_rdata_id_o         <= '0;

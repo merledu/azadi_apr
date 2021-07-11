@@ -21,7 +21,7 @@ module uart_top (
 );
     
     logic [31:0] wdata;
-    logic [3:0] addr;
+    logic [7:0] addr;
     logic        we;
     logic        re;
     logic [31:0] rdata;
@@ -44,7 +44,7 @@ uart_core u_uart_core(
 
     
  tlul_adapter_reg #(
-    .RegAw(4),
+    .RegAw(8),
     .RegDw(32)
  ) u_reg_if (
    .clk_i,

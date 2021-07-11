@@ -116,7 +116,7 @@ module tlul_adapter_reg import tlul_pkg::*; #(
   end
 
   // tl_err : separate checker
-  tlul_err u_err (
+ tlul_err u_err (
     .tl_i (tl_i),
     .err_o (tl_err)
   );

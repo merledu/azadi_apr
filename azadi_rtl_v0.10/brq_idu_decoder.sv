@@ -149,7 +149,7 @@ module brq_idu_decoder #(
   // To help timing the flops containing the current instruction are replicated to reduce fan-out.
   // instr_alu is used to determine the ALU control logic and associated operand/imm select signals
   // as the ALU is often on the more critical timing paths. instr is used for everything else.
-  assign instr     = instr_rdata_alu_i;
+  assign instr     = instr_rdata_i;
   assign instr_alu = instr_rdata_alu_i;
 
   //////////////////////////////////////
@@ -157,11 +157,11 @@ module brq_idu_decoder #(
   //////////////////////////////////////
 
   // immediate extraction and sign extension
-  assign imm_i_type_o = { {20{instr[31]}}, instr[31:20] };
-  assign imm_s_type_o = { {20{instr[31]}}, instr[31:25], instr[11:7] };
-  assign imm_b_type_o = { {19{instr[31]}}, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0 };
+  assign imm_i_type_o = { {20{instr[31]}}, instr_alu[31:20] };
+  assign imm_s_type_o = { {20{instr[31]}}, instr_alu[31:25], instr[11:7] };
+  assign imm_b_type_o = { {19{instr[31]}}, instr[31], instr[7], instr_alu[30:25], instr[11:8], 1'b0 };
   assign imm_u_type_o = { instr[31:12], 12'b0 };
-  assign imm_j_type_o = { {12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0 };
+  assign imm_j_type_o = { {12{instr[31]}}, instr_alu[19:12], instr[20], instr_alu[30:21], 1'b0 };
 
   // immediate for CSR manipulation (zero extended)
   assign zimm_rs1_type_o = { 27'b0, instr_rs1 }; // rs1
@@ -176,9 +176,9 @@ module brq_idu_decoder #(
   end
 
   // source registers
-  assign instr_rs1 = instr[19:15];
-  assign instr_rs2 = instr[24:20];
-  assign instr_rs3 = instr[31:27];
+  assign instr_rs1 = instr_alu[19:15];
+  assign instr_rs2 = instr_alu[24:20];
+  assign instr_rs3 = instr_alu[31:27];
   assign rf_raddr_a_o = (use_rs3_q & ~instr_first_cycle_i) ? instr_rs3 : instr_rs1; // rs3 / rs1
   assign rf_raddr_b_o = instr_rs2; // rs2
 

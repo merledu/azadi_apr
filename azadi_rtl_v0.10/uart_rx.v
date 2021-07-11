@@ -8,13 +8,12 @@
 // (10000000)/(115200) = 87
   
 module uart_rx (
-   input wire        clk_i,
-   input wire        rst_ni,
-   input wire        rx_en,
-   input wire        i_Rx_Serial,
-   input wire [15:0] CLKS_PER_BIT,
+   input  wire       clk_i,
+   input  wire       rst_ni,
+   input  wire       i_Rx_Serial,
+   input  wire [15:0] CLKS_PER_BIT,
    output wire        o_Rx_DV,
-   output wire [7:0] o_Rx_Byte
+   output wire  [7:0] o_Rx_Byte
    );
     
   parameter s_IDLE         = 3'b000;
@@ -55,6 +54,7 @@ module uart_rx (
         r_Rx_DV       <= 1'b0;
         r_Clock_Count <= 16'b0;
         r_Bit_Index   <= 3'b0;
+	r_Rx_Byte     <= 8'b0;
       end else begin       
       case (r_SM_Main)
         s_IDLE :
@@ -62,14 +62,10 @@ module uart_rx (
             r_Rx_DV       <= 1'b0;
             r_Clock_Count <= 16'b0;
             r_Bit_Index   <= 3'b0;
-             
-            if (r_Rx_Data == 1'b0) begin
-                if(rx_en == 1'b1) begin          // Start bit detected
-                    r_SM_Main <= s_RX_START_BIT;
-                end else begin
-                    r_SM_Main <= s_IDLE;
-                end
-              end else
+            r_Rx_Byte     <= 8'b0; 
+            if (r_Rx_Data == 1'b0)          // Start bit detected
+              r_SM_Main <= s_RX_START_BIT;
+            else
               r_SM_Main <= s_IDLE;
           end
          
@@ -97,7 +93,7 @@ module uart_rx (
         // Wait CLKS_PER_BIT-1 clock cycles to sample serial data
         s_RX_DATA_BITS :
           begin
-            if (r_Clock_Count < CLKS_PER_BIT- 16'b1)
+            if (r_Clock_Count < CLKS_PER_BIT-1)
               begin
                 r_Clock_Count <= r_Clock_Count + 16'b1;
                 r_SM_Main     <= s_RX_DATA_BITS;
@@ -126,7 +122,7 @@ module uart_rx (
         s_RX_STOP_BIT :
           begin
             // Wait CLKS_PER_BIT-1 clock cycles for Stop bit to finish
-            if (r_Clock_Count < CLKS_PER_BIT- 16'b1)
+            if (r_Clock_Count < CLKS_PER_BIT-1)
               begin
                 r_Clock_Count <= r_Clock_Count + 16'b1;
                 r_SM_Main     <= s_RX_STOP_BIT;
@@ -152,7 +148,7 @@ module uart_rx (
           r_SM_Main <= s_IDLE;
          
       endcase
-      end 
+      end
     end   
    
   assign o_Rx_DV   = r_Rx_DV;
