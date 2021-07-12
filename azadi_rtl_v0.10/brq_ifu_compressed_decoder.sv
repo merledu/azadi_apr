@@ -27,6 +27,8 @@ module brq_ifu_compressed_decoder (
     // By default, forward incoming instruction, mark it as legal.
     instr_o         = instr_i;
     illegal_instr_o = 1'b0;
+    //instr_o         = instr_i;
+    //illegal_instr_o = 1'b0;
 
     // Check if incoming instruction is compressed.
     unique case (instr_i[1:0])

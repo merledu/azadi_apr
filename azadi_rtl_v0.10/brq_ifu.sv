@@ -121,12 +121,13 @@ module brq_ifu #(
   logic              predict_branch_taken;
   logic       [31:0] predict_branch_pc;
 
+
   brq_pkg::pc_sel_e pc_mux_internal;
 
   // exception PC selection mux
   always_comb begin : exc_pc_mux
     unique case (exc_pc_mux_i)
-      EXC_PC_EXC:     exc_pc = {csr_mepc_i + 32'h4 };
+      EXC_PC_EXC:     exc_pc = { csr_mtvec_i[31:2], 2'b00 };
       EXC_PC_IRQ:     exc_pc = { csr_mtvec_i[31:2], 2'b00 };
       EXC_PC_DBD:     exc_pc = DmHaltAddr;
       EXC_PC_DBG_EXC: exc_pc = DmExceptionAddr;

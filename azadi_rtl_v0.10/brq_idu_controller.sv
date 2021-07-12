@@ -645,8 +645,8 @@ module brq_idu_controller #(
         if (exc_req_q || store_err_q || load_err_q) begin
           pc_set_o         = 1'b1;
           pc_set_spec_o    = 1'b1;
-          pc_mux_o         = PC_EXC;
-          exc_pc_mux_o     = debug_mode_q ? EXC_PC_DBG_EXC : EXC_PC_EXC;
+          pc_mux_o         = PC_JUMP;
+          exc_pc_mux_o     = debug_mode_q ? EXC_PC_DBG_EXC : EXC_PC_IRQ;
 
           if (WritebackStage) begin : g_writeback_mepc_save
             // With the writeback stage present whether an instruction accessing memory will cause
@@ -709,12 +709,12 @@ module brq_idu_controller #(
               end
             end
             store_err_prio: begin
-              exc_cause_o = EXC_CAUSE_STORE_ACCESS_FAULT;
-              csr_mtval_o = lsu_addr_last_i;
+              exc_cause_o = EXC_CAUSE_INSN_ADDR_MISA;
+              csr_mtval_o = '0;
             end
             load_err_prio: begin
-              exc_cause_o = EXC_CAUSE_LOAD_ACCESS_FAULT;
-              csr_mtval_o = lsu_addr_last_i;
+              exc_cause_o = EXC_CAUSE_INSN_ADDR_MISA;
+              csr_mtval_o = '0;
             end
             default: ;
           endcase

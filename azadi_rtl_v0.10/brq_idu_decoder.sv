@@ -177,7 +177,7 @@ module brq_idu_decoder #(
 
   // source registers
   assign instr_rs1 = instr_alu[19:15];
-  assign instr_rs2 = instr_alu[24:20];
+  assign instr_rs2 = instr_rdata_alu_i[24:20];
   assign instr_rs3 = instr_alu[31:27];
   assign rf_raddr_a_o = (use_rs3_q & ~instr_first_cycle_i) ? instr_rs3 : instr_rs1; // rs3 / rs1
   assign rf_raddr_b_o = instr_rs2; // rs2
