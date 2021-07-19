@@ -1,8 +1,8 @@
 
 module azadi_soc_top (
 `ifdef USE_POWER_PINS
-   inout VPWR,
-   inout VGND,
+   inout vccd1,
+   inout vssd1,
 `endif
   input logic clk_i,
   input logic rst_ni,
@@ -372,8 +372,8 @@ DFFRAM #(
 .WSIZE(4)
 ) u_iccm(
 `ifdef USE_POWER_PINS
-.VPWR(VPWR),
-.VGND(VGND),
+.vccd1(vccd1),
+.vssd1(vssd1),
 `endif
 .CLK(clk_i),
 .WE (instr_we? instr_wmask: '0),
@@ -409,8 +409,8 @@ DFFRAM #(
 .WSIZE(4)
 ) u_dccm(
 `ifdef USE_POWER_PINS
-    .VPWR  (VPWR),
-    .VGND  (VGND),
+.vccd1(vccd1),
+.vssd1(vssd1),
 `endif
     .CLK (clk_i),
     .WE  (data_we? data_wmask: '0),

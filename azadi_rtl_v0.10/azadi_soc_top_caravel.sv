@@ -20,8 +20,8 @@
 `define MPRJ_IO_PADS 38
 module azadi_soc_top_caravel (
   `ifdef USE_POWER_PINS
-        inout VPWR,
-        inout VGND,
+        inout vccd1,
+        inout vssd1,
   `endif
 
     // Wishbone Slave ports (WB MI A)
@@ -185,8 +185,8 @@ module azadi_soc_top_caravel (
 
   azadi_soc_top soc_top(
   `ifdef USE_POWER_PINS
-    .VPWR(VPWR),
-    .VGND(VGND),
+    .vccd1(vccd1),
+    .vssd1(vssd1),
   `endif
     .clk_i(wb_clk_i),
     .rst_ni(~wb_rst_i),

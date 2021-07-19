@@ -25,8 +25,8 @@
 module DFFRAM #(parameter  USE_LATCH=1,
                             WSIZE=1 )(
 `ifdef USE_POWER_PINS
-    input VPWR,
-    input VGND,
+    input vccd1,
+    input vssd1,
 `endif
     input CLK,
     input [3:0] WE,
