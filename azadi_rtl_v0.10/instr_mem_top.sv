@@ -30,18 +30,49 @@ logic [31:0] tl_wdata;
 logic [11:0] tl_addr;
 logic        tl_req;
 logic [3:0]  mask_sel;
+ 
+logic        instr_csbD;
+logic [11:0] instr_addrD;
+logic [3:0]  instr_wmaskD;
+logic        instr_weD;
+logic [31:0] instr_wdataD;
 
 assign mask_sel[0] = (tl_wmask[7:0]   != 8'b0) ? 1'b1: 1'b0;
 assign mask_sel[1] = (tl_wmask[15:8]  != 8'b0) ? 1'b1: 1'b0;
 assign mask_sel[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 1'b0;
 assign mask_sel[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 1'b0;
-
-assign csb     = (prog_rst_ni ? tl_req : iccm_ctrl_we);
+/*
+assign instr_csbD     = ~(prog_rst_ni ? tl_req : iccm_ctrl_we);
 //assign csb     = ~(1'b1);
-assign addr_o  = (prog_rst_ni) ? tl_addr  : iccm_ctrl_addr;
-assign wdata_o = (prog_rst_ni) ? tl_wdata : iccm_ctrl_wdata;
-assign we_o    = ((prog_rst_ni) ? tl_we  : iccm_ctrl_we);
-assign wmask_o = (prog_rst_ni) ? mask_sel : 4'b1111;
+assign instr_addrD  = (prog_rst_ni) ? tl_addr  : iccm_ctrl_addr;
+assign instr_wdataD = (prog_rst_ni) ? tl_wdata : iccm_ctrl_wdata;
+assign instr_weD    = ~((prog_rst_ni) ? tl_we  : iccm_ctrl_we);
+assign instr_wmaskD = (prog_rst_ni) ? mask_sel : 4'b1111;
+*/
+always_ff @(negedge clk_i) begin
+  if(prog_rst_ni) begin
+    instr_csbD  <= tl_req;
+    instr_addrD <= tl_addr;
+    instr_wdataD<= tl_wdata;
+    instr_weD   <= tl_we;
+    instr_wmaskD<= mask_sel;
+  end else begin
+    instr_csbD  <= iccm_ctrl_we;
+    instr_addrD <= iccm_ctrl_addr;
+    instr_wdataD<= iccm_ctrl_wdata;
+    instr_weD   <= iccm_ctrl_we;
+    instr_wmaskD<= 4'b1111;
+  end
+end
+
+always @(*) begin
+  wdata_o=   instr_wdataD;
+  addr_o =   instr_addrD;
+  csb    =   ~instr_csbD;
+  we_o   =   ~instr_weD;
+  wmask_o=   instr_wmaskD;
+ 
+end
 
 
  tlul_sram_adapter #(
@@ -68,7 +99,7 @@ assign wmask_o = (prog_rst_ni) ? mask_sel : 4'b1111;
   .rerror_i  (2'b0)
 );
 
- always_ff @(posedge clk_i) begin
+ always_ff @(posedge clk_i or negedge rst_ni) begin
   if (!rst_ni) begin
     rvalid <= 1'b0;
   end else if (iccm_ctrl_we | tl_we) begin

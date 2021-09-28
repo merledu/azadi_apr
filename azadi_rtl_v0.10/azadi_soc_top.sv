@@ -7,6 +7,7 @@ module azadi_soc_top (
   input logic clk_i,
   input logic rst_ni,
   input wire prog,
+ // input logic s_clk,
   //output system_rst_ni,
  // output prog_rst_ni,
   input  logic [15:0] clks_per_bit, 
@@ -366,7 +367,7 @@ instr_mem_top iccm_adapter(
 );
 
 
-
+/*
 DFFRAM #(
 .USE_LATCH(0),
 .WSIZE(4)
@@ -380,14 +381,33 @@ DFFRAM #(
 .EN(instr_csb),
 .Di(instr_wdata),
 .Do(instr_rdata),
-.A(instr_addr[9:0])
-);
+.A(instr_addr[10:0])
+);*/
+
+sky130_sram_1kbyte_1rw1r_32x256_8 u_iccm (
+`ifdef USE_POWER_PINS
+  .vccd1 (vccd1),
+  .vssd1 (vssd1),
+`endif
+    .clk0      (clk_i), // clock
+    .csb0      (instr_csb), // active low chip select
+    .web0      (instr_we), // active low write control
+    .wmask0    (instr_wmask), // write mask
+    .addr0     (instr_addr[7:0]),
+    .din0      (instr_wdata),
+    .dout0     (instr_rdata),
+    .clk1     (1'b0),
+    .csb1     (1'b1),
+    .addr1    ('0),
+    .dout1    ()
+    );
 
 
 // dummy data memory
 
 data_mem_top dccm_adapter(
   .clk_i    (clk_i),
+ // .s_clk    (s_clk),
   .rst_ni    (system_rst_ni),
 
 // tl-ul insterface
@@ -403,7 +423,7 @@ data_mem_top dccm_adapter(
    .rdata_i (data_rdata)
 );
 
-
+/*
 DFFRAM #(
 .USE_LATCH(0),
 .WSIZE(4)
@@ -417,6 +437,24 @@ DFFRAM #(
     .EN  (data_csb),
     .Di  (data_wdata),
     .Do  (data_rdata),
-    .A   (data_addr[9:0])
-);
+    .A   (data_addr[10:0])
+);*/
+
+sky130_sram_1kbyte_1rw1r_32x256_8 u_dccm (
+`ifdef USE_POWER_PINS
+  .vccd1 (vccd1),
+  .vssd1 (vssd1),
+`endif
+  .clk0      (clk_i), // clock
+  .csb0      (data_csb), // active low chip select
+  .web0      (data_we), // active low write control
+  .wmask0    (data_wmask), // write mask
+  .addr0     (data_addr[7:0]),
+  .din0      (data_wdata),
+  .dout0     (data_rdata),
+  .clk1      (1'b0),
+  .csb1      (1'b1),
+  .addr1     ('0),
+  .dout1     ()
+  );
 endmodule

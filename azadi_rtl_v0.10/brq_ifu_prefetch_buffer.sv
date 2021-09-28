@@ -180,14 +180,11 @@ module brq_ifu_prefetch_buffer #(
 
   // CPU resets with a branch, so no need to reset these addresses
   always_ff @(posedge clk_i or negedge rst_ni) begin
-   // if (stored_addr_en) begin
 	if(~rst_ni) begin
 	  stored_addr_q <= '0;
 	end else if (stored_addr_en) begin
 	  stored_addr_q <= stored_addr_d;
 	end
-      
-   // end
   end
 
   if (BranchPredictor) begin : g_branch_predictor
@@ -236,16 +233,11 @@ module brq_ifu_prefetch_buffer #(
 
   always_ff @(posedge clk_i or negedge rst_ni) begin
 
-   // if (fetch_addr_en) begin
 	if(~rst_ni) begin 
 	  fetch_addr_q <= '0;
 	end else if (fetch_addr_en) begin
 	  fetch_addr_q <= fetch_addr_d;
 	end 
-      
-
-   // end
-
   end
 
   // Address mux
@@ -326,6 +318,16 @@ module brq_ifu_prefetch_buffer #(
     end
   end
 
+ /* 
+  always_ff @(negedge clk_i or negedge rst_ni) begin
+    if(!rst_ni) begin
+      valid_req_q          <= '0;
+      rdata_outstanding_q  <= '0;
+    end else begin
+      valid_req_q          <= valid_req_d;
+      rdata_outstanding_q  <= rdata_outstanding_s;
+    end
+  end*/
   /////////////
   // Outputs //
   /////////////

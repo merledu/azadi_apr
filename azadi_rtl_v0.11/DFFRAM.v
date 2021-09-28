@@ -33,11 +33,11 @@ module DFFRAM #(parameter  USE_LATCH=1,
     input EN,
     input [31:0] Di,
     output reg [31:0] Do,
-    input [9:0] A
+    input [10:0] A
 );
   
 
-reg [31:0] mem [0:1023];
+reg [31:0] mem [0:2047];
 
 always @(posedge CLK) begin
     if (EN == 1'b1) begin

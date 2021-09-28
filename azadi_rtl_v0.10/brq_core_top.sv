@@ -78,8 +78,6 @@ import brq_pkg::*;
   logic [31:0] data_rdata;
   logic        data_err;
 
-
-
 brq_core #(
     .PMPEnable        (PMPEnable),
     .PMPGranularity   (PMPGranularity), 
@@ -210,6 +208,7 @@ tlul_host_adapter #(
   .tl_h_c_a (tl_d_o),
   .tl_h_c_d (tl_d_i)
 );
+
 
 
 endmodule

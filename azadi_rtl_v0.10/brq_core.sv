@@ -429,7 +429,7 @@ assign       test_en_i = 1'b0;
   // main clock gate of the core
   // generates all clocks except the one for the debug unit which is
   // independent
-  prim_clock_gating core_clock_gate_i (
+  prim_generic_clock_gating core_clock_gate_i (
       .clk_i     ( clk_i           ),
       .en_i      ( clock_en        ),
       .test_en_i ( test_en_i       ),

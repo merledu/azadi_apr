@@ -19,12 +19,12 @@ module azadi_soc_top (
   input  logic       uart_rx,
 
   // jtag interface 
-  input  logic       jtag_tck_i,
+ /* input  logic       jtag_tck_i,
   input  logic       jtag_tms_i,
   input  logic       jtag_trst_ni,
   input  logic       jtag_tdi_i,
   output logic       jtag_tdo_o,
-  output logic       jtag_tdo_oe_o,
+  output logic       jtag_tdo_oe_o,*/
 
   // PWM interface  
 
@@ -118,12 +118,12 @@ module azadi_soc_top (
   jtag_pkg::jtag_rsp_t jtag_rsp;
   
 
-  assign jtag_req.tck    = jtag_tck_i;
+ /* assign jtag_req.tck    = jtag_tck_i;
   assign jtag_req.tms    = jtag_tms_i;
   assign jtag_req.trst_n = jtag_trst_ni;
   assign jtag_req.tdi    = jtag_tdi_i;
   assign jtag_tdo_o      = jtag_rsp.tdo;
-  assign jtag_tdo_oe_o = jtag_rsp.tdo_oe;
+  assign jtag_tdo_oe_o = jtag_rsp.tdo_oe;*/
 
   // interrupt vector
   logic [35:0] intr_vector;
@@ -204,7 +204,7 @@ brq_core_top #(
     .irq_nm_i       (1'b0),       // non-maskeable interrupt
 
     // Debug Interface
-    .debug_req_i    (dbg_req),
+    .debug_req_i    ('0),
     // CPU Control Signals
     .fetch_enable_i (1'b1),
     .alert_minor_o  (),
@@ -253,15 +253,15 @@ rv_dm #(
   .tl_brqif_o         (xbar_to_ifu),
   .tl_brqlsu_i        (lsu_to_xbar),
   .tl_brqlsu_o        (xbar_to_lsu),
-  .tl_dm_sba_i        (dm_to_xbar),
-  .tl_dm_sba_o        (xbar_to_dm),
+  .tl_dm_sba_i        ('0),
+  .tl_dm_sba_o        (),
 
   // Device interfaces
   .tl_iccm_o          (xbar_to_iccm),
   .tl_iccm_i          (iccm_to_xbar),
   .tl_debug_rom_o     (dbgrom_to_xbar),
-  .tl_debug_rom_i     (xbar_to_dbgrom),
-  .tl_dccm_o          (xbar_to_dccm),
+  .tl_debug_rom_i     ('0),
+  .tl_dccm_o          (),
   .tl_dccm_i          (dccm_to_xbar),
   .tl_timer0_o        (xbar_to_timer),
   .tl_timer0_i        (timer_to_xbar),

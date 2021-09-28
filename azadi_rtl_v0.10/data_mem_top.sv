@@ -20,15 +20,42 @@ module data_mem_top
   logic [31:0] tl_wmask;
   logic        we_i;
   logic        rvalid_o;
-
-  assign wmask_o[0] = (tl_wmask[7:0]   != 8'b0) ? 1'b1: 1'b0;
-  assign wmask_o[1] = (tl_wmask[15:8]  != 8'b0) ? 1'b1: 1'b0;
-  assign wmask_o[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 1'b0;
-  assign wmask_o[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 1'b0; 
   
-  assign we_o    = we_i;
-  assign csb     = tl_req;
+  logic        data_csbD;
+  logic [11:0] data_addrD;
+  logic [3:0]  data_wmaskD;
+  logic        data_weD;
+  logic [31:0] data_wdataD;
 
+  assign data_wmaskD[0] = (tl_wmask[7:0]   != 8'b0) ? 1'b1: 1'b0;
+  assign data_wmaskD[1] = (tl_wmask[15:8]  != 8'b0) ? 1'b1: 1'b0;
+  assign data_wmaskD[2] = (tl_wmask[23:16] != 8'b0) ? 1'b1: 1'b0;
+  assign data_wmaskD[3] = (tl_wmask[31:24] != 8'b0) ? 1'b1: 1'b0; 
+  
+  assign data_weD    = ~we_i;
+  assign data_csbD     = ~tl_req;
+  
+  logic [31:0] data_hold;
+  logic c_slow;
+  logic v_slow;
+
+  always_ff @(negedge clk_i or negedge rst_ni) begin
+   if(!rst_ni) begin
+    addr_o =  '0;
+    csb    =  '1;
+    wmask_o=  '0;
+    we_o   =  '0;
+    wdata_o=  '0;
+   end else begin
+    addr_o =  data_addrD;
+    csb    =  data_csbD;
+    wmask_o=  data_wmaskD;
+    we_o   =  data_weD;
+    wdata_o=  data_wdataD;
+    end
+  
+  end
+  
 tlul_sram_adapter #(
   .SramAw       (12),
   .SramDw       (32), 
@@ -45,21 +72,25 @@ tlul_sram_adapter #(
     .req_o    (tl_req),
     .gnt_i    (1'b1),
     .we_o     (we_i),
-    .addr_o   (addr_o),
-    .wdata_o  (wdata_o),
+    .addr_o   (data_addrD),
+    .wdata_o  (data_wdataD),
     .wmask_o  (tl_wmask),
-    .rdata_i  (rst_ni? rdata_i: '0), // (reset) ? rdata_o: '0
+    .rdata_i  (rdata_i), // (reset) ? rdata_o: '0
     .rvalid_i (rvalid_o),
     .rerror_i (2'b0)
 
 );
 
-  always_ff @(posedge clk_i) begin
+
+  always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
       rvalid_o <= 1'b0;
+   //   v_slow   <= 1'b0;
     end else if (we_i) begin
       rvalid_o <= 1'b0;
+    //  v_slow   <= 1'b0;
     end else begin 
+     // v_slow   <= tl_req;
       rvalid_o <= tl_req;
     end
   end

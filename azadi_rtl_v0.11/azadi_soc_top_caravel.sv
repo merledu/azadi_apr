@@ -205,12 +205,12 @@ module azadi_soc_top_caravel (
     .gpio_oe(gpio_oe),
 
     // jtag interface 
-    .jtag_tck_i(jtag_tck),
+   /* .jtag_tck_i(jtag_tck),
     .jtag_tms_i(jtag_tms),
     .jtag_trst_ni(jtag_trst),
     .jtag_tdi_i(jtag_tdi),
     .jtag_tdo_o(jtag_tdo),
-    .jtag_tdo_oe_o(jtag_tdo_oe),
+    .jtag_tdo_oe_o(jtag_tdo_oe),*/
 
     // uart-periph interface
     .uart_tx(uart_tx), // output
